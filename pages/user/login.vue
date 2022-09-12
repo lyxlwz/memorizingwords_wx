@@ -293,7 +293,7 @@ export default {
         success: () => {
           setTimeout(() => {
             uni.switchTab({
-              url: '/pages/template/addTemplate'
+              url: '/pages/index/index'
             });
           }, 2000);
         }
