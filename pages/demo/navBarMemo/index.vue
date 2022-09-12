@@ -103,7 +103,7 @@ export default {
 	position: relative;
 	margin-bottom: 10upx;
 	&:active {
-		background-color: #F5f5f5;
+		background-color: #ffffff;
 	}
 	image {
 		width: 40upx;

@@ -74,7 +74,7 @@ module.exports = {
 	userAgentStyles: {
 		address: 'font-style:italic',
 		big: 'display:inline;font-size:1.2em',
-		blockquote: 'background-color:#f6f6f6;border-left:3px solid #dbdbdb;color:#6c6c6c;padding:5px 0 5px 10px',
+		blockquote: 'background-color:#ffffff;border-left:3px solid #dbdbdb;color:#6c6c6c;padding:5px 0 5px 10px',
 		caption: 'display:table-caption;text-align:center',
 		center: 'text-align:center',
 		cite: 'font-style:italic',

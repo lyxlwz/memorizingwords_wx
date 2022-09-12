@@ -84,6 +84,7 @@ export default {
 
 <style lang="scss">
 /* #ifndef APP-NVUE */
+@import "uview-ui/index.scss";
 @import './style/common.scss';
 @import './style/input.scss';
 @import './style/table.scss';
