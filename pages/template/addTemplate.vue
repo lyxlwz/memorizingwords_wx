@@ -8,7 +8,7 @@
 				<u-gap height="80rpx" bgColor="#3d5cff"></u-gap>
 
 				<view class="tobe">
-					<text class="text">今日待学习单词</text>
+					<view class="text">今日待学习单词</view>
 					<view class="number">
 						201
 					</view>
@@ -24,7 +24,7 @@
 					<view class="aplan">
 						<view class="train" @click="train">
 							<view class="format">
-								<view class="text" style="font-weight: 800; padding-bottom: 20px;">
+								<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
 								记忆训练
 							</view>
 							<view class="percentage">
@@ -36,7 +36,7 @@
 						</view>
 						<view class="today" @click="today">
 							<view class="format">
-							<view class="text" style="font-weight: 800;padding-bottom: 20px;">
+							<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
 								今日单词学习
 							</view>
 							<view class="percentage">
@@ -47,7 +47,7 @@
 						</view>
 						<view class="lit" @click="lit">
 							<view class="format">
-							<view class="text" style="font-weight: 800;padding-bottom: 20px;">
+							<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
 								文献背诵
 							</view>
 							<view class="percentage">
@@ -58,7 +58,7 @@
 						</view>
 						<view class="key" @click="key">
 							<view class="format">
-							<view class="text" style="font-weight: 800;">
+							<view class="text" style="font-weight: 800; font-size: 100%;">
 								关键词背诵
 							</view>
 							<view class="percentage">
@@ -143,14 +143,16 @@
 
 			.tobe {
 				// padding-top:30px;
-				padding: 8px 8px;
+				padding: 9px 9px;
 				background: #FFFF;
 				border-radius:20upx;
+				box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 				
 
 				.text {
 					color: #afafaf;
 					font-weight: 900;
+					margin-left:5px;
 					font-size: 80%;
 				}
 
@@ -163,13 +165,14 @@
 
 			.plan {
 				.aplan {
-					padding: 20px 20px 20px 60px;
+					padding: 20px 20px 20px 40px;
 					background: #FFFF;
 					border-radius:20upx;
+					box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 					.format{
 						display:flex;
 						.percentage {
-							padding-left: 80px;
+							padding-left: 70px;
 							display:flex;
 							justify-content: flex-end
 						
@@ -180,6 +183,7 @@
 			}
 			.Proverbs{
 				background: #efe0ff;
+				box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 				border-radius:20upx;
 				padding: 20px 20px;
 		
