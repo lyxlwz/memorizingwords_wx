@@ -21,54 +21,13 @@
 				<view class="plan">
 					<text style="font-size: 130%;font-weight: 800;">学习计划</text>
 					<u-gap height="10rpx" bgColor="#f5f5f5"></u-gap>
-					<view class="aplan">
-						<view class="train" @click="train">
-							<view class="format">
-								<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
-								记忆训练
-							</view>
-							<view class="percentage">
-								<view class="count">7</view>
-								<view class="all" style="color: #afafaf">/10</view>
-							</view>
-							</view>
-							
-						</view>
-						<view class="today" @click="today">
-							<view class="format">
-							<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
-								今日单词学习
-							</view>
-							<view class="percentage">
-								<view class="count">890</view>
-								<view class="all" style="color: #afafaf">/1455</view>
-							</view>
-							</view>
-						</view>
-						<view class="lit" @click="lit">
-							<view class="format">
-							<view class="text" style="font-weight: 800; font-size: 100%; padding-bottom: 20px;">
-								文献背诵
-							</view>
-							<view class="percentage">
-								<view class="count">0</view>
-								<view class="all" style="color: #afafaf">/0</view>
-							</view>
-							</view>
-						</view>
-						<view class="key" @click="key">
-							<view class="format">
-							<view class="text" style="font-weight: 800; font-size: 100%;">
-								关键词背诵
-							</view>
-							<view class="percentage">
-								<view class="count">0</view>
-								<view class="all" style="color: #afafaf">/0</view>
-							</view>
-							</view>
-						</view>
-						
+					<view class="aplan" style="">
+					<view class="dark text-dark" v-for="i in list">
+						<view class="name">{{i.name}}</view>  
+						<view class="key" style="padding-left: 80rpx;">{{i.key}}</view> 
+						<view class="all">{{i.all}}</view>
 					</view>
+						</view>
 				</view>
 				<u-gap height="40rpx" bgColor="#f5f5f5"></u-gap>
 				<view class="Proverbs">
@@ -84,10 +43,6 @@
 			</view>
 
 		</view>
-
-
-
-
 		<!-- 公共组件-每个页面必须引入 -->
 		<public-module></public-module>
 		<z-navigation></z-navigation>
@@ -98,6 +53,26 @@
 	export default {
 		data() {
 			return {
+				list:[
+				// 	{"记忆训练";"7"}
+				// 	{"今日单词学习";"7"},
+				// 	{"文献背诵";"7"},
+				// 	{"关键词背诵";"7"}
+				
+					
+					{name:"记忆训练",
+					key:'7',
+					all:'/10'},
+					{name:'今日单词学习',
+					key:'890',
+					all:'/1455'},
+					{name:'文献背诵',
+					key:'0',
+					all:'/0'},
+					{name:'关键词背诵',
+					key:'0',
+					all:'/0'}
+				],
 				keyword: "shuru"
 			};
 		},
@@ -169,15 +144,22 @@
 					background: #FFFF;
 					border-radius:20upx;
 					box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
-					.format{
-						display:flex;
-						.percentage {
-							padding-left: 70px;
-							display:flex;
-							justify-content: flex-end
-						
-						}
+					
+					.drak{
+						// justify-content: flex-end
+						display: flex;
+						justify-content: space-between;
+						// justify-content:space-between
 					}
+					// .format{
+					// 	display:flex;
+					// 	.percentage {
+					// 		padding-left: 70px;
+					// 		display:flex;
+					// 		justify-content: flex-end
+						
+					// 	}
+					// }
 					
 				}
 			}

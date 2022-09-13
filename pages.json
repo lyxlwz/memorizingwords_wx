@@ -15,12 +15,19 @@
         "navigationBarTitleText": "新增功能"
       }
     },
+	{
+	  "path": "pages/course/course",
+	  "style": {
+	    "navigationBarTitleText": "功能示例"
+	  }
+	},
     {
       "path": "pages/demo/common",
       "style": {
         "navigationBarTitleText": "功能示例"
       }
     },
+	
     {
       "path": "pages/demo/list",
       "style": {
@@ -369,7 +376,9 @@
         "enablePullDownRefresh": false
       }
     }
-  ],
+    
+        
+    ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
@@ -390,7 +399,7 @@
         "text": "新增功能"
       },
       {
-        "pagePath": "pages/demo/common",
+        "pagePath": "pages/course/course",
         "iconPath": "static/icon/tab/icon_wode.png",
         "selectedIconPath": "static/icon/tab/icon_wode_c.png",
         "text": "组件示例"

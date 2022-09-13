@@ -78,7 +78,7 @@ export default {
           text: '新增功能'
         },
         {
-          pagePath: 'pages/demo/common',
+          pagePath: 'pages/course/course',
           iconPath: 'static/icon/tab/icon_wode.png',
           selectedIconPath: 'static/icon/tab/icon_wode_c.png',
           text: '组件示例'
