@@ -10,15 +10,10 @@
           :showAction="false"
           v-model="keyword"
         ></u-search>
-        <!-- 间隔 -->
-        <u-gap
-          height="80rpx"
-          bgColor="#3d5cff"
-        ></u-gap>
 
         <view class="tobe">
           <view class="title">今日待学习单词</view>
-          <view class="number">
+          <view class="number margin-tb-xs">
             201
           </view>
           <u-line-progress
@@ -29,121 +24,64 @@
           >
           </u-line-progress>
         </view>
-        <!-- 间隔 -->
-        <!-- <u-gap
-          height="40rpx"
-          bgColor="#f5f5f5"
-        ></u-gap> -->
 
         <view class="plan padding-top-lg">
-          <text style="font-size: 130%;font-weight: 800;">学习计划</text>
-          <view class="aplan padding-top-xs">
-            <view
-              class="train"
-              @click="train"
-            >
-              <view class="format">
+          <text style="font-size: 120%;font-weight: 800;">学习计划</text>
+          <view class="aplan margin-top-sm">
+            <view class="train">
+              <view
+                class="format"
+                v-for="(plan, index) in planList"
+                :key="index"
+                @click="planItem(plan,index)"
+              >
                 <view
                   class="title flex"
                   style="font-weight: 800; font-size: 100%; "
                 >
                   <circle-progress
-                    canvasId='canvas'
+                    :canvasId="`canvas${index}`"
                     active-color="#2979ff"
-                    :total="10"
-                    :num="3"
+                    :total="plan.planTotalNum"
+                    :num="plan.planNum"
                     :radius="12"
                     :width="66"
                   >
                   </circle-progress>
-                  <text class="margin-left-xs">记忆训练</text>
+                  <text class="margin-left-xs">{{plan.planName}}</text>
                 </view>
                 <view class="percentage">
-                  <view class="count">7</view>
+                  <view class="count">{{plan.planNum}}</view>
                   <view
                     class="all"
                     style="color: #afafaf"
-                  >/10</view>
-                </view>
-              </view>
-
-            </view>
-            <view
-              class="today"
-              @click="today"
-            >
-              <view class="format">
-                <view
-                  class="title"
-                  style="font-weight: 800; font-size: 100%; padding-bottom: 20px;"
-                >
-                  今日单词学习
-                </view>
-                <view class="percentage">
-                  <view class="count">890</view>
-                  <view
-                    class="all"
-                    style="color: #afafaf"
-                  >/1455</view>
-                </view>
-              </view>
-            </view>
-            <view
-              class="lit"
-              @click="lit"
-            >
-              <view class="format">
-                <view
-                  class="title"
-                  style="font-weight: 800; font-size: 100%; padding-bottom: 20px;"
-                >
-                  文献背诵
-                </view>
-                <view class="percentage">
-                  <view class="count">0</view>
-                  <view
-                    class="all"
-                    style="color: #afafaf"
-                  >/0</view>
-                </view>
-              </view>
-            </view>
-            <view
-              class="key"
-              @click="key"
-            >
-              <view class="format">
-                <view
-                  class="title"
-                  style="font-weight: 800; font-size: 100%;"
-                >
-                  关键词背诵
-                </view>
-                <view class="percentage">
-                  <view class="count">0</view>
-                  <view
-                    class="all"
-                    style="color: #afafaf"
-                  >/0</view>
+                  >/{{plan.planTotalNum}}</view>
                 </view>
               </view>
             </view>
           </view>
         </view>
-        <view class="Proverbs margin-top-lg">
-          <view
-            class="big"
-            style="font-weight: 800;font-size: 180%;padding-bottom: 10px;"
-          >
-            箴言
+        <view class="Proverbs margin-top-lg flex">
+          <view>
+            <view
+              class="big"
+              style="font-weight: 800;font-size: 180%;padding-bottom: 10px;"
+            >
+              箴言
+            </view>
+            <view
+              class="Small"
+              style="font-weight: 900;font-size: 80%;color: #afafaf;"
+            >
+              人的一生中应该有三个爱好，一
+              个帮助你赚钱，一个帮助你管理
+            </view>
           </view>
-          <view
-            class="Small"
-            style="font-weight: 900;font-size: 80%;color: #afafaf;"
+          <img
+            :src="require(`static/image/index.png`)"
+            width="120rpx"
+            height="120rpx"
           >
-            人的一生中应该有三个爱好，一
-            个帮助你赚钱，一个帮助你管理
-          </view>
         </view>
 
       </view>
@@ -161,7 +99,29 @@ import circleProgress from '@/components/circle-progress/circle-progress'
 export default {
   data() {
     return {
-      keyword: "shuru"
+      keyword: "shuru",
+      planList: [
+        {
+          planName: '记忆训练',
+          planNum: 7,
+          planTotalNum: 10,
+        },
+        {
+          planName: '今日单词学习',
+          planNum: 890,
+          planTotalNum: 1455,
+        },
+        {
+          planName: '文献背诵',
+          planNum: 0,
+          planTotalNum: 0,
+        },
+        {
+          planName: '关键词背诵',
+          planNum: 0,
+          planTotalNum: 0,
+        },
+      ],
     };
   },
   components: {
@@ -179,18 +139,9 @@ export default {
   },
   //方法
   methods: {
-    train() {
-      console.log("1")
+    planItem(plan, index) {
+      console.log(plan, index, '===plan')
     },
-    today() {
-      console.log("2")
-    },
-    lit() {
-      console.log("3")
-    },
-    key() {
-      console.log("4")
-    }
   }
 }
 </script>
@@ -208,6 +159,7 @@ export default {
     height: 42px;
 
     .tobe {
+      margin-top: 80rpx;
       // padding-top:30px;
       padding: 18rpx;
       background: #ffff;
@@ -222,15 +174,16 @@ export default {
       }
 
       .number {
-        padding: 1px 0;
-        font-weight: 900;
-        font-size: 160%;
+        padding: 2rpx 0;
+        // font-weight: 900;
+        font-weight: bold;
+        font-size: 110%;
       }
     }
 
     .plan {
       .aplan {
-        padding: 20px;
+        padding: 40rpx;
         background: #ffff;
         border-radius: 20upx;
         box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
@@ -238,10 +191,13 @@ export default {
           display: flex;
           justify-content: space-between;
           .percentage {
-            padding-left: 70px;
             display: flex;
             // justify-content: flex-end;
           }
+        }
+
+        .format:not(:last-child) {
+          padding-bottom: 20rpx;
         }
       }
     }

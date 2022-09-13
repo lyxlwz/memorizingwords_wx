@@ -1,113 +1,127 @@
 <template>
-	<view>
-		<view class="course">
-			<view class="text">导航</view>
-			<view class="ge padding-top-lg">
-				<view class="tobe " v-for="(i,index) in list" @click="click(index)">	
-				<view class="image" style="padding: 28rpx; 28rpx">
-					<img :src="require(`static/image/image${index}.png`)" width="60rpx" height="60rpx" >
-				</view>
-			  <view class="title text-dark" >{{i.chinese}}</view>
-			  <view class="english" >{{i.english}}</view>
-			  </view>
-			</view>
-			
-		</view>
-		<!-- 公共组件-每个页面必须引入 -->
-		<public-module></public-module>
-		<z-navigation></z-navigation>
-	</view>
+  <view>
+    <view class="course">
+      <view class="text">导航</view>
+      <view class="ge padding-top-lg">
+        <view
+          class="tobe flex"
+          v-for="(i,index) in list"
+          :key="index"
+          @click="click(index)"
+        >
+          <view
+            class="image"
+            style="padding: 28rpx; 28rpx"
+          >
+            <img
+              :src="require(`static/image/image${index}.png`)"
+              width="60rpx"
+              height="60rpx"
+            >
+          </view>
+          <view>
+            <view class="title text-dark">{{i.chinese}}</view>
+            <view class="english">{{i.english}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 公共组件-每个页面必须引入 -->
+    <public-module></public-module>
+    <z-navigation></z-navigation>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				list:[
-					{
-						 chinese:"今日单词学习",
-						 english:"Robertson Connie"
-					},
-					{
-						chinese:"今日单词筛查",
-				
-						english:"Nguyen Shane"
-					},
-					{
-						chinese:"易错单词筛查",
-						english:"Bert Pullman"
-					},
-					{
-						chinese:"随机单词筛查",
-						english:"Robertson Connie"
-					},
-					{
-						chinese:"数字记忆训练",
-						english:"Nguyen Shane"
-					},
-					{
-						chinese:"词组记忆训练",
-						english:"Bert Pullman"
-					},
-					{
-						chinese:"文献背诵",
-						english:"Robertson Connie"
-					},
-					{
-						chinese:"关键词背诵",
-						english:"Nguyen Shane"
-					},
-					{
-						chinese:"Visual Design",
-						english:"Bert Pullman"
-					}
-				]
-			}
-		},
-		methods: {
-			click(index){
-				console.log(index)
-			}
-		}
-	}
+export default {
+  data() {
+    return {
+      list: [
+        {
+          chinese: "今日单词学习",
+          english: "Robertson Connie"
+        },
+        {
+          chinese: "今日单词筛查",
+
+          english: "Nguyen Shane"
+        },
+        {
+          chinese: "易错单词筛查",
+          english: "Bert Pullman"
+        },
+        {
+          chinese: "随机单词筛查",
+          english: "Robertson Connie"
+        },
+        {
+          chinese: "数字记忆训练",
+          english: "Nguyen Shane"
+        },
+        {
+          chinese: "词组记忆训练",
+          english: "Bert Pullman"
+        },
+        {
+          chinese: "文献背诵",
+          english: "Robertson Connie"
+        },
+        {
+          chinese: "关键词背诵",
+          english: "Nguyen Shane"
+        },
+        {
+          chinese: "Visual Design",
+          english: "Bert Pullman"
+        }
+      ]
+    }
+  },
+  methods: {
+    click(index) {
+      console.log(index)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-	@import "@/style/mixin.scss";
-.course{
-	height: 360rpx;
-	background: #3d5cff;
-	.text{
-		color: white;
-		font-weight: 900;
-		font-size: 180%; 
-		padding-top: 100rpx;
-		padding-left: 40rpx;
-	}
-	.tobe {
-		height: 180rpx;
-		margin: 35rpx;
-		width: 90%;
-	  background: #ffff;
-	  border-radius: 20upx;
-	  box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
-	 
-	
-	  .title {
-	    padding-top: 30rpx;
-	    font-weight: 900;
-	    margin-left: 240rpx;
-	    font-size: 90%;
-	  }
-	
-	  .english {
-		  padding: 10rpx 0;
-		  margin-left: 240rpx;
-		color: #afafaf;
-	    // padding: 1rpx 0;
-	    font-weight: 600;
-	    font-size: 80%;
-	  }
-	}
+@import "@/style/mixin.scss";
+.course {
+  height: 360rpx;
+  background: #3d5cff;
+  .text {
+    color: white;
+    font-weight: 900;
+    font-size: 180%;
+    padding-top: 100rpx;
+    padding-left: 40rpx;
+  }
+  .ge {
+    height: calc(90vh - 200rpx);
+    overflow: scroll;
+    .tobe {
+      height: 180rpx;
+      margin: 35rpx;
+      width: 90%;
+      background: #ffff;
+      border-radius: 20upx;
+      box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
+
+      .title {
+        padding-top: 30rpx;
+        font-weight: 900;
+        font-size: 90%;
+      }
+
+      .english {
+        padding: 10rpx 0;
+        color: #afafaf;
+        // padding: 1rpx 0;
+        font-weight: 600;
+        font-size: 80%;
+      }
+    }
+  }
 }
 </style>
