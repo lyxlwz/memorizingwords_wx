@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
         <u-search
@@ -146,8 +146,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import "@/style/mixin.scss";
-
 .hpage {
   height: 360rpx;
   background: #3d5cff;

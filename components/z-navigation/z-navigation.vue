@@ -135,7 +135,7 @@ export default {
   padding-bottom: env(safe-area-inset-bottom);
 }
 .footer_box {
-  height: 160rpx;
+  height: $footer-height;
   position: fixed;
   bottom: 1%;
   left: 2%;
