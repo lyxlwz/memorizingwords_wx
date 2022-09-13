@@ -1761,3 +1761,6 @@ page {
   background-color: var(--background-sub-color);
   // flex-direction: row;
 }
+
+// 单词项目特有的样式
+@import '@/style/words.scss';
