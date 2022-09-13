@@ -21,7 +21,7 @@
 				<view class="plan">
 					<text style="font-size: 130%;font-weight: 800;">学习计划</text>
 					<u-gap height="10rpx" bgColor="#f5f5f5"></u-gap>
-					<view class="aplan" style="">
+					<view class="aplan" >
 					<view class="dark text-dark" v-for="i in list">
 						<view class="name">{{i.name}}</view>  
 						<view class="key" style="padding-left: 80rpx;">{{i.key}}</view> 

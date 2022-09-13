@@ -3,7 +3,10 @@
 		<view class="course">
 			<view class="text">导航</view>
 			<view class="ge padding-top-lg">
-				<view class="tobe " v-for="(i,index) in list" @click="click" :key="index">	
+				<view class="tobe " v-for="(i,index) in list" @click="click(index)">	
+				<view class="image" style="padding: 28rpx; 28rpx">
+					<img :src="require(`static/image/image${index}.png`)" width="60rpx" height="60rpx" >
+				</view>
 			  <view class="title text-dark" >{{i.chinese}}</view>
 			  <view class="english" >{{i.english}}</view>
 			  </view>
@@ -27,6 +30,7 @@
 					},
 					{
 						chinese:"今日单词筛查",
+				
 						english:"Nguyen Shane"
 					},
 					{
@@ -87,6 +91,7 @@
 	  background: #ffff;
 	  border-radius: 20upx;
 	  box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
+	 
 	
 	  .title {
 	    padding-top: 30rpx;
