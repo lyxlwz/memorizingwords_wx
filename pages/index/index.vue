@@ -1,4 +1,5 @@
 <template>
+	<!-- 这里直接引用即可 wordPageSty -->
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
