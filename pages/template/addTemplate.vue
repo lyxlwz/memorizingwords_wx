@@ -21,11 +21,11 @@
 				<view class="plan">
 					<text style="font-size: 130%;font-weight: 800;">学习计划</text>
 					<u-gap height="10rpx" bgColor="#f5f5f5"></u-gap>
-					<view class="aplan" >
-					<view class="dark text-dark" v-for="i in list">
-						<view class="name">{{i.name}}</view>  
-						<view class="key" style="padding-left: 80rpx;">{{i.key}}</view> 
-						<view class="all">{{i.all}}</view>
+					<view class="aplan"  >
+					<view class="dark text-dark" v-for="i in list" style="display: flex;justify-content: space-between;">
+						<view class="name" style="padding: 20rpx; font-weight: 800; font-size: 100%;">{{i.name}}</view> 
+						 <view class="key" style="padding: 20rpx;">{{i.key}}</view>
+						<view class="all" style="padding: 20rpx;color: #afafaf;">{{i.all}}</view>
 					</view>
 						</view>
 				</view>
@@ -61,17 +61,17 @@
 				
 					
 					{name:"记忆训练",
-					key:'7',
-					all:'/10'},
-					{name:'今日单词学习',
-					key:'890',
-					all:'/1455'},
-					{name:'文献背诵',
-					key:'0',
-					all:'/0'},
-					{name:'关键词背诵',
-					key:'0',
-					all:'/0'}
+					key:"7",
+					all:"/10"},
+					{name:"今日单词学习",
+					key:"890",
+					all:"/1455"},
+					{name:"文献背诵",
+					key:"0",
+					all:"/0"},
+					{name:"关键词背诵",
+					key:"0",
+					all:"/0"}
 				],
 				keyword: "shuru"
 			};
@@ -147,8 +147,11 @@
 					
 					.drak{
 						// justify-content: flex-end
-						display: flex;
+						.name{
+							display: flex;
 						justify-content: space-between;
+						}
+						
 						// justify-content:space-between
 					}
 					// .format{
