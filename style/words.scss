@@ -1,7 +1,26 @@
-$mainBlueColor:#3D5CFF;
-$mainGrayColor:#738394;
-$mainBorderColor:#EEEEEE;
-$mainTextDarkColor:#2E3032;
-$mainTextColor:#7F7F7F;
-$mainTextLightColor:#909399;
-$mainBorderRadius:20upx;
+/**color**/
+$wordColors:("primary": #3D5CFF,
+  "info": #738394,
+  "border": #EEEEEE,
+  "dark": #2E3032,
+  "middle": #7F7F7F,
+  "light": #909399);
+
+/**brder-radius**/
+$wordBorderRadius:20upx;
+
+.word-Border-radius {
+  border-radius: $wordBorderRadius;
+}
+
+/**color / backGroundColor**/
+@each $colorKey,
+$color in $wordColors {
+  .text-#{$colorKey} {
+    color: $color
+  }
+
+  .bg-#{$colorKey} {
+    background-color: $color
+  }
+}
