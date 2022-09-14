@@ -25,7 +25,8 @@
 export default {
   data() {
     return {
-
+      wid: 200,
+      r: 33,
     }
   },
   props: {
@@ -71,7 +72,10 @@ export default {
       default: 200,
     },
   },
+
   mounted() {
+    this.wid = uni.getSystemInfoSync().windowWidth / 375 * this.width
+    this.r = uni.getSystemInfoSync().windowWidth / 375 * this.radius
     const data = {
       total: this.total,
       num: this.num,
@@ -88,7 +92,7 @@ export default {
       cxt_arc.setLineCap('round');
       cxt_arc.beginPath();
       // 参数分别：圆心的x坐标；圆心的y坐标；圆半径；起始弧度，单位弧度（在3点钟方向）；终止弧度；弧度的方向是否是逆时针
-      cxt_arc.arc(this.width / 4, this.width / 4, this.radius, 0, 2 * Math.PI, false);//创建一条弧线
+      cxt_arc.arc(this.wid / 4, this.wid / 4, this.r, 0, 2 * Math.PI, false);//创建一条弧线
       cxt_arc.stroke(); //对当前路径进行描边
       cxt_arc.draw();
       that.drawCirclePg(prefix, data);
@@ -104,7 +108,7 @@ export default {
       cxt_arc.setStrokeStyle(this.activeColor);
       cxt_arc.setLineCap('round');
       cxt_arc.beginPath();
-      cxt_arc.arc(this.width / 4, this.width / 4, this.radius, -0.5 * Math.PI, Math.PI * (value - 0.5), false);
+      cxt_arc.arc(this.wid / 4, this.wid / 4, this.r, -0.5 * Math.PI, Math.PI * (value - 0.5), false);
       cxt_arc.stroke();
       cxt_arc.draw();
     },
