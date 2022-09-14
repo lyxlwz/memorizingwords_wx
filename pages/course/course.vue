@@ -77,6 +77,16 @@ export default {
       ]
     }
   },
+  //第一次加载
+  onLoad(e) {
+    // 隐藏原生的tabbar
+    uni.hideTabBar();
+  },
+  //页面显示
+  onShow() {
+    // 隐藏原生的tabbar
+    uni.hideTabBar();
+  },
   methods: {
     click(index) {
       console.log(index)
