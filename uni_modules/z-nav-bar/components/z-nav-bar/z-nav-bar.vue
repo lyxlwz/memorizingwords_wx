@@ -190,10 +190,10 @@ export default {
 	},
 	computed: {
 		back() {
-			return this.backState == 1000 || this.backState == 3000;
+			return this.backState == 2000 || this.backState == 3000;
 		},
         home() {
-			return this.homeState == 1000;
+			return this.homeState == 2000;
 		},
 		//导航固定
 		navFixed() {
@@ -360,9 +360,9 @@ export default {
 	position: relative;
 }
 
-.header_station {
-	height: 88rpx;
-}
+// .header_station {
+// 	height: 88rpx;
+// }
 
 .header_shadow {
 	// border-style: solid;

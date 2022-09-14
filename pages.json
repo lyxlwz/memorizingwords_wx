@@ -27,7 +27,12 @@
         "navigationBarTitleText": "功能示例"
       }
     },
-	
+	{
+	  "path": "pages/manage/manage",
+	  "style": {
+	    "navigationBarTitleText": "列表"
+	  }
+	},
     {
       "path": "pages/demo/list",
       "style": {
@@ -378,12 +383,23 @@
     }
     
         
+        ,{
+            "path" : "pages/manage/manage",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "单词管理",
+                "enablePullDownRefresh": false,
+				"navigationBarBackgroundColor":"#3d5cff"
+				
+            }
+            
+        }
     ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uni-app",
-    "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#FFFFFF",
+    // "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#3d5cff",
+    "backgroundColor": "#3d5cff",
     "navigationStyle": "custom"
   },
   "tabBar": {
@@ -405,7 +421,7 @@
         "text": "组件示例"
       },
       {
-        "pagePath": "pages/sdkDemo/common",
+        "pagePath": "pages/manage/manage",
         "iconPath": "static/icon/tab/icon_xiaoxi.png",
         "selectedIconPath": "static/icon/tab/icon_xiaoxi_c.png",
         "text": "SDK示例"

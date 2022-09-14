@@ -89,7 +89,7 @@ export default {
           raised: true
         },
         {
-          pagePath: 'pages/sdkDemo/common',
+          pagePath: 'pages/manage/manage',
           iconPath: 'static/icon/tab/icon_xiaoxi.png',
           selectedIconPath: 'static/icon/tab/icon_xiaoxi_c.png',
           text: 'SDK示例'
@@ -129,7 +129,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/style/mixin.scss";
 .footer_station {
-  height: 100rpx;
+  // height: 100rpx;
   box-sizing: content-box;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);

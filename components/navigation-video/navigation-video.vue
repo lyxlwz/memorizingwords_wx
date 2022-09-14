@@ -76,7 +76,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/style/mixin.scss';
 .footer_station {
-	height: 100rpx;
+	// height: 100rpx;
 }
 .footer_box {
 	position: fixed;
