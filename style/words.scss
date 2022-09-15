@@ -5,7 +5,9 @@ $wordColors:("primary": #3D5CFF,
   "border": #EEEEEE,
   "dark": #2E3032,
   "middle": #7F7F7F,
-  "light": #909399);
+  "light": #909399,
+  "middle-1":#CBCDCE,
+);
 
 /**brder-radius**/
 $wordBorderRadius:20upx;
@@ -17,11 +19,11 @@ $wordBorderRadius:20upx;
 /**color / backGroundColor**/
 @each $colorKey,
 $color in $wordColors {
-  .text-#{$colorKey} {
+  .word-text-#{$colorKey} {
     color: $color
   }
 
-  .bg-#{$colorKey} {
+  .word-bg-#{$colorKey} {
     background-color: $color
   }
 }

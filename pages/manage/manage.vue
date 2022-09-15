@@ -67,7 +67,7 @@
     </view>
 
     <!-- // 列表-->
-    <view class="u-page padding-top-lg">
+    <view class="u-page margin-top-lg">
       <u-list @scrolltolower="scrolltolower">
         <u-list-item
           v-for="(item, index) in indexList"
