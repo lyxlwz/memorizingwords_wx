@@ -46,7 +46,7 @@ export default {
     //边框背景颜色
     bgColor: {
       type: String,
-      default: '#afafaf',
+      default: '#F0F0F0',
     },
     //线条的宽度
     lineWidth: {
@@ -56,7 +56,7 @@ export default {
     //边框背景颜色
     activeColor: {
       type: String,
-      default: '#FFC000',
+      default: '#009DFF',
     },
     canvasId: {
       type: String,

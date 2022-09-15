@@ -1,5 +1,5 @@
 <template>
-	<!-- 这里直接引用即可 wordPageSty -->
+  <!-- 这里直接引用即可 wordPageSty -->
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
@@ -42,7 +42,7 @@
                 >
                   <circle-progress
                     :canvasId="`canvas${index}`"
-                    active-color="#2979ff"
+                    active-color="#009DFF"
                     :total="plan.planTotalNum"
                     :num="plan.planNum"
                     :radius="12"
