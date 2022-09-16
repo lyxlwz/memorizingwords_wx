@@ -27,7 +27,7 @@
         </view>
 
         <view class="plan padding-top-lg">
-          <text style="font-size: 120%;font-weight: 800;">学习计划</text>
+          <text style="font-size: 100%;font-weight: 800;">学习计划</text>
           <view class="aplan margin-top-sm">
             <view class="train">
               <view
@@ -65,14 +65,14 @@
         <view class="Proverbs margin-top-lg flex">
           <view>
             <view
-              class="big"
-              style="font-weight: 800;font-size: 180%;padding-bottom: 10px;"
+              class="big "
+              style="font-weight: 800;font-size: 130%;color: #4d5156; padding-bottom: 10px;"
             >
               箴言
             </view>
             <view
               class="Small"
-              style="font-weight: 900;font-size: 80%;color: #afafaf;"
+              style="font-weight: 900;font-size: 70%;color: #afafaf;"
             >
               人的一生中应该有三个爱好，一
               个帮助你赚钱，一个帮助你管理

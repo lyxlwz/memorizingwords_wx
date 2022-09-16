@@ -39,11 +39,14 @@
           >
             <view
               class="sys"
-              style="height: 1000rpx;width: 90%;"
+              style="height: 1000rpx;width: 100%;
+			  "
             >
               <view style="padding: 40rpx 300rpx;">设置</view>
-              <view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">搜索条件</view>
-              <view class="u-page__tag-item flex text-center">
+			  <view class="lg " style=" height: calc(800rpx - 50rpx);
+    overflow: scroll;">
+			  	<view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">搜索条件</view>
+				<view class="u-page__tag-item flex text-center">
                 <u-tag
                   v-for="(item, index) in radios"
                   class="tag-item text-center"
@@ -58,9 +61,69 @@
                 >
                 </u-tag>
               </view>
+			  <view class="padding-top-lg">
+			  	<view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">选择</view>
+			  </view>
+			  <view class="u-page__tag-item-i flex text-center">
+			    <u-tag
+			      v-for="(aitem, index) in aradios"
+			      class="atag-item text-center"
+			      :key="index"
+			      :text="aitem.aname"
+			      size="large"
+			      :name="index"
+			      :bgColor="aitem.bgColor"
+			      :borderColor="aitem.borderColor"
+			      :color="aitem.color"
+			      @click="aradioClick"
+			    >
+			    </u-tag>
+			  </view>
+			  <view class="padding-top-lg">
+			  	<view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">表头选择</view>
+			  </view>
+			  <view class="u-page__tag-item-ii flex text-center">
+			    <u-tag
+			      v-for="(aitem, index) in yaradios"
+			      class="yatag-item text-center"
+			      :key="index"
+			      :text="aitem.aname"
+			      size="large"
+			      :name="index"
+			      :bgColor="aitem.bgColor"
+			      :borderColor="aitem.borderColor"
+			      :color="aitem.color"
+			      @click="yaradioClick"
+			    >
+			    </u-tag>
+			  </view>
+			  <view class="padding-top-lg">
+			  	<view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">批量修改为</view>
+			  </view>
+			  <view style="padding: 20rpx 50rpx;">
+			  	<view class="input" >
+			  	<u--input
+			  	    border="none"
+			  	    @change="change"
+					height="500"
+			  	  ></u--input>
+			  </view>
+			  </view>
+			  
+			  </view>
+              <view class="butt" 
+			  style="display: flex;
+			  padding: 20rpx 80rpx;
+			  margin: auto;
+			  justify-content: space-between;">
+              	<button type="primary" plain = true style="width: 40%;" @click="no">取消</button>
+				<button type="primary" iconColor="#3d5cff" size="large" style="width: 55%;" @click="yes">确定</button>
+              </view>
+              
             </view>
           </u-popup>
-          <u-button @click="show = true">打开</u-button>
+          <!-- <image @click="show = true" url></image> -->
+		  <u--image :src="src" width="40rpx" height="40rpx" @click="show = true"></u--image>
         </template>
 
       </u--input>
@@ -92,9 +155,47 @@
 export default {
   data() {
     return {
+		src:'/static/word/sear.png',
       indexList: [],
       urls: [],
       show: false,
+	  yaradios:[{
+		  checked: false,
+		    aname: "首次学习日期",
+		    bgColor: "#d7d7d7",
+		    borderColor: "#d7d7d7",
+		    color: "#a6a6a6",
+		  },
+		  {
+			checked: false,
+			  aname: "分组序号",
+			  bgColor: "#d7d7d7",
+			  borderColor: "#d7d7d7",
+			  color: "#a6a6a6",  
+		  },
+		  {
+		    checked: false,
+		    aname: "最后筛查日期",
+		    bgColor: "#d7d7d7",
+		    borderColor: "#d7d7d7",
+		    color: "#a6a6a6",
+		  
+	  }],
+	  aradios:[{
+		 checked: false,
+		   aname: "全选",
+		   bgColor: "#d7d7d7",
+		   borderColor: "#d7d7d7",
+		   color: "#a6a6a6",
+		 },
+		 {
+		   checked: false,
+		   aname: "已选单词",
+		   bgColor: "#d7d7d7",
+		   borderColor: "#d7d7d7",
+		   color: "#a6a6a6",
+		 
+	  }],
       radios: [{
         checked: false,
         name: "单词",
@@ -111,11 +212,32 @@ export default {
       },
       {
         checked: false,
-        name: "学习日期",
+        name: "首次学习日期",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-      }
+      },
+	  {
+	    checked: false,
+	    name: "学习日期",
+	    bgColor: "#d7d7d7",
+	    borderColor: "#d7d7d7",
+	    color: "#a6a6a6",
+	  },
+	  {
+	    checked: false,
+	    name: "分组序号",
+	    bgColor: "#d7d7d7",
+	    borderColor: "#d7d7d7",
+	    color: "#a6a6a6",
+	  },
+	  {
+	    checked: false,
+	    name: "今日学习单词",
+	    bgColor: "#d7d7d7",
+	    borderColor: "#d7d7d7",
+	    color: "#a6a6a6",
+	  }
       ],
 
     }
@@ -132,6 +254,12 @@ export default {
     uni.hideTabBar();
   },
   methods: {
+	  yes(){
+		  this.close()
+	  },
+	  no(){
+		  this.close()
+	  },
     radioClick(name) {
       this.radios.forEach((item, index) => {
         if (index === name) {
@@ -153,6 +281,48 @@ export default {
       })
 
     },
+	aradioClick(aname) {
+      this.aradios.forEach((aitem, index) => {
+        if (index === aname) {
+          // 如果被选中再点一次就被取消了
+          aitem.checked = !aitem.checked
+        } else {
+          aitem.checked = false
+        }
+
+        if (aitem.checked) {
+          aitem.bgColor = "#3d5cff"
+          aitem.borderColor = "#3d5cff"
+          aitem.color = "#FFFF"
+        } else {
+          aitem.bgColor = "#d7d7d7"
+          aitem.borderColor = "#d7d7d7"
+          aitem.color = "#a6a6a6"
+        }
+      })
+
+    },
+	yaradioClick(aname) {
+	  this.yaradios.forEach((aitem, index) => {
+	    if (index === aname) {
+	      // 如果被选中再点一次就被取消了
+	      aitem.checked = !aitem.checked
+	    } else {
+	      aitem.checked = false
+	    }
+	
+	    if (aitem.checked) {
+	      aitem.bgColor = "#3d5cff"
+	      aitem.borderColor = "#3d5cff"
+	      aitem.color = "#FFFF"
+	    } else {
+	      aitem.bgColor = "#d7d7d7"
+	      aitem.borderColor = "#d7d7d7"
+	      aitem.color = "#a6a6a6"
+	    }
+	  })
+	
+	},
     click(index) {
       console.log(index)
     },
@@ -193,12 +363,51 @@ export default {
   .u-page__tag-item {
     width: 100%;
     padding: 20rpx;
+	flex-wrap:wrap;
+	justify-content: center;
     .tag-item {
-      width: 30%;
+      width: 25%;
       margin-right: 5%;
+
+	  margin-top: 2%;
       // display: flex;
       // align-items: center;
     }
+  }
+  .u-page__tag-item-i{
+	  width: 100%;
+	  padding: 20rpx;
+	  flex-wrap:wrap;
+	  margin-left: 4%;
+	  .atag-item {
+	    width: 25%;
+	    margin-right: 5%;
+	  
+	    margin-top: 2%;
+	    // display: flex;
+	    // align-items: center;
+	  }
+  }
+  .u-page__tag-item-ii{
+  	  width: 100%;
+  	  padding: 20rpx;
+  	  flex-wrap:wrap;
+  	  margin-left: 4%;
+  	  .yatag-item {
+  	    width: 25%;
+  	    margin-right: 5%;
+  	  
+  	    margin-top: 2%;
+  	    // display: flex;
+  	    // align-items: center;
+  	  }
+  }
+  .input{
+	  padding: 20rpx 50rpx; 
+	  height:100rpx; 
+	  background: #ffffff; 
+	  border-radius: 20upx;
+	  box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
   }
 }
 

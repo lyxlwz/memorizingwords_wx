@@ -11,12 +11,12 @@
         >
           <view
             class="image"
-            style="padding: 28rpx; 28rpx"
+            style="padding: 35rpx; 40rpx"
           >
             <img
               :src="require(`static/image/image${index}.png`)"
-              width="60rpx"
-              height="60rpx"
+              width="70rpx"
+              height="70rpx"
             >
           </view>
           <view>
@@ -103,7 +103,7 @@ export default {
   .text {
     color: white;
     font-weight: 900;
-    font-size: 180%;
+    font-size: 130%;
     padding-top: 100rpx;
     padding-left: 40rpx;
   }
@@ -111,7 +111,7 @@ export default {
     height: calc(90vh - 200rpx);
     overflow: scroll;
     .tobe {
-      height: 180rpx;
+      height: 200rpx;
       margin: 35rpx;
       width: 90%;
       background: #ffff;
@@ -120,7 +120,7 @@ export default {
 
       .title {
         padding-top: 30rpx;
-        font-weight: 900;
+        font-weight: 550;
         font-size: 90%;
       }
 
