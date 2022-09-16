@@ -99,11 +99,9 @@ export default {
     },
     //绘制橙色进度条
     drawCirclePg(prefix, data) {
-      console.log(data);
       //创建并返回绘图上下文context对象。
       let cxt_arc = uni.createCanvasContext(prefix + '_p');
       var value = (data.num / data.total) * 2;
-      console.log(value);
       cxt_arc.setLineWidth(this.lineWidth);
       cxt_arc.setStrokeStyle(this.activeColor);
       cxt_arc.setLineCap('round');

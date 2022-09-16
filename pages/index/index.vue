@@ -36,10 +36,7 @@
                 :key="index"
                 @click="planItem(plan,index)"
               >
-                <view
-                  class="title flex"
-                  style="font-weight: 800; font-size: 100%; "
-                >
+                <view class="title flex">
                   <circle-progress
                     :canvasId="`canvas${index}`"
                     active-color="#009DFF"
@@ -49,9 +46,9 @@
                     :width="66"
                   >
                   </circle-progress>
-                  <text class="margin-left-xs">{{plan.planName}}</text>
+                  <text class="margin-left-sm test-w-b flex_y_center">{{plan.planName}}</text>
                 </view>
-                <view class="percentage">
+                <view class="percentage test-w-b flex_y_center">
                   <view class="count">{{plan.planNum}}</view>
                   <view
                     class="all"
@@ -71,8 +68,8 @@
               箴言
             </view>
             <view
-              class="Small"
-              style="font-weight: 900;font-size: 70%;color: #afafaf;"
+              class="Small test-w-b word-text-middle"
+              style="font-size: 80%;"
             >
               人的一生中应该有三个爱好，一
               个帮助你赚钱，一个帮助你管理
@@ -189,6 +186,7 @@ export default {
         .format {
           display: flex;
           justify-content: space-between;
+          font-size: 90%;
           .percentage {
             display: flex;
             // justify-content: flex-end;
@@ -207,5 +205,9 @@ export default {
       padding: 20px 20px;
     }
   }
+}
+
+::v-deep .u-search__content {
+  border-radius: 10px !important;
 }
 </style>
