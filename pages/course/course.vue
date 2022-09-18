@@ -89,7 +89,11 @@ export default {
   },
   methods: {
     click(index) {
-      console.log(index)
+      if(index === 3){
+		  uni.navigateTo({
+		  	url: '/pages/word/Fallible'
+		  });
+	  }
     }
   }
 }

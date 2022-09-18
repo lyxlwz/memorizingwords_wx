@@ -66,7 +66,7 @@
           >
             热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
           </view>
-          <view class="bycorenr margin-top-sm  flex_x_right">
+          <view class="bycorenr margin-top-sm flex_x_right">
             <view
               class="word-text-border word-Border-radius Corner"
               style="font-size: 30rpx; padding: 10rpx 42rpx"
@@ -79,50 +79,39 @@
       </view>
       <!-- 例句 -->
       <view style="padding-top: 50rpx;">
-        <view class="exp word-Border-radius">
-          <view
-            class="eng"
-            style="display: flex;"
-          >
-            <view
-              class="but"
-              style="width: 40rpx; padding: 30rpx 40rpx"
-            >
-              <u-button
-                style="width:auto"
-                class="custom-style"
-                type="primary"
-                text="英"
-                icon="static/word/word"
-                size="mini"
-                shape="circle"
-              ></u-button>
-            </view>
-            <view
-              class=" word-text-middle-1"
-              style="font-size: 30rpx; padding-top: 30rpx;padding-left: 80rpx"
-            >
-              This place is just so charming, the perfect winter resort.
-            </view>
+        <view class="exp word-Border-radius" 
+		style="padding: 30rpx 40rpx;">
+          <view style="display: flex;">
+          	<u-button
+          	  style="width:auto"
+          	  class="custom-style"
+          	  type="primary"
+          	  text="英"
+          	  icon="static/word/word"
+          	  size="mini"
+          	  shape="circle"
+          	></u-button>  
+			
+			<view class="word-text-middle-1"
+            style="font-size: 30rpx; padding-left:20rpx">
+				This place is just so charming, the perfect winter resort.
+			</view>
           </view>
-          <view class="ch">
-            <view
-              class=" word-text-middle-1"
-              style="font-size: 30rpx; padding-top: 30rpx;padding-left: 150rpx;"
-            >
-              这个地方实在是太好啦，完美的冬季旅游胜地！
-            </view>
-          </view>
-          <view>
-            <view class="expl word-Border-radius">
-              <view
-                class="word-text-border"
-                style="font-size: 30rpx; padding: 10rpx 42rpx"
-              >
-                例句
-              </view>
-            </view>
-          </view>
+		   
+		   <view class="word-text-middle-1"
+            style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx">
+		   	这个地方实在是太好啦，完美的冬季旅游胜地！
+		   </view>
+		   
+		   <view class=" margin-top-sm flex_x_right">
+		     <view
+		       class="word-text-border word-Border-radius expl"
+		       style="font-size: 30rpx; padding: 10rpx 42rpx"
+		     >
+		       例句
+		     </view>
+		   </view>
+          
         </view>
 
       </view>
