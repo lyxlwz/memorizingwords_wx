@@ -89,9 +89,17 @@ export default {
   },
   methods: {
     click(index) {
-      if(index === 3){
+      if(index === 2){
 		  uni.navigateTo({
 		  	url: '/pages/word/Fallible'
+		  });
+	  }else if(index === 3){
+		  uni.navigateTo({
+		  	url: '/pages/word/random'
+		  });
+	  }else if(index === 0){
+		  uni.navigateTo({
+		  	url: '/pages/word/today'
 		  });
 	  }
     }

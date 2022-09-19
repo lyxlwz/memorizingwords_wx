@@ -11,7 +11,7 @@
 		</view>
 		<view class="fbl " style="padding: 300rpx 120rpx; ">
 			<view class="text flex_x_center word-text-border"  >
-				易错单词筛查
+				随机单词筛查
 			</view>
 			<view class="input flex_x_center" style="padding-top: 150rpx; ">
 				<view class=" word-Border-radius" style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx">
@@ -69,3 +69,4 @@
 		}
 	}
 </style>
+
