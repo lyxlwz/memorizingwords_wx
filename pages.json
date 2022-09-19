@@ -421,6 +421,7 @@
 		    }
 		    
 		},
+		
 		{
 		    "path" : "pages/word/random",
 		    "style" :                                                                                    
@@ -440,7 +441,7 @@
             
         }
         ,{
-            "path" : "pages/word/ screen ",
+            "path" : "pages/word/scre",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",

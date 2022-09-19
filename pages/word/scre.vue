@@ -1,5 +1,5 @@
 <template>
-  <view class="today">
+  <view class="screen">
     <view>
       <u-navbar
 	   leftText="10/100"
@@ -23,11 +23,11 @@
 			单词学习
 		</view>
 	</view>
-    <view class="all">
+    
       <view class="title test-w-b">resort</view>
       <view
         class="flex "
-        style="padding-top: 10rpx;"
+        style="padding-top: 10rpx; padding-left: 40rpx;"
       >
         <u-button
           style="width:auto"
@@ -43,6 +43,8 @@
         <!--  -->
         <view class="word-text-middle-1">/ rɪˈzɔːrt /</view>
       </view>
+	  <view v-if="aaa">
+	  	<view class="all" >
       <view
         class="translate padding-top-lg"
         style="display: flex;"
@@ -132,7 +134,7 @@
 	  
 	  <view class="flex_bet" style="padding: 80rpx 80rpx; display: flex; ">
 	  	<view class="tab-t word-text-border " style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;" @click="tabt">
-	  		上一词
+	  		不记得
 	  	</view>
 	
 		<view class="tab-b word-text-border " style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;" @click="tabb">
@@ -141,6 +143,26 @@
 	  </view>
 
     </view>
+	  </view>
+	  <view  style="padding: 100rpx 130rpx;">
+		 <view class="flex_xy_center">
+		  	 <view class="look word-text-border flex_xy_center" style="font-size: 40rpx; width: 250rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;" @click="look">
+		  	查看释义
+		  </view>
+		  </view>
+		  	
+		  
+	  	<view class="flex_bet" style="padding-top: 100rpx; display: flex; ">
+	 	<view class="top word-text-border " style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;" @click="top">
+	 		上一词
+	 	</view>
+	 	
+	 		<view class="down word-text-border " style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx;background: #627bff;" @click="down">
+	 			下一词
+	 		</view>
+	 </view>
+	  </view>
+	 
 
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
@@ -153,38 +175,53 @@ import playWords from './components/playWords'
 export default {
   data() {
     return {
-
+		aaa: false
     }
   },
   components: { playWords },
   methods: {
-	  tabt(){
+	  top(){
 		  console.log("上一词")
 	  },
-	  tabb(){
+	  down(){
 	  		  console.log("下一词")
 	  },
+	  look(){
+		  this.aaa = true
+	  },
+	  tabt(){
+		  console.log("不记得")
+	  },
+	  tabb(){
+		  console.log("下一词")
+	  }
   }
 }
 </script>
 <style lang="scss" scoped>
-.today {
+.screen {
   height: 100vh;
   background: #3d5cff;
-  .all {
-    margin: auto;
-    width: 90%;
-    // padding-left: 20rpx;
-    .title {
+  .title {
+	  margin: auto;
+	  width: 90%;
+	  
       // padding-top: 150rpx;
       color: white;
       font-size: 100rpx;
       font-weight: 200%;
       .custom-style {
-        // margin: 0 200rpx;
-        width: 50rpx;
+		  margin: auto;
+		  
+			// margin: 0 200rpx;
+        // width: 50rpx;
       }
     }
+  .all {
+    margin: auto;
+    width: 90%;
+    // padding-left: 20rpx;
+    
     .association {
       // height: 200rpx;
       background: #506cff;
@@ -209,6 +246,8 @@ export default {
 	.tab-b{
 		background: #627bff;
 	}
+	
   }
 }
 </style>
+

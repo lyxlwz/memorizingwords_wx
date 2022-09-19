@@ -101,6 +101,10 @@ export default {
 		  uni.navigateTo({
 		  	url: '/pages/word/today'
 		  });
+	  }else if(index === 1){
+		  uni.navigateTo({
+		  	url: '/pages/word/scre'
+		  });
 	  }
     }
   }
