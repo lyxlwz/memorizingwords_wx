@@ -1,13 +1,6 @@
 <template>
   <view class='circlePage'>
     <view class='wrap'>
-      <!-- 圆形中间的文字 -->
-      <!-- <view class="circleText">
-        <text class='num'>{{total}}</text>
-        <view class='line'></view>
-        <text class="text">总数量</text>
-      </view> -->
-      <!-- 第一个canvas用于绘制白色圆形 第二个canvas用于绘制橙色圆形进度条 -->
       <canvas
         :canvas-id='canvasId'
         :style="{height:width+'rpx',width:width+'rpx'}"
@@ -134,24 +127,6 @@ export default {
   justify-content: center;
   align-items: center;
 }
-// .num {
-//   font-size: 16px;
-//   font-weight: 200;
-//   line-height: 12px;
-// }
-
-// .line {
-//   width: 70rpx;
-//   height: 2rpx;
-//   background: rgba(255, 255, 255, 0.4);
-//   margin-top: 12rpx;
-//   margin-bottom: 9rpx;
-// }
-// .text {
-//   font-size: 12px;
-//   font-weight: 200;
-//   line-height: 12px;
-// }
 .progress {
   position: absolute;
 }
