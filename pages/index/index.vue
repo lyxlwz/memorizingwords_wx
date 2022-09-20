@@ -129,6 +129,7 @@ export default {
   onLoad(e) {
     // 隐藏原生的tabbar
     uni.hideTabBar();
+    this.getData()
   },
   //页面显示
   onShow() {
@@ -139,6 +140,23 @@ export default {
   methods: {
     planItem(plan, index) {
       console.log(plan, index, '===plan')
+    },
+    getData() {
+      uni.request({
+        url: 'http://jds.cox1314.com:8081/api/COXOA/NhsaJmkey',
+        methods: 'POST',
+        header: {
+          'Content-Type': 'application/json',
+        },
+        data: {},
+        success: (res) => {
+          // console.log(res.data, '===res');
+          const X2JS = require('./utils/we-x2js')
+          const x2js = new X2JS()
+          const data = x2js.xml2js(res.data)//json转xml
+          console.log(data, '===res');
+        }
+      })
     },
   }
 }

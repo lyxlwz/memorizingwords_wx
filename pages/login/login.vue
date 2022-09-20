@@ -1,5 +1,7 @@
 <template>
   <view class="login">
+    <!-- 公共组件-每个页面必须引入 -->
+    <public-module></public-module>
     <view
       class="text"
       style="padding-top: 130rpx; padding-left: 50rpx;"
@@ -27,38 +29,35 @@
       >
         秘钥
       </view>
-      <view style="padding-top: 10rpx;">
-        <!-- 注意：由于兼容性差异，如果需要使用前后插槽，nvue下需使用u--input，非nvue下需使用u-input -->
-
-        <u--input
-          type="number"
-          :password="password"
-          :focus="focus"
-          border="surround"
-          fontSize="30rpx"
-          style="height: 100rpx;border-radius: 20rpx;"
-        >
-          <template slot="suffix">
-            <view @click="password = !password">
-              <u-icon
-                v-show="!password"
-                name="eye-fill"
-                color="#909399"
-                size="28"
-              ></u-icon>
-              <u-icon
-                v-show="password"
-                name="eye-off"
-                color="#909399"
-                size="28"
-              ></u-icon>
-            </view>
-          </template>
-        </u--input>
+      <view
+        style="padding-top: 10rpx;"
+        class="input_box"
+      >
+        <input
+          class="input_item"
+          v-model="password"
+          :password="!isSee"
+          placeholder="请输入密码"
+          placeholder-class="grey"
+          @confirm="onSubmit"
+        />
+        <view @click="isSee = !isSee">
+          <image
+            v-if="isSee"
+            src="../../static/icon/ic_logon_display.png"
+            mode="aspectFit"
+          ></image>
+          <image
+            v-else-if="!isSee"
+            src="../../static/icon/ic_logon_hide.png"
+            mode="aspectFit"
+          ></image>
+        </view>
       </view>
 
       <view style="padding-top: 80rpx;">
         <button
+          @click="onSubmit"
           type="primary"
           class="btn"
         >登录</button>
@@ -68,21 +67,112 @@
 </template>
 
 <script>
+import md5 from '@/plugins/md5';
+var clear;
+import {
+  mapState,
+  mapMutations
+} from 'vuex';
+import socket from '@/config/socket';
 export default {
   data() {
     return {
-      password: true,
-      passwordicon: true,
-      focus: true
+      password: '',
+      isSee: false,
     }
   },
+  //第一次加载
+  onLoad(e) {
+    this.logo = this.$base.logoUrl;
+    // #ifdef APP-PLUS
+    this.isIos = (plus.os.name == "iOS");
+    let systemInfo = uni.getSystemInfoSync();
+    this.system = parseFloat(systemInfo['system'].replace(/[a-zA-Z]/g, ""));
+    this.isWeixin = plus.runtime.isApplicationExist({
+      pname: 'com.tencent.mm',
+      action: "weixin://"
+    });
+    // #endif
+  },
+  //页面显示
+  onShow() { },
   methods: {
+    ...mapMutations(['setUserInfo']),
+    onSubmit() {
+      if (!this.password) {
+        uni.showToast({
+          title: '请输入密码',
+          icon: 'none'
+        });
+        return;
+      }
 
+      this.$http.post('/login/check',
+        { key: this.password },
+        {
+          // isPrompt: true,//（默认 true 说明：本接口抛出的错误是否提示）
+          // load: true,//（默认 true 说明：本接口是否提示加载动画）
+          header: { //默认 无 说明：请求头
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+          }
+        }).then(res => {
+          this.setUserInfo(res);
+          socket.init();
+          uni.showToast({
+            title: '登录成功',
+            duration: 2000,
+            success: () => {
+              setTimeout(() => {
+                uni.switchTab({
+                  url: 'pages/index/index'
+                });
+              }, 2000);
+            }
+          });
+        });
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.input_box {
+  display: flex;
+  align-items: center;
+  height: 104rpx;
+  // background-color: #f8f9fb;
+  border-radius: 8rpx;
+  border: 2rpx solid #efeef4;
+  padding: 30rpx 40rpx;
+  margin-top: 20rpx;
+  image {
+    width: 36rpx;
+    height: 24rpx;
+  }
+
+  input {
+    flex: 1;
+    font-size: 28rpx;
+    color: #333;
+    height: 60rpx;
+  }
+
+  .input_item {
+    font-size: 28rpx;
+    border: 0px;
+    flex: 1;
+    background-color: #f8f9fb;
+    height: 88rpx;
+    width: 100%;
+    outline: none;
+    //margin-left: 32rpx;
+  }
+
+  .grey {
+    color: #999999;
+  }
+}
+
 .login {
   height: 360rpx;
   background: #3d5cff;
