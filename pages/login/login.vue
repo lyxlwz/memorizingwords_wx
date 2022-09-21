@@ -29,10 +29,7 @@
       >
         秘钥
       </view>
-      <view
-        style="padding-top: 10rpx;"
-        class="input_box"
-      >
+      <view class="input_box">
         <input
           class="input_item"
           v-model="password"
@@ -73,11 +70,10 @@ import {
   mapState,
   mapMutations
 } from 'vuex';
-import socket from '@/config/socket';
 export default {
   data() {
     return {
-      password: '',
+      password: '', //正确密码为123456
       isSee: false,
     }
   },
@@ -110,26 +106,23 @@ export default {
       this.$http.post('/login/check',
         { key: this.password },
         {
-          // isPrompt: true,//（默认 true 说明：本接口抛出的错误是否提示）
-          // load: true,//（默认 true 说明：本接口是否提示加载动画）
           header: { //默认 无 说明：请求头
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
           }
         }).then(res => {
           this.setUserInfo(res);
-          socket.init();
           uni.showToast({
             title: '登录成功',
             duration: 2000,
             success: () => {
               setTimeout(() => {
                 uni.switchTab({
-                  url: 'pages/index/index'
+                  url: '/pages/index/index'
                 });
               }, 2000);
             }
           });
-        });
+        })
     }
   }
 }
@@ -140,9 +133,8 @@ export default {
   display: flex;
   align-items: center;
   height: 104rpx;
-  // background-color: #f8f9fb;
-  border-radius: 8rpx;
-  border: 2rpx solid #efeef4;
+  border-radius: 20rpx;
+  border: 2rpx solid #dadbde;
   padding: 30rpx 40rpx;
   margin-top: 20rpx;
   image {

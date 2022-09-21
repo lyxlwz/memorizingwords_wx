@@ -210,50 +210,13 @@ $http.dataFactory = async function (res) {
       //     return Promise.resolve(result);
       // }
       // 返回错误的结果(catch接受数据)
-      // return Promise.reject({
-      // 	statusCode: 0,
-      // 	errMsg: "【request】" +  (httpData.info || httpData.msg)
-      // });
-
-
-
-
-
-      store.commit("emptyUserInfo");
-      // #ifdef MP-WEIXIN
-      onLogin();
-      // #endif
-      // #ifdef H5
-      h5Login("force");
-      // #endif
-      // #ifdef APP-PLUS
-      var content = '此时此刻需要您登录喔~';
-      if (httpData.code == "1000") {
-        content = '此时此刻需要您登录喔';
-      }
-      if (loginPopupNum <= 0) {
-        loginPopupNum++;
-        uni.showModal({
-          title: '温馨提示',
-          content: content,
-          confirmText: "去登录",
-          cancelText: "再逛会",
-          success: function (res) {
-            loginPopupNum--;
-            if (res.confirm) {
-              uni.navigateTo({
-                url: "/pages/user/login"
-              });
-            }
-          }
-        });
-      }
-      // #endif
-      // 返回错误的结果(catch接受数据)
+      uni.showToast({
+        title: httpData.info || httpData.msg,
+        icon: 'none'
+      });
       return Promise.reject({
         statusCode: 0,
-        errMsg: "【request】" + (httpData.info || httpData.msg),
-        data: res.data
+        errMsg: httpData.info || httpData.msg
       });
     } else if (httpData.code == "1004") {
       if (loginPopupNum <= 0) {
