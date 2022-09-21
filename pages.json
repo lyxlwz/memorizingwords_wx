@@ -438,7 +438,25 @@
         "enablePullDownRefresh": false
       }
     }
-  ],
+      ,{
+            "path" : "pages/userr/user",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        },
+		{
+		      "path" : "pages/number/number",
+		      "style" :                                                                                    
+		      {
+		          "navigationBarTitleText": "",
+		          "enablePullDownRefresh": false
+		      }
+		      
+		  }
+    ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     // "navigationBarTitleText": "uni-app",
