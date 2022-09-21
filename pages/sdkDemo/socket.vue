@@ -26,7 +26,6 @@
 	</view>
 </template>
 <script>
-import socket from '@/config/socket.js';
 export default {
 	data() {
 		return {
