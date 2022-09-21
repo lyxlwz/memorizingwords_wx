@@ -135,7 +135,6 @@ import {
   mapState,
   mapMutations
 } from 'vuex';
-import socket from '@/config/socket';
 export default {
   data() {
     return {
@@ -300,7 +299,6 @@ export default {
       });
       // this.$http.post('api/common/v1/login', httpData).then(res => {
       // 	this.setUserInfo(res);
-      // 	socket.init();
       // 	uni.showToast({
       // 		title: '登录成功',
       // 		duration: 2000,
@@ -337,7 +335,6 @@ export default {
                       ...data,
                     });
                     if (data.thirdLoginSuccess) {
-                      socket.init();
                       uni.showToast({
                         title: '登录成功',
                         duration: 2000
@@ -396,7 +393,6 @@ export default {
                   .then(data => {
                     this.setUserInfo(data);
                     if (data.thirdLoginSuccess) {
-                      socket.init();
                       uni.showToast({
                         title: '登录成功',
                         duration: 2000
