@@ -21,11 +21,6 @@
               mode="aspectFit"
             ></image>
           </view>
-
-          <!-- <text
-            class="footer_nav_item_text"
-            :class="[item.pagePath == path ? 'footer_item_text_active' : '']"
-          >{{ item.text }}</text> -->
         </view>
         <view
           v-else
@@ -46,7 +41,7 @@
           ></image>
           <text
             class="footer_nav_item_text"
-            :class="[item.pagePath == path ? 'footer_item_text_active' : '']"
+            :class="[item.pagePath == path ? 'footer_nav_item_text_active' : '']"
           >{{ item.text }}</text>
         </view>
       </view>
@@ -183,7 +178,7 @@ export default {
   font-weight: bold;
 }
 .footer_nav_item_text_active {
-  color: #f9a633;
+  color: #3d5cff;
 }
 .footer_nav_item_image {
   width: 50rpx;
@@ -197,7 +192,6 @@ export default {
   width: 120rpx;
   height: 120rpx;
   background-color: #fff;
-  // background-color: #f5f7ff;
   border-radius: 50%;
   /* #ifndef APP-NVUE */
   display: flex;
