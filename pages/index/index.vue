@@ -3,15 +3,16 @@
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
-        <u-search
+		  <view @click="search">
+		  	  <u-search
           shape="square"
           placeholder="请输入要查询的单词"
           bgColor="#ffff"
           height="90rpx"
           :showAction="false"
-          v-model="keyword"
         ></u-search>
-
+		  </view>
+      
         <view class="tobe">
           <view class="title">今日待学习单词</view>
           <view class="number margin-tb-xs">
@@ -85,7 +86,7 @@
       </view>
 
     </view>
-
+	<search  :show.sync="pop"></search>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
     <z-navigation></z-navigation>
@@ -97,7 +98,8 @@ import circleProgress from '@/components/circle-progress/circle-progress'
 export default {
   data() {
     return {
-      keyword: "shuru",
+      keyword: '',
+	  pop:false,
       planList: [
         {
           planName: '记忆训练',
@@ -142,8 +144,10 @@ export default {
       console.log(plan, index, '===plan')
     },
     getData() {
-
     },
+	search(){
+		this.pop = true;
+	}
   }
 }
 </script>

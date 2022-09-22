@@ -10,7 +10,7 @@
       >
 	  <view slot="right">
 		  <view style="font-size: 30rpx; color:#cbcdce;">
-		  	学习日期：2022年9月5日
+		  	学习日期：{{day}}
 		  </view>
 	  </view>
       </u-navbar>
@@ -153,11 +153,28 @@ import playWords from './components/playWords'
 export default {
   data() {
     return {
-
+		day:'2021-07-16',
+		type:'1'
     }
+  },
+  onLoad(){
+	  this.api()
   },
   components: { playWords },
   methods: {
+	  api(){
+		  this.$http.get('/WordLearn/todayWordScreening',
+	    { date: this.day,
+		  type: this.type},
+	    {
+	      header: { //默认 无 说明：请求头
+	        'Content-Type': 'multipart/form-data; charset=UTF-8'
+	      }
+	    }).then(data =>{
+			console.log(data,'成功返回参数')
+		})
+	  },
+	  
 	  tabt(){
 		  console.log("上一词")
 	  },

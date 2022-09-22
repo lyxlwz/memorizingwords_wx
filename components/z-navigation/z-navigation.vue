@@ -50,15 +50,17 @@
       v-if="bg"
       class="footer_station"
     ></view>
-    <z-popup
+	<search
+	 :show.sync="popupShow"
+	></search>
+    <!-- <z-popup
       v-model="popupShow"
       type="center"
     >
       <view class="popup_content">
-        <view>凸起导航解决方案，请看components/module/navigation.vue</view>
-        <view>和pages/demo/common.vue</view>
+		
       </view>
-    </z-popup>
+    </z-popup> -->
   </view>
 </template>
 <script>
@@ -69,6 +71,7 @@ export default {
       default: true
     }
   },
+  
   data() {
     return {
       path: '',
@@ -86,6 +89,7 @@ export default {
           text: 'Course'
         },
         {
+		  pagePath: 'pages/search/search',
           iconPath: 'static/icon/tab/icon_search.png',
           text: 'Search',
           raised: true
