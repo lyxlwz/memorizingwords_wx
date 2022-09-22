@@ -14,11 +14,18 @@
           class="footer_raised_item"
           @click="onRaised"
         >
-          <image
-            class="footer_raised_item_image"
-            :src="'/' + item.iconPath"
-            mode="aspectFit"
-          ></image>
+          <view class="footer_raised_item_bg">
+            <image
+              class="footer_raised_item_image"
+              :src="'/' + item.iconPath"
+              mode="aspectFit"
+            ></image>
+          </view>
+
+          <!-- <text
+            class="footer_nav_item_text"
+            :class="[item.pagePath == path ? 'footer_item_text_active' : '']"
+          >{{ item.text }}</text> -->
         </view>
         <view
           v-else
@@ -75,30 +82,30 @@ export default {
           pagePath: 'pages/index/index',
           iconPath: 'static/icon/tab/icon_home.png',
           selectedIconPath: 'static/icon/tab/icon_home_c.png',
-          text: '新增功能'
+          text: 'Home'
         },
         {
           pagePath: 'pages/course/course',
-          iconPath: 'static/icon/tab/icon_wode.png',
-          selectedIconPath: 'static/icon/tab/icon_wode_c.png',
-          text: '组件示例'
+          iconPath: 'static/icon/tab/icon_manage.png',
+          selectedIconPath: 'static/icon/tab/icon_manage_c.png',
+          text: 'Course'
         },
         {
-          iconPath: 'static/icon/tab/icon_home_c.png',
-          text: '凸起导航',
+          iconPath: 'static/icon/tab/icon_search.png',
+          text: 'Search',
           raised: true
         },
         {
           pagePath: 'pages/manage/manage',
-          iconPath: 'static/icon/tab/icon_xiaoxi.png',
-          selectedIconPath: 'static/icon/tab/icon_xiaoxi_c.png',
-          text: 'SDK示例'
+          iconPath: 'static/icon/tab/icon_course.png',
+          selectedIconPath: 'static/icon/tab/icon_course_c.png',
+          text: 'Manage'
         },
         {
-          pagePath: 'pages/template/common',
-          iconPath: 'static/icon/tab/icon_xiaoxi.png',
-          selectedIconPath: 'static/icon/tab/icon_xiaoxi_c.png',
-          text: '模板页面'
+          pagePath: 'pages/account/account',
+          iconPath: 'static/icon/tab/icon_account.png',
+          selectedIconPath: 'static/icon/tab/icon_account_c.png',
+          text: 'Account'
         }
       ],
       popupShow: false
@@ -173,6 +180,7 @@ export default {
   font-size: 24rpx;
   color: #999999;
   margin-top: 6rpx;
+  font-weight: bold;
 }
 .footer_nav_item_text_active {
   color: #f9a633;
@@ -189,16 +197,23 @@ export default {
   width: 120rpx;
   height: 120rpx;
   background-color: #fff;
+  // background-color: #f5f7ff;
   border-radius: 50%;
   /* #ifndef APP-NVUE */
   display: flex;
   /* #endif */
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  &_bg {
+    padding: 26rpx;
+    background-color: #f5f7ff;
+    border-radius: 50%;
+  }
 }
 .footer_raised_item_image {
-  width: 70rpx;
-  height: 70rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 .popup_content {
   background-color: #fff;
