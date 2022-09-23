@@ -13,7 +13,7 @@
         ></u-search>
 		  </view>
       
-        <view class="tobe">
+        <view class="tobe" @click="tobe">
           <view class="title">今日待学习单词</view>
           <view class="number margin-tb-xs">
             201
@@ -72,8 +72,7 @@
               class="Small test-w-b word-text-middle"
               style="font-size: 80%;"
             >
-              人的一生中应该有三个爱好，一
-              个帮助你赚钱，一个帮助你管理
+              {{text}}
             </view>
           </view>
           <img
@@ -99,6 +98,7 @@ export default {
   data() {
     return {
       keyword: '',
+	  text:'',
 	  pop:false,
       planList: [
         {
@@ -132,6 +132,7 @@ export default {
     // 隐藏原生的tabbar
     uni.hideTabBar();
     this.getData()
+	this.api()
   },
   //页面显示
   onShow() {
@@ -140,9 +141,33 @@ export default {
   },
   //方法
   methods: {
+	  api(){
+		  this.$http.get('/Aphorism/aphorism_search',
+		  {
+		    // header: { //默认 无 说明：请求头
+		    //   'Content-Type': 'multipart/form-data; charset=UTF-8'
+		    // }
+		  }).then(data =>{
+		  	console.log(data,'成功返回参数')
+			this.text = data.aphorism
+		  })
+	  },
     planItem(plan, index) {
-      console.log(plan, index, '===plan')
+      if(index === 0){
+		  uni.navigateTo({
+		  	url: '/pages/number/number'
+		  });
+	  }else if(index === 1){
+		  uni.navigateTo({
+		  	url: '/pages/word/today'
+		  });
+	  }
     },
+	tobe(){
+		uni.navigateTo({
+			url: '/pages/word/today'
+		});
+	},
     getData() {
     },
 	search(){

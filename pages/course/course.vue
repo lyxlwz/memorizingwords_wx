@@ -105,6 +105,10 @@ export default {
 		  uni.navigateTo({
 		  	url: '/pages/word/scre'
 		  });
+	  }else if(index === 4){
+		  uni.navigateTo({
+		  	url: '/pages/number/number'
+		  });
 	  }
     }
   }

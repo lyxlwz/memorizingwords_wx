@@ -1,5 +1,5 @@
 <template>
-  <view class="wordPageSty">
+  <view class="wordPageSty" style="height: 100%;">
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
     <view
@@ -14,17 +14,22 @@
       </view>
 
     </view>
-    <view class="search">
-      <u--input
+    <view class="search" > 
+		<view class="inp">
+			
+		
+			  <u--input
         shape="square"
         placeholder="今日单词学习"
         clearable
         placeholderStyle="color:#3d5cff"
-        bgColor="#ebdffd"
         height="90rpx"
         prefixIcon="search"
+		border="none"
         prefixIconStyle="font-size: 22px;color: #909399"
       >
+		
+    
 
         <template slot="suffix">
           <u-popup
@@ -127,6 +132,7 @@
         </template>
 
       </u--input>
+	  </view>
     </view>
 
     <!-- // 列表-->
@@ -138,8 +144,8 @@
           @click="click(index)"
         >
           <u-cell
-            :title="`2022-9-6     on`"
-            value="内容"
+            :title="title+ '  ' +title1"
+            value="在...中;关于"
           >
 
           </u-cell>
@@ -157,6 +163,8 @@ export default {
     return {
 		src:'/static/word/sear.png',
       indexList: [],
+	  title:"2022-9-6",
+	  title1:"on",
       urls: [],
       show: false,
 	  yaradios:[{
@@ -350,10 +358,16 @@ export default {
 </script>
 <style lang="scss" scoped>
 .search {
+	// background: #ffaaff;
   margin: auto;
-  padding-top: 20rpx;
+  padding-top: 30rpx;
   width: 90%;
-  height: 42px;
+  height: 100rpx;
+  .inp{
+	  border-radius: 20upx;
+	  padding: 20rpx;
+	  background: #ede9fd;
+  }
   // .u-page__tag-item {
   //   width: 230rpx;
   //   margin-right: 20px;
@@ -412,7 +426,7 @@ export default {
 }
 
 .u-page {
-  height: calc(100vh - 100rpx);
+  height: calc(70vh - 10rpx);
   overflow: scroll;
 }
 </style>

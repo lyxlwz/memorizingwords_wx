@@ -48,7 +48,9 @@
 		},
 		methods: {
 			yes(){
-				console.log("kaishi")
+				uni.navigateTo({
+					url: '/pages/word/scre'
+				});
 			}
 		}
 	}
