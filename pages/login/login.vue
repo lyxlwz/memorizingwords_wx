@@ -157,7 +157,6 @@ export default {
     font-size: 28rpx;
     border: 0px;
     flex: 1;
-    background-color: #f8f9fb;
     height: 88rpx;
     width: 100%;
     outline: none;

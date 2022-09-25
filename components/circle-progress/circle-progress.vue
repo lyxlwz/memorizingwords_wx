@@ -94,7 +94,12 @@ export default {
     drawCirclePg(prefix, data) {
       //创建并返回绘图上下文context对象。
       let cxt_arc = uni.createCanvasContext(prefix + '_p');
-      var value = (data.num / data.total) * 2;
+      let value
+      if (parseFloat(data.total) == 0) {
+        value = 0.01
+      } else {
+        value = (data.num / data.total) * 2;
+      }
       cxt_arc.setLineWidth(this.lineWidth);
       cxt_arc.setStrokeStyle(this.activeColor);
       cxt_arc.setLineCap('round');

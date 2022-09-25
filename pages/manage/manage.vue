@@ -171,7 +171,7 @@
     <view class="u-page margin-top-lg">
       <u-list
         @scrolltolower="scrolltolower"
-        height="calc(80vh - 120rpx)"
+        height="calc(80vh - 180rpx)"
       >
         <u-list-item
           v-for="(item, index) in indexList"

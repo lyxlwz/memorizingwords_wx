@@ -2,7 +2,7 @@
 //主题色
 $themeColor: #ea552d;
 
-$footer-height:160rpx;
+$footer-height:200rpx;
 
 @mixin theme($type, $path:'') {
   @if $type=="btn_bg" {

@@ -3,22 +3,25 @@
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
-		  <view @click="search">
-		  	  <u--input
-          shape="square"
-          placeholder="请输入要查询的单词"
-          bgColor="#ffff"
-          height="90rpx"
-          border="none"
-        >
-		<!-- <view v-slot="slot">
+        <view @click="search">
+          <u--input
+            shape="square"
+            placeholder="请输入要查询的单词"
+            bgColor="#ffff"
+            height="90rpx"
+            border="none"
+          >
+            <!-- <view v-slot="slot">
 			quxiao
 		</view> -->
-		
-		</u--input>
-		  </view>
-      
-        <view class="tobe" @click="tobe">
+
+          </u--input>
+        </view>
+
+        <view
+          class="tobe"
+          @click="tobe"
+        >
           <view class="title">今日待学习单词</view>
           <view class="number margin-tb-xs">
             201
@@ -66,7 +69,7 @@
           </view>
         </view>
         <view
-          class="Proverbs margin-top-lg flex"
+          class="Proverbs margin-top-lg flex-row"
           :style="{'background':bgColor}"
         >
           <view>
@@ -84,10 +87,11 @@
             </view>
           </view>
           <img
-            :src="`data:image/png;base64,${imgUrl}`"
+            :src="imgUrl"
             alt=""
             width="120rpx"
             height="120rpx"
+            style="border-radius:50%"
           >
         </view>
 

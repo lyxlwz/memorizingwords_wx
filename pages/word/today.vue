@@ -30,7 +30,7 @@
       </view>
     </view>
     <view class="all">
-      <view class="title test-w-b" >resort</view>
+      <view class="title test-w-b">resort</view>
       <view
         class="flex "
         style="padding-top: 10rpx;"
@@ -47,7 +47,10 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
-        <view class="word-text-light-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
+        <view
+          class="word-text-light-1"
+          style="font-size: 30rpx;"
+        >/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="translate padding-top-lg"
@@ -181,20 +184,24 @@ export default {
     }
   },
   onLoad() {
-    this.api()
+    this.todayWordList()
   },
   components: { playWords },
   methods: {
-    api() {
+    todayWordList() {
       this.$http.get('/WordLearn/todayWordScreening',
         {
           date: this.day,
           type: this.type
-        },
+        }).then(data => {
+          // this.todayWord(data[0])
+          console.log(data, '成功返回参数')
+        })
+    },
+    todayWord(wordId) {
+      this.$http.get('/WordLearn/todayWordScreening',
         {
-          header: { //默认 无 说明：请求头
-            'Content-Type': 'multipart/form-data; charset=UTF-8'
-          }
+          id: wordId
         }).then(data => {
           console.log(data, '成功返回参数')
         })

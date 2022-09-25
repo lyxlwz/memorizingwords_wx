@@ -50,15 +50,13 @@
       v-if="bg"
       class="footer_station"
     ></view>
-	<search
-	 :show.sync="popupShow"
-	></search>
+    <search :show.sync="popupShow"></search>
     <!-- <z-popup
       v-model="popupShow"
       type="center"
     >
       <view class="popup_content">
-		
+
       </view>
     </z-popup> -->
   </view>
@@ -71,7 +69,7 @@ export default {
       default: true
     }
   },
-  
+
   data() {
     return {
       path: '',
@@ -89,7 +87,7 @@ export default {
           text: 'Course'
         },
         {
-		  pagePath: 'pages/search/search',
+          pagePath: 'pages/search/search',
           iconPath: 'static/icon/tab/icon_search.png',
           text: 'Search',
           raised: true
@@ -141,6 +139,7 @@ export default {
   padding-bottom: env(safe-area-inset-bottom);
 }
 .footer_box {
+  box-shadow: 20rpx 0rpx 20rpx 20rpx rgba(0, 0, 0, 0.1);
   height: $footer-height;
   position: fixed;
   bottom: 1%;
