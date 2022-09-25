@@ -47,11 +47,7 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
-<<<<<<< Updated upstream
         <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
-=======
-        <view class="word-text-middle-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
->>>>>>> Stashed changes
       </view>
       <view
         class="translate padding-top-lg"

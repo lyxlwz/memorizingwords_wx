@@ -20,9 +20,6 @@
         class="word-text-light-1 flex_x_right"
         style="font-size: 30rpx;"
       >
-<<<<<<< Updated upstream
-        分组序号
-=======
         <u-button
           style="width:auto"
           class="custom-style"
@@ -35,16 +32,15 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
-        <view class="word-text-middle-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
->>>>>>> Stashed changes
+        <view
+          class="word-text-middle-1"
+          style="font-size: 30rpx;"
+        >/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="word-text-light-1 flex_x_right"
         style="padding-top: 20rpx;font-size: 30rpx;"
       >
-<<<<<<< Updated upstream
-        单词学习
-=======
         <view class="noun word-text-middle-1">
           n.
         </view>
@@ -54,7 +50,6 @@
         >
           度假胜地 采用的方法
         </view>
->>>>>>> Stashed changes
       </view>
     </view>
 
@@ -80,13 +75,8 @@
     <view v-if="aaa">
       <view class="all">
         <view
-<<<<<<< Updated upstream
-          class="translate padding-top-lg"
-          style="display: flex;"
-=======
           class="word-text-border"
           style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
->>>>>>> Stashed changes
         >
           <view class="noun word-text-light-1">
             n.
