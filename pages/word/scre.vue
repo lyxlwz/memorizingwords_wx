@@ -1,5 +1,6 @@
 <template>
   <view class="screen">
+	  
     <view>
       <u-navbar
         leftText="10/100"
@@ -20,36 +21,13 @@
         class="word-text-light-1 flex_x_right"
         style="font-size: 30rpx;"
       >
-        <u-button
-          style="width:auto"
-          class="custom-style"
-          type="primary"
-          text="英"
-          icon="static/word/word"
-          size="mini"
-          shape="circle"
-        ></u-button>
-        <!--  -->
-        <play-words></play-words>
-        <!--  -->
-        <view
-          class="word-text-middle-1"
-          style="font-size: 30rpx;"
-        >/ rɪˈzɔːrt /</view>
+        分组序号
       </view>
       <view
         class="word-text-light-1 flex_x_right"
         style="padding-top: 20rpx;font-size: 30rpx;"
       >
-        <view class="noun word-text-middle-1">
-          n.
-        </view>
-        <view
-          class="ntranslate word-text-border"
-          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
-        >
-          度假胜地 采用的方法
-        </view>
+        单词学习
       </view>
     </view>
 
@@ -70,20 +48,23 @@
       <!--  -->
       <play-words></play-words>
       <!--  -->
-      <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
-    </view>
+      <view class="word-text-light-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
+    
+	
+		
+	</view>
     <view v-if="aaa">
       <view class="all">
         <view
-          class="word-text-border"
-          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+          class="translate padding-top-lg"
+          style="display: flex;"
         >
           <view class="noun word-text-light-1">
             n.
           </view>
           <view
             class="ntranslate word-text-border"
-            style="padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+            style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
           >
             度假胜地 采用的方法
           </view>
@@ -94,7 +75,7 @@
           </view>
           <view
             class="word-text-border"
-            style="padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+            style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
           >
             诉诸，采取
           </view>
@@ -190,6 +171,7 @@
 
       </view>
     </view>
+	<view v-if="bbb">
     <view style="padding: 100rpx 130rpx;">
       <view class="flex_xy_center">
         <view
@@ -222,7 +204,7 @@
         </view>
       </view>
     </view>
-
+</view>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
     <z-navigation></z-navigation>
@@ -234,7 +216,8 @@ import playWords from './components/playWords'
 export default {
   data() {
     return {
-      aaa: false
+      aaa: false,
+	  bbb: true,
     }
   },
   components: { playWords },
@@ -246,7 +229,9 @@ export default {
       console.log("下一词")
     },
     look() {
-      this.aaa = true
+      this.aaa = ! this.aaa,
+	  this.bbb = ! this.bbb
+
     },
     tabt() {
       console.log("不记得")

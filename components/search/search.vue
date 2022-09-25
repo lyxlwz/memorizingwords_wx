@@ -3,7 +3,7 @@
     <u-overlay
       :show="show"
       @click="close"
-      opacity="0.7"
+      opacity="0.9"
     >
 
       <view

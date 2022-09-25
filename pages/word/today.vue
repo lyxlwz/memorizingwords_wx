@@ -30,7 +30,7 @@
       </view>
     </view>
     <view class="all">
-      <view class="title test-w-b">resort</view>
+      <view class="title test-w-b" >resort</view>
       <view
         class="flex "
         style="padding-top: 10rpx;"
@@ -47,7 +47,7 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
-        <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
+        <view class="word-text-light-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="translate padding-top-lg"
@@ -148,7 +148,7 @@
       >
         <view
           class="tab-t word-text-border "
-          style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;"
+          style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
           @click="tabt"
         >
           上一词
@@ -156,7 +156,7 @@
 
         <view
           class="tab-b word-text-border "
-          style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;"
+          style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
           @click="tabb"
         >
           下一词

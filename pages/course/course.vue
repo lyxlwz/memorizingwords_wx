@@ -7,7 +7,7 @@
           class="tobe flex"
           v-for="(i,index) in list"
           :key="index"
-          @click="click(index)"
+          @click="to(index)"
         >
           <view
             class="image"
@@ -88,7 +88,7 @@ export default {
     uni.hideTabBar();
   },
   methods: {
-    click(index) {
+    to(index) {
       if(index === 2){
 		  uni.navigateTo({
 		  	url: '/pages/word/Fallible'
