@@ -27,7 +27,11 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
+<<<<<<< Updated upstream
         <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
+=======
+        <view class="word-text-middle-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
+>>>>>>> Stashed changes
       </view>
       <view
         class="translate padding-top-lg"
@@ -38,7 +42,7 @@
         </view>
         <view
           class="ntranslate word-text-border"
-          style="padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
         >
           度假胜地 采用的方法
         </view>
@@ -49,7 +53,7 @@
         </view>
         <view
           class="word-text-border"
-          style="padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
         >
           诉诸，采取
         </view>

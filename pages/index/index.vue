@@ -3,20 +3,21 @@
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
-        <view @click="search">
-          <u-search
-            shape="square"
-            placeholder="请输入要查询的单词"
-            bgColor="#ffff"
-            height="90rpx"
-            :showAction="false"
-          ></u-search>
-        </view>
-
-        <view
-          class="tobe"
-          @click="tobe"
+		  <view @click="search">
+		  	  <u-search
+          shape="square"
+          placeholder="请输入要查询的单词"
+          bgColor="#ffff"
+          height="90rpx"
+          :showAction="false"
         >
+		<view v-slot="slot">
+			quxiao
+		</view>
+		</u-search>
+		  </view>
+      
+        <view class="tobe" @click="tobe">
           <view class="title">今日待学习单词</view>
           <view class="number margin-tb-xs">
             201
