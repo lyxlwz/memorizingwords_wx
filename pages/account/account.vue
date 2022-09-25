@@ -37,10 +37,11 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   data() {
     return {
-		day:"2020-6-3",
+      day: "2020-6-3",
       item: [
         {
           name: "已背单词数量",
@@ -57,11 +58,14 @@ export default {
       ]
     }
   },
+  computed: {
+    ...mapState(['userInfo'])
+  },
   //第一次加载
   onLoad(e) {
     // 隐藏原生的tabbar
     uni.hideTabBar();
-	this.api()
+    this.api()
   },
   //页面显示
   onShow() {
@@ -69,21 +73,25 @@ export default {
     uni.hideTabBar();
   },
   methods: {
-	  api(){
-		  this.$http.get('/LearnPlan/learn_plan_search',
-		  { date: this.day},
-		  {
-		    header: { //默认 无 说明：请求头
-		      // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-		    }
-		  }).then(data =>{
-		  	console.log(data,'成功返回参数')
-			this.item[0].number = data.today_number_target
-			this.item[1].number = data.screening_number
-			this.item[2].number = data.screening_words
+    api() {
+      this.item[0].number = this.userInfo.today_number_target
+      this.item[1].number = this.userInfo.screening_number
+      this.item[2].number = this.userInfo.screening_words
 
-		  })
-	  }
+      // this.$http.get('/LearnPlan/learn_plan_search',
+      // { date: this.day},
+      // {
+      //   header: { //默认 无 说明：请求头
+      //     // 'Content-Type': 'multipart/form-data; charset=UTF-8'
+      //   }
+      // }).then(data =>{
+      // 	console.log(data,'成功返回参数')
+      // this.item[0].number = data.today_number_target
+      // this.item[1].number = data.screening_number
+      // this.item[2].number = data.screening_words
+
+      // })
+    }
 
   }
 }

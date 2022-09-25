@@ -13,7 +13,7 @@
         登录
       </view>
       <view
-        class="word-text-middle-1"
+        class="word-text-light-1"
         style="font-size: 30rpx; "
       >
         在下面输入你的秘钥
@@ -64,8 +64,6 @@
 </template>
 
 <script>
-import md5 from '@/plugins/md5';
-var clear;
 import {
   mapState,
   mapMutations
@@ -110,20 +108,26 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
           }
         }).then(res => {
-          this.setUserInfo(res);
+          this.setUserInfo({ token: res });
+          this.getUserInfo()
           uni.showToast({
             title: '登录成功',
             duration: 2000,
             success: () => {
-              setTimeout(() => {
-                uni.switchTab({
-                  url: '/pages/index/index'
-                });
-              }, 2000);
+              uni.switchTab({
+                url: '/pages/index/index'
+              });
             }
           });
         })
-    }
+    },
+    getUserInfo() {
+      const date = new Date().format("yyyy-MM-dd");
+      this.$http.get('/LearnPlan/learn_plan_search',
+        { date }).then(res => {
+          this.setUserInfo(res);
+        })
+    },
   }
 }
 </script>

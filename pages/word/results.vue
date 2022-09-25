@@ -27,13 +27,13 @@
         <!--  -->
         <play-words></play-words>
         <!--  -->
-        <view class="word-text-middle-1">/ rɪˈzɔːrt /</view>
+        <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="translate padding-top-lg"
         style="display: flex;"
       >
-        <view class="noun word-text-middle-1">
+        <view class="noun word-text-light-1">
           n.
         </view>
         <view
@@ -44,7 +44,7 @@
         </view>
       </view>
       <view style="display: flex;padding-top: 10rpx;">
-        <view class="word-text-middle-1">
+        <view class="word-text-light-1">
           vi.
         </view>
         <view
@@ -61,7 +61,7 @@
           style="padding: 30rpx 40rpx"
         >
           <view
-            class="word-text-middle-1"
+            class="word-text-light-1"
             style="font-size: 30rpx;"
           >
             热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
@@ -79,39 +79,45 @@
       </view>
       <!-- 例句 -->
       <view style="padding-top: 50rpx;">
-        <view class="exp word-Border-radius" 
-		style="padding: 30rpx 40rpx;">
+        <view
+          class="exp word-Border-radius"
+          style="padding: 30rpx 40rpx;"
+        >
           <view style="display: flex;">
-          	<u-button
-          	  style="width:auto"
-          	  class="custom-style"
-          	  type="primary"
-          	  text="英"
-          	  icon="static/word/word"
-          	  size="mini"
-          	  shape="circle"
-          	></u-button>  
-			
-			<view class="word-text-middle-1"
-            style="font-size: 30rpx; padding-left:20rpx">
-				This place is just so charming, the perfect winter resort.
-			</view>
+            <u-button
+              style="width:auto"
+              class="custom-style"
+              type="primary"
+              text="英"
+              icon="static/word/word"
+              size="mini"
+              shape="circle"
+            ></u-button>
+
+            <view
+              class="word-text-light-1"
+              style="font-size: 30rpx; padding-left:20rpx"
+            >
+              This place is just so charming, the perfect winter resort.
+            </view>
           </view>
-		   
-		   <view class="word-text-middle-1"
-            style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx">
-		   	这个地方实在是太好啦，完美的冬季旅游胜地！
-		   </view>
-		   
-		   <view class=" margin-top-sm flex_x_right">
-		     <view
-		       class="word-text-border word-Border-radius expl"
-		       style="font-size: 30rpx; padding: 10rpx 42rpx"
-		     >
-		       例句
-		     </view>
-		   </view>
-          
+
+          <view
+            class="word-text-light-1"
+            style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx"
+          >
+            这个地方实在是太好啦，完美的冬季旅游胜地！
+          </view>
+
+          <view class=" margin-top-sm flex_x_right">
+            <view
+              class="word-text-border word-Border-radius expl"
+              style="font-size: 30rpx; padding: 10rpx 42rpx"
+            >
+              例句
+            </view>
+          </view>
+
         </view>
 
       </view>
