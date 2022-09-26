@@ -32,23 +32,27 @@
     <view class="all">
       <view class="title test-w-b">resort</view>
       <view
-        class="flex "
+        class="flex-start"
         style="padding-top: 10rpx;"
       >
-        <u-button
+        <view class="word-Border-radius padding-xs association text-xs flex-start text-white">
+          <view class="margin-right-xs">英</view>
+          <play-words ref="playWords"></play-words>
+        </view>
+        <!-- <u-button
           style="width:auto"
           class="custom-style"
           type="primary"
-          text="英"
-          icon="static/word/word"
           size="mini"
           shape="circle"
-        ></u-button>
+        >
+
+        </u-button> -->
         <!--  -->
-        <play-words></play-words>
+
         <!--  -->
         <view
-          class="word-text-light-1"
+          class="word-text-light-1 margin-left-xs"
           style="font-size: 30rpx;"
         >/ rɪˈzɔːrt /</view>
       </view>
@@ -208,6 +212,15 @@ export default {
   },
   onLoad() {
     this.todayWordList()
+  },
+  onShow() {
+    this.$nextTick(() => {
+      console.log(this.$refs);
+      this.$refs.playWords.creatAudio()
+    })
+  },
+  onUnLoad() {
+    console.log("creatAudio beforeDestroy")
   },
   components: { playWords, cuEditor },
   methods: {

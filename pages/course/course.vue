@@ -7,7 +7,7 @@
           class="tobe flex"
           v-for="(i,index) in list"
           :key="index"
-          @click="to(index)"
+          @click="to(i.chinese)"
         >
           <view
             class="image"
@@ -88,28 +88,28 @@ export default {
     uni.hideTabBar();
   },
   methods: {
-    to(index) {
-      if(index === 2){
-		  uni.navigateTo({
-		  	url: '/pages/word/Fallible'
-		  });
-	  }else if(index === 3){
-		  uni.navigateTo({
-		  	url: '/pages/word/random'
-		  });
-	  }else if(index === 0){
-		  uni.navigateTo({
-		  	url: '/pages/word/today'
-		  });
-	  }else if(index === 1){
-		  uni.navigateTo({
-		  	url: '/pages/word/scre'
-		  });
-	  }else if(index === 4){
-		  uni.navigateTo({
-		  	url: '/pages/number/number'
-		  });
-	  }
+    to(name) {
+      if (name === '易错单词筛查') {
+        uni.navigateTo({
+          url: '/pages/word/Fallible'
+        });
+      } else if (name === '随机单词筛查') {
+        uni.navigateTo({
+          url: '/pages/word/random'
+        });
+      } else if (name === '今日单词学习') {
+        uni.navigateTo({
+          url: '/pages/word/today'
+        });
+      } else if (name === '今日单词筛查') {
+        uni.navigateTo({
+          url: '/pages/word/scre'
+        });
+      } else if (name === '数字记忆训练') {
+        uni.navigateTo({
+          url: '/pages/number/number'
+        });
+      }
     }
   }
 }
