@@ -58,17 +58,17 @@
                 style="height: 1000rpx;width: 100%;
 			  "
               >
-                <view style="padding: 40rpx 300rpx;">设置</view>
+                <view class="test-w-b" style="padding: 40rpx 300rpx;">设置</view>
                 <view
                   class="lg "
                   style=" height: calc(800rpx - 50rpx);
     overflow: scroll;"
                 >
-                  <view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">搜索条件</view>
+                  <view class="test-w-b" style="font-size: 100%;padding-left: 20rpx;">搜索条件</view>
                   <view class="u-page__tag-item flex text-center">
                     <u-tag
                       v-for="(item, index) in radios"
-                      class="tag-item text-center"
+                      class="tag-item"
                       :key="index"
                       :text="item.name"
                       size="large"
@@ -81,12 +81,12 @@
                     </u-tag>
                   </view>
                   <view class="padding-top-lg">
-                    <view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">选择</view>
+                    <view class="test-w-b" style="font-size: 100%;padding-left: 20rpx;">选择</view>
                   </view>
                   <view class="u-page__tag-item-i flex text-center">
                     <u-tag
                       v-for="(aitem, index) in aradios"
-                      class="atag-item text-center"
+                      class="atag-item "
                       :key="index"
                       :text="aitem.aname"
                       size="large"
@@ -99,12 +99,12 @@
                     </u-tag>
                   </view>
                   <view class="padding-top-lg">
-                    <view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">表头选择</view>
+                    <view class="test-w-b" style="font-size: 100%;padding-left: 20rpx;">表头选择</view>
                   </view>
                   <view class="u-page__tag-item-ii flex text-center">
                     <u-tag
                       v-for="(aitem, index) in yaradios"
-                      class="yatag-item text-center"
+                      class="yatag-item"
                       :key="index"
                       :text="aitem.aname"
                       size="large"
@@ -117,7 +117,7 @@
                     </u-tag>
                   </view>
                   <view class="padding-top-lg">
-                    <view style="font-size: 120%;font-weight: 500;padding-left: 20rpx;">批量修改为</view>
+                    <view class="test-w-b" style="font-size: 100%;padding-left: 20rpx;">批量修改为</view>
                   </view>
                   <view style="padding: 20rpx 50rpx;">
                     <view class="input">
@@ -429,10 +429,9 @@ export default {
     .tag-item {
       width: 25%;
       margin-right: 5%;
-
       margin-top: 2%;
-      // display: flex;
-      // align-items: center;
+      display: flex;
+      align-items: center;
     }
   }
   .u-page__tag-item-i {
@@ -446,7 +445,7 @@ export default {
 
       margin-top: 2%;
       // display: flex;
-      // align-items: center;
+      align-items: center;
     }
   }
   .u-page__tag-item-ii {

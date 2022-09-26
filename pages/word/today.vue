@@ -83,12 +83,28 @@
           class="association word-Border-radius"
           style="padding: 30rpx 40rpx"
         >
-          <view
+          <!-- <view
             class="word-text-light-1"
             style="font-size: 30rpx;"
           >
             热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
-          </view>
+          </view> -->
+		  	<view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
+		  		<u--input
+		  		  shape="square"
+		  		  height="60rpx"
+		  		  border="none"
+				  color="#CBCDCE"
+		  		  @confirm="confirmInput"
+						  		>
+		  		  <!-- <template slot="prefix">
+					  <text>
+					  	<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>
+		  		    </text> 
+		  		  </template> -->
+				  </u--input>
+		  	</view>
+			
           <view class="bycorenr margin-top-sm flex_x_right">
             <view
               class="word-text-border word-Border-radius Corner"
@@ -180,7 +196,7 @@ export default {
   data() {
     return {
       day: '2021-07-16',
-      type: '1'
+      type: '1',
     }
   },
   onLoad() {
@@ -188,6 +204,21 @@ export default {
   },
   components: { playWords },
   methods: {
+	  blue(){
+		  
+	  },
+	  onEditorReady() {
+	  			    // #ifdef MP-BAIDU
+	  			    this.editorCtx = requireDynamicLib('editorLib').createEditorContext('editor');
+	  			    // #endif
+	  			    
+	  			    // #ifdef APP-PLUS || H5 ||MP-WEIXIN
+	  			    uni.createSelectorQuery().select('#editor').context((res) => {
+	  			      this.editorCtx = res.context
+	  			    }).exec()
+	  			    // #endif
+
+	  			},
     todayWordList() {
       this.$http.get('/WordLearn/todayWordScreening',
         {
@@ -223,6 +254,9 @@ export default {
   .all {
     margin: auto;
     width: 90%;
+	.ql-container {
+			color:#CBCDCE;
+		}
     // padding-left: 20rpx;
     .title {
       // padding-top: 150rpx;
