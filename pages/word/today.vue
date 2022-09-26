@@ -89,7 +89,12 @@
           >
             热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
           </view> -->
-		  	<view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
+          <cu-editor
+            ref="editor"
+            :content="content"
+            @save="onSave"
+          ></cu-editor>
+          <!-- <view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
 		  		<u--input
 		  		  shape="square"
 		  		  height="60rpx"
@@ -97,14 +102,14 @@
 				  color="#CBCDCE"
 		  		  @confirm="confirmInput"
 						  		>
-		  		  <!-- <template slot="prefix">
+		  		  <template slot="prefix">
 					  <text>
 					  	<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>
-		  		    </text> 
-		  		  </template> -->
+		  		    </text>
+		  		  </template>
 				  </u--input>
-		  	</view>
-			
+		  	</view> -->
+
           <view class="bycorenr margin-top-sm flex_x_right">
             <view
               class="word-text-border word-Border-radius Corner"
@@ -192,33 +197,23 @@
 
 <script>
 import playWords from './components/playWords'
+import cuEditor from '@/components/cu-editor/cu-editor'
 export default {
   data() {
     return {
       day: '2021-07-16',
       type: '1',
+      content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
     }
   },
   onLoad() {
     this.todayWordList()
   },
-  components: { playWords },
+  components: { playWords, cuEditor },
   methods: {
-	  blue(){
-		  
-	  },
-	  onEditorReady() {
-	  			    // #ifdef MP-BAIDU
-	  			    this.editorCtx = requireDynamicLib('editorLib').createEditorContext('editor');
-	  			    // #endif
-	  			    
-	  			    // #ifdef APP-PLUS || H5 ||MP-WEIXIN
-	  			    uni.createSelectorQuery().select('#editor').context((res) => {
-	  			      this.editorCtx = res.context
-	  			    }).exec()
-	  			    // #endif
+    blue() {
 
-	  			},
+    },
     todayWordList() {
       this.$http.get('/WordLearn/todayWordScreening',
         {
@@ -237,6 +232,9 @@ export default {
           console.log(data, '成功返回参数')
         })
     },
+    onSave() {
+      console.log('富文本编辑器保存');
+    },
 
     tabt() {
       console.log("上一词")
@@ -254,9 +252,6 @@ export default {
   .all {
     margin: auto;
     width: 90%;
-	.ql-container {
-			color:#CBCDCE;
-		}
     // padding-left: 20rpx;
     .title {
       // padding-top: 150rpx;

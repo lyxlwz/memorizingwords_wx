@@ -52,6 +52,33 @@ export default {
         this.qeihuanwenjian()
       });
     },
+    // 录音暂停播放
+    changePlayState() {
+      if (this.audioPlay == false) {
+        this.innerAudioContext.play();
+      } else {
+        this.innerAudioContext.pause()
+      }
+    },
+    // 文件切换播放
+    filechange(item, i) {
+      this.innerAudioContext.destroy()
+      this.csdFileindex = i;
+      this.recordPath = item.recordPath;
+      this.sliderMax = this.getTime(item.recordDuration);
+      this.timeStr = this.getTime(item.recordDuration);
+      this.creatAudio()
+    },
+    // 自动播放下一个文件
+    qeihuanwenjian() {
+      let index = this.csdFileindex + 1;
+      if (index < this.luyinList.length) {
+        this.csdFileindex = index;
+        let item = this.luyinList[this.csdFileindex];
+        let i = this.csdFileindex;
+        this.filechange(item, i)
+      }
+    },
   }
 }
 
