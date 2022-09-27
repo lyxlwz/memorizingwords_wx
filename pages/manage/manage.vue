@@ -215,6 +215,7 @@
 export default {
   data() {
     return {
+		all:'',
       src: '/static/word/sear.png',
       indexList: [],
       searchVal: 'Product Design',
@@ -307,7 +308,8 @@ export default {
   },
   //第一次加载
   onLoad(e) {
-    this.loadmore()
+    // this.loadmore()
+	this.manageapi()
     // 隐藏原生的tabbar
     uni.hideTabBar();
   },
@@ -317,6 +319,20 @@ export default {
     uni.hideTabBar();
   },
   methods: {
+	  manageapi(){
+		  this.$http.post('/WordSystem/wordData',
+		    { wordList:'all' },
+		    {
+		      header: { //默认 无 说明：请求头
+		        // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+		      }
+		    }).then(
+		  	 //   this.indexList.name = this.data.word,
+		    // this.indexList.key = this.data.paraphrase
+		    // this.indexList = data
+			console.log("请求成功")
+		    );
+	  },
     yes() {
       this.close()
     },
@@ -392,13 +408,13 @@ export default {
     scrolltolower() {
       this.loadmore()
     },
-    loadmore() {
-      for (let i = 0; i <= 15; i++) {
-        this.indexList.push({
-          url: this.urls[uni.$u.random(0, 1)]
-        })
-      }
-    },
+    // loadmore() {
+    //   for (let i = 0; i <= 15; i++) {
+    //     this.indexList.push({
+    //       url: this.urls[uni.$u.random(0, 1)]
+    //     })
+    //   }
+    // },
     open() {
       // console.log('open');
     },

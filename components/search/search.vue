@@ -24,7 +24,9 @@
        	clearable
        	height="90rpx"
        	border="none" 
+		:focus="boo"
        	confirmType="search" 
+		v-model="keyword"
        	prefixIcon="search"
        	prefixIconStyle="font-size: 60rpx;color: #909399"
        	@confirm="confirmInput">
@@ -46,8 +48,9 @@
               :key="index"
             >
               <u-cell
-                :title="item.name"
-                :label="item.key"
+			  @click = "word(index)"
+                :title="item.word"
+                :label="item.paraphrase"
                 :titleStyle="{'font-size':'32rpx','color':'#FFFFFFCC'}"
               >
               </u-cell>
@@ -76,22 +79,39 @@ export default {
       keyword: '',
       // show: vshow,
       // show: true,
-      indexList: [
-        {
-          name: "word",
-          key: "n. 单词，词汇"
-        },
-        {
-          name: "apple",
-          key: "n. 苹果"
-        },
-      ],
+	  indexList:[],
+	  boo:true,
+      // indexList: [
+      //   {
+      //     name: "word",
+      //     key: "n. 单词，词汇"
+      //   },
+      // ],
     }
   },
   methods: {
     close() {
       this.$emit('update:show', false)
-    }
+    },
+	confirmInput(){
+		this.$http.post('/WordSystem/wordData',
+		  { word: this.keyword },
+		  {
+		    header: { //默认 无 说明：请求头
+		      // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+		    }
+		  }).then(data =>{
+			 //   this.indexList.name = this.data.word,
+		  // this.indexList.key = this.data.paraphrase
+		  this.indexList = data
+		  });
+		      
+	},
+	word(){
+		uni.navigateTo({
+		  url: '/pages/word/results'
+		});
+	}
   }
 }
 </script>
