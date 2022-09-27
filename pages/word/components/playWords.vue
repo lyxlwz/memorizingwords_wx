@@ -1,7 +1,7 @@
 <template>
   <view
     class="bg"
-    :class="[audioPlay ? 'voicePlay' :'']"
+    :class="[yaudioPlay ? 'voicePlay' :'']"
     @click="play"
   >
   </view>
@@ -15,8 +15,8 @@ export default {
   data() {
     return {
       innerAudioContext: null,
-      // audioPlay: false,
-    };
+      yaudioPlay: this.audioPlay
+    }
   },
   props: {
     audioLink: {

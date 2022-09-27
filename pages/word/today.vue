@@ -35,7 +35,7 @@
         class="flex-start"
         style="padding-top: 10rpx;"
       >
-        <view class="word-Border-radius padding-xs association text-xs flex-start text-white">
+        <view class="word-Border-radius padding-xs association text-xs flex-start text-white" style="background: #5670fb;">
           <view class="margin-right-xs">英</view>
           <play-words ref="playWords"></play-words>
         </view>
@@ -132,15 +132,10 @@
           style="padding: 30rpx 40rpx;"
         >
           <view style="display: flex;">
-            <u-button
-              style="width:auto"
-              class="custom-style"
-              type="primary"
-              text="英"
-              icon="static/word/word"
-              size="mini"
-              shape="circle"
-            ></u-button>
+            <view class="word-Border-radius padding-xs text-xs flex-start text-white"  style="background: #667efb; margin: 10rpx; ">
+              <view class="margin-right-xs">英</view>
+              <play-words ref="playWords"></play-words>
+            </view>
 
             <view
               class="word-text-light-1"

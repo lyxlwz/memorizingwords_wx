@@ -15,19 +15,14 @@
         class="flex "
         style="padding-top: 10rpx;"
       >
-        <u-button
-          style="width:auto"
-          class="custom-style"
-          type="primary"
-          text="英"
-          icon="static/word/word"
-          size="mini"
-          shape="circle"
-        ></u-button>
+        <view class="word-Border-radius padding-xs association text-xs flex-start text-white" style="background: #5670fb;">
+          <view class="margin-right-xs">英</view>
+          <play-words ref="playWords"></play-words>
+        </view>
         <!--  -->
-        <play-words></play-words>
+        <!-- <play-words></play-words> -->
         <!--  -->
-        <view class="word-text-light-1">/ rɪˈzɔːrt /</view>
+        <view class="word-text-light-1" style="padding-left: 5rpx;">/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="translate padding-top-lg"
@@ -60,12 +55,33 @@
           class="association word-Border-radius"
           style="padding: 30rpx 40rpx"
         >
-          <view
+          <!-- <view
             class="word-text-light-1"
             style="font-size: 30rpx;"
           >
             热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
-          </view>
+          </view> -->
+          <cu-editor
+            ref="editor"
+            :content="content"
+            @save="onSave"
+          ></cu-editor>
+          <!-- <view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
+      		  		<u--input
+      		  		  shape="square"
+      		  		  height="60rpx"
+      		  		  border="none"
+      				  color="#CBCDCE"
+      		  		  @confirm="confirmInput"
+      						  		>
+      		  		  <template slot="prefix">
+      					  <text>
+      					  	<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>
+      		  		    </text>
+      		  		  </template>
+      				  </u--input>
+      		  	</view> -->
+      
           <view class="bycorenr margin-top-sm flex_x_right">
             <view
               class="word-text-border word-Border-radius Corner"
@@ -74,7 +90,7 @@
               联想
             </view>
           </view>
-
+      
         </view>
       </view>
       <!-- 例句 -->
@@ -135,7 +151,7 @@ import playWords from './components/playWords'
 export default {
   data() {
     return {
-
+		content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
     }
   },
   components: { playWords },

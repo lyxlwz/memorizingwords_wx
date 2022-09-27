@@ -36,19 +36,14 @@
       class="flex "
       style="padding-top: 10rpx; padding-left: 40rpx;"
     >
-      <u-button
-        style="width:auto"
-        class="custom-style"
-        type="primary"
-        text="英"
-        icon="static/word/word"
-        size="mini"
-        shape="circle"
-      ></u-button>
+      <view class="word-Border-radius padding-xs association text-xs flex-start text-white" style="background: #5670fb;">
+        <view class="margin-right-xs">英</view>
+        <play-words ref="playWords"></play-words>
+      </view>
       <!--  -->
-      <play-words></play-words>
+      <!-- <play-words></play-words> -->
       <!--  -->
-      <view class="word-text-light-1" style="font-size: 30rpx;">/ rɪˈzɔːrt /</view>
+      <view class="word-text-light-1" style="font-size: 30rpx;padding-left: 10rpx;">/ rɪˈzɔːrt /</view>
     
 	
 		
