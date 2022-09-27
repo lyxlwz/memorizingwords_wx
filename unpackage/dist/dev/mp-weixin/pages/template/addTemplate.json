@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "新增功能",
+  "usingComponents": {
+    "u-search": "/node-modules/uview-ui/components/u-search/u-search",
+    "u-gap": "/node-modules/uview-ui/components/u-gap/u-gap",
+    "u-line-progress": "/node-modules/uview-ui/components/u-line-progress/u-line-progress",
+    "public-module": "/components/public-module/public-module",
+    "z-navigation": "/components/z-navigation/z-navigation"
+  }
+}

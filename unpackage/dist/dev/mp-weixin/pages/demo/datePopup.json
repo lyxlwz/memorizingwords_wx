@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "日期时间选择器",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
+    "public-module": "/components/public-module/public-module",
+    "date-popup": "/components/date-popup/date-popup"
+  }
+}

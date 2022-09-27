@@ -35,9 +35,18 @@
         class="flex-start"
         style="padding-top: 10rpx;"
       >
-        <view class="word-Border-radius padding-xs association text-xs flex-start text-white" style="background: #5670fb;">
+        <view
+          class="word-Border-radius padding-xs association text-xs flex-start text-white"
+          style="background: #5670fb;"
+          @click="wordIsPlay = !wordIsPlay"
+        >
           <view class="margin-right-xs">英</view>
-          <play-words ref="playWords"></play-words>
+          <play-words
+            ref="playWords"
+            play-id="wordLink"
+            :audio-play.sync="wordIsPlay"
+            :audio-link="wordLink"
+          ></play-words>
         </view>
         <!-- <u-button
           style="width:auto"
@@ -132,9 +141,18 @@
           style="padding: 30rpx 40rpx;"
         >
           <view style="display: flex;">
-            <view class="word-Border-radius padding-xs text-xs flex-start text-white"  style="background: #667efb; margin: 10rpx; ">
+            <view
+              class="word-Border-radius padding-xs text-xs flex-start text-white"
+              style="background: #667efb; margin: 10rpx; "
+              @click="wordExampleIsPlay != wordExampleIsPlay"
+            >
               <view class="margin-right-xs">英</view>
-              <play-words ref="playWords"></play-words>
+              <play-words
+                ref="playExample"
+                play-id="wordExampleLink"
+                :audio-play.sync="wordExampleIsPlay"
+                :audio-link="wordExampleLink"
+              ></play-words>
             </view>
 
             <view
@@ -203,6 +221,10 @@ export default {
       day: '2021-07-16',
       type: '1',
       content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
+      wordIsPlay: false,
+      wordLink: 'https://tts.youdao.com/fanyivoice?word=word.mp3',
+      wordExampleIsPlay: false,
+      wordExampleLink: 'https://tts.youdao.com/fanyivoice?word=example.mp3',
     }
   },
   onLoad() {

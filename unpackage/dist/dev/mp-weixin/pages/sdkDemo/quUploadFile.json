@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "七牛云图片上传/文件上传",
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
+    "public-module": "/components/public-module/public-module"
+  }
+}

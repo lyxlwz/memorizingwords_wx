@@ -1,7 +1,7 @@
 <template>
   <view
     class="bg"
-    :class="[yaudioPlay ? 'voicePlay' :'']"
+    :class="[audioPlay ? 'voicePlay' :'']"
     @click="play"
   >
   </view>
@@ -15,13 +15,16 @@ export default {
   data() {
     return {
       innerAudioContext: null,
-      yaudioPlay: this.audioPlay
     }
   },
   props: {
     audioLink: {
       type: String,
       default: 'https://www.runoob.com/try/demo_source/horse.mp3'
+    },
+    playId: {
+      type: String,
+      default: 'audio'
     },
     audioPlay: {
       type: Boolean,
@@ -36,7 +39,7 @@ export default {
 
   },
   beforeDestroy() {
-    console.log("creatAudio beforeDestroy")
+    this.destroy()
   },
 
   computed: {},
@@ -46,67 +49,38 @@ export default {
     //录音实例
     creatAudio() {
       this.innerAudioContext = uni.createInnerAudioContext();//创建实例
-      this.innerAudioContext.autoplay = true;//设置是否自动播放
-      this.innerAudioContext.loop = true;
-      this.innerAudioContext.src = this.audioLink
-      this.play()
-      this.pause()
-      this.ended()
+      if (this.playId == 'wordLink') {
+        this.innerAudioContext.autoplay = true;//设置是否自动播放
+        // this.innerAudioContext.loop = true;
+        this.innerAudioContext.src = this.audioLink
+      }
+
+      this.innerAudioContext.onCanplay(() => {
+        if (this.audioPlay) {
+          this.pause()
+        } else {
+          this.play()
+        }
+      })
+
+      this.innerAudioContext.onEnded(() => {
+        this.$emit('update:audioPlay', false)
+      })
     },
     // 结束
-    ended() {
-      this.innerAudioContext.onEnded(() => {
-        // 结束播放监听
-        console.log('播放结束!');
-        this.audioPlay = false;
-        //自动切换事件
-        this.qeihuanwenjian()
-      });
-    },
-    // 暂停
     pause() {
-      this.innerAudioContext.onPause(() => {
-        // 暂停监听
-        console.log('暂停播放!');
-        this.audioPlay = false
-
-      });
+      // this.innerAudioContext.loop = false;
+      this.$emit('update:audioPlay', false)
+      this.innerAudioContext.pause()
     },
     // 播放
     play() {
-      console.log(this.innerAudioContext.src, '6666666');
-      this.innerAudioContext.onPlay(() => {
-        // 播放监听
-        console.log('播放!');
-        this.audioPlay = true;
-      });
+      this.innerAudioContext.src = this.audioLink
+      this.$emit('update:audioPlay', true)
+      this.innerAudioContext.play(); //直接播放
     },
-    // 录音暂停播放
-    changePlayState() {
-      if (this.audioPlay == false) {
-        this.innerAudioContext.play();
-      } else {
-        this.innerAudioContext.pause()
-      }
-    },
-    // 文件切换播放
-    filechange(item, i) {
+    destroy() {
       this.innerAudioContext.destroy()
-      this.csdFileindex = i;
-      this.recordPath = item.recordPath;
-      this.sliderMax = this.getTime(item.recordDuration);
-      this.timeStr = this.getTime(item.recordDuration);
-      this.creatAudio()
-    },
-    // 自动播放下一个文件
-    qeihuanwenjian() {
-      let index = this.csdFileindex + 1;
-      if (index < this.luyinList.length) {
-        this.csdFileindex = index;
-        let item = this.luyinList[this.csdFileindex];
-        let i = this.csdFileindex;
-        this.filechange(item, i)
-      }
     },
   }
 }

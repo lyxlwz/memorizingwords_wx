@@ -1,0 +1,289 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+@font-face {
+  font-family: 'iconfont';  /* Project id 2843597 */
+  src: url('//at.alicdn.com/t/font_2843597_kx4g4k3cyrh.woff2?t=1633846789896') format('woff2'),
+       url('//at.alicdn.com/t/font_2843597_kx4g4k3cyrh.woff?t=1633846789896') format('woff'),
+       url('//at.alicdn.com/t/font_2843597_kx4g4k3cyrh.ttf?t=1633846789896') format('truetype');
+}
+.iconfont.data-v-7b039d96 {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-list-check.data-v-7b039d96:before {
+  content: "\e667";
+}
+.icon-add.data-v-7b039d96:before {
+  content: "\e664";
+}
+.icon-textformat.data-v-7b039d96:before {
+  content: "\e8b8";
+}
+.icon-image.data-v-7b039d96:before {
+  content: "\e65b";
+}
+.icon-photo.data-v-7b039d96:before {
+  content: "\e65f";
+}
+.icon-keyboard.data-v-7b039d96:before {
+  content: "\e64c";
+}
+.icon-undo.data-v-7b039d96:before {
+  content: "\e6f0";
+}
+.icon-redo.data-v-7b039d96:before {
+  content: "\e6f1";
+}
+.icon-bgcolors.data-v-7b039d96:before {
+  content: "\eb95";
+}
+.icon-fontbgcolor.data-v-7b039d96:before {
+  content: "\e68d";
+}
+.icon-indent.data-v-7b039d96:before {
+  content: "\e7f3";
+}
+.icon-outdent.data-v-7b039d96:before {
+  content: "\e7f4";
+}
+.icon-menu.data-v-7b039d96:before {
+  content: "\e7f5";
+}
+.icon-unorderedlist.data-v-7b039d96:before {
+  content: "\e7f6";
+}
+.icon-orderedlist.data-v-7b039d96:before {
+  content: "\e7f7";
+}
+.icon-align-right.data-v-7b039d96:before {
+  content: "\e7f8";
+}
+.icon-align-center.data-v-7b039d96:before {
+  content: "\e7f9";
+}
+.icon-align-left.data-v-7b039d96:before {
+  content: "\e7fa";
+}
+.icon-bold.data-v-7b039d96:before {
+  content: "\e7fb";
+}
+.icon-font-size.data-v-7b039d96:before {
+  content: "\e7fd";
+}
+.icon-line-height.data-v-7b039d96:before {
+  content: "\e7fe";
+}
+.icon-strikethrough.data-v-7b039d96:before {
+  content: "\e7ff";
+}
+.icon-underline.data-v-7b039d96:before {
+  content: "\e800";
+}
+.icon-italic.data-v-7b039d96:before {
+  content: "\e801";
+}
+.icon-check.data-v-7b039d96:before {
+  content: "\e802";
+}
+.icon-line.data-v-7b039d96:before {
+  content: "\e803";
+}
+.fixed-top.data-v-7b039d96 {
+  position: fixed;
+  top: -88rpx;
+  line-height: 88rpx;
+  border-bottom: solid 1rpx #f1f1f1;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  z-index: 999;
+}
+.fixed-top.isFixed.data-v-7b039d96 {
+  top: 0;
+}
+.fixed-top .btn.data-v-7b039d96 {
+  width: 100%;
+  position: relative;
+  border: 0 !important;
+  border-radius: 6rpx;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: visible;
+  float: right;
+  width: 100rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 24rpx;
+  margin: 14rpx 0;
+  text-align: center;
+}
+.fixed-top .btn-primary.data-v-7b039d96 {
+  background: #5677fc !important;
+  color: #fff;
+}
+.fixed-top .btn-primary.data-v-7b039d96:hover {
+  opacity: 0.8;
+}
+.fixed-top.data-v-7b039d96,
+.fixed-top__place.data-v-7b039d96 {
+  width: 100%;
+  height: 88rpx;
+}
+.flex.data-v-7b039d96 {
+  display: flex;
+}
+.cu-editor.data-v-7b039d96 {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  font-size: 28rpx;
+  line-height: 1.5;
+  overflow: auto;
+  min-height: unset !important;
+  color: #cbcdce;
+}
+.editor-img.data-v-7b039d96 {
+  max-width: 98% !important;
+}
+.ql-active.data-v-7b039d96 {
+  background-color: #eaeaea;
+}
+.ql-active .color-circle.data-v-7b039d96 {
+  border: solid 1px;
+}
+.noBgColor.data-v-7b039d96 {
+  background-color: none !important;
+}
+.fixed-bottom.data-v-7b039d96 {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  right: 100%;
+  bottom: 0;
+  z-index: 99999;
+}
+.toolbar.data-v-7b039d96 {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1rpx solid #e5e5e5;
+  border-left: none;
+  border-right: none;
+  background: #fff;
+}
+.toolbar .iconfont.data-v-7b039d96 {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 40rpx;
+  text-align: center;
+  position: relative;
+}
+.toolbar .iconfont.active.data-v-7b039d96::after {
+  content: "";
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  position: absolute;
+  height: 6rpx;
+  border-bottom: solid 6rpx #000000;
+}
+.toolbar .toolbar-item.data-v-7b039d96 {
+  height: 100rpx;
+  line-height: 100rpx;
+  flex: 1;
+  text-align: center;
+}
+.toolbar .toolbar-item.data-v-7b039d96:active {
+  opacity: 0.4;
+}
+.toolbar .toolbar-item-header.data-v-7b039d96,
+.toolbar .toolbar-item-footer.data-v-7b039d96 {
+  width: 108rpx;
+  text-align: center;
+}
+.toolbar .toolbar-item-header.data-v-7b039d96 {
+  border-right: solid 1rpx #c8c7cc;
+}
+.toolbar .toolbar-item-footer.data-v-7b039d96 {
+  border-left: solid 1rpx #c8c7cc;
+  color: #5b8ff9;
+  font-weight: bold;
+}
+.toolbar-content.data-v-7b039d96 {
+  background-color: #ffffff;
+}
+.swiper-item.data-v-7b039d96 {
+  box-sizing: border-box;
+  padding: 0 30rpx;
+}
+.tool-items.data-v-7b039d96 {
+  background-color: #f7f7f7;
+  color: #323232;
+  height: 80rpx;
+  line-height: 80rpx;
+  margin: 32rpx 0;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.tool-items .tool-item.data-v-7b039d96 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tool-items .tool-item.data-v-7b039d96:active {
+  background-color: #eaeaea;
+}
+.tool-items .iconfont.data-v-7b039d96 {
+  display: inline-block;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  cursor: pointer;
+  font-size: 40rpx;
+  text-align: center;
+}
+.tool-items .color-circle.data-v-7b039d96 {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+}
+.tool-items .txt.data-v-7b039d96 {
+  font-size: 14px;
+}
+.feature.data-v-7b039d96 {
+  margin: 30rpx;
+  text-align: center;
+}
+.feature .icon.data-v-7b039d96 {
+  background-color: #f7f7f7;
+  width: 120rpx;
+  height: 120rpx;
+  line-height: 120rpx;
+  color: #323232;
+  margin-bottom: 10rpx;
+}
+.feature .icon.data-v-7b039d96:active {
+  background-color: #eaeaea;
+}
+.feature .icon .iconfont.data-v-7b039d96 {
+  font-size: 42rpx;
+}
+

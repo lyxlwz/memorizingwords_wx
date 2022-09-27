@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "防抖音滑动视频",
+  "enablePullDownRefresh": false,
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "direction-swiper": "/components/direction-swiper/direction-swiper",
+    "short-video": "/components/short-video/short-video",
+    "navigation-video": "/components/navigation-video/navigation-video"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "功能示例",
+  "usingComponents": {
+    "public-module": "/components/public-module/public-module",
+    "z-navigation": "/components/z-navigation/z-navigation"
+  }
+}

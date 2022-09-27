@@ -1,0 +1,55 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.addres_select_val.data-v-083d7a6d {
+  padding: 0rpx 10rpx;
+  border-bottom: 1rpx solid #ebebeb;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+.addres_select_val > view.data-v-083d7a6d {
+  display: flex;
+  flex-wrap: wrap;
+}
+.addres_select_val > view > view.data-v-083d7a6d {
+  margin-left: 20rpx;
+  padding: 0rpx 10rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-bottom: 2rpx solid #fff;
+  box-sizing: border-box;
+  font-size: 28rpx;
+}
+.addres_select_val > view > view.data-v-083d7a6d:first-child {
+  margin-left: 0rpx;
+}
+.addres_select_val > view > view.select.data-v-083d7a6d {
+  border-bottom: 2rpx solid #ea552d;
+  color: #ea552d;
+}
+.addres_box.data-v-083d7a6d {
+  padding: 0rpx 20rpx;
+  height: 420rpx;
+  overflow-y: auto;
+  background-color: #fff;
+}
+.addres_box view > view.data-v-083d7a6d {
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 28rpx;
+}
+.addres_box view > view.select.data-v-083d7a6d {
+  color: #ea552d;
+}
+

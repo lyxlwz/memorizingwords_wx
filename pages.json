@@ -34,12 +34,12 @@
         "navigationBarTitleText": "功能示例"
       }
     },
-    {
-      "path": "pages/manage/manage",
-      "style": {
-        "navigationBarTitleText": "列表"
-      }
-    },
+    // {
+    //   "path": "pages/manage/manage",
+    //   "style": {
+    //     "navigationBarTitleText": "列表"
+    //   }
+    // },
     {
       "path": "pages/demo/list",
       "style": {
@@ -419,13 +419,6 @@
     },
     {
       "path": "pages/word/random",
-      "style": {
-        "navigationBarTitleText": "",
-        "enablePullDownRefresh": false
-      }
-    },
-    {
-      "path": "pages/word/today",
       "style": {
         "navigationBarTitleText": "",
         "enablePullDownRefresh": false
