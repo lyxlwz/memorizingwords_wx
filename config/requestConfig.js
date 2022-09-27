@@ -146,63 +146,12 @@ $http.dataFactory = async function (res) {
     if (typeof (httpData) == "string") {
       httpData = JSON.parse(httpData);
     }
-    /*********以下只是模板(及共参考)，需要开发者根据各自的接口返回类型修改*********/
 
     //判断数据是否请求成功
     if (httpData.success || httpData.code == 200) {
       // 返回正确的结果(then接受数据)
       return Promise.resolve(httpData.data);
     } else if (httpData.code == "1000" || httpData.code == "1001" || httpData.code == 1100 || httpData.code == 402) {
-
-      // 失败重新请求（最多重新请求3次）
-      // if(res.resend < 3){
-      //     let result = await $http.request({
-      //     	url: res.url,
-      //     	data: res.data,
-      //     	method: res.method,
-      //     	header: res.header,
-      //     	isPrompt: res.isPrompt,//（默认 true 说明：本接口抛出的错误是否提示）
-      //     	load: res.load,//（默认 true 说明：本接口是否提示加载动画）
-      //     	isFactory: res.isFactory, //（默认 true 说明：本接口是否调用公共的数据处理方法，设置false后isPrompt参数将失去作用）
-      //      resend: res.resend += 1 // 当前重发次数
-      //     });
-      //     // 返回正确的结果(then接受数据)
-      //     return Promise.resolve(result);
-      // }
-      // 返回错误的结果(catch接受数据)
-      // return Promise.reject({
-      // 	statusCode: 0,
-      // 	errMsg: "【request】" +  (httpData.info || httpData.msg)
-      // });
-
-      //----------------------------------------分割线---------------------------------------------------
-
-      // 刷新token在重新请求（最多重新请求2次）
-      // if(res.resend < 2){
-      //     let tokenResult = await $http.request({
-      //     	url: "http://localhost:7001/api/common/v1/protocol", // 获取token接口地址
-      //     	data: {
-      //             type: 1000
-      //         }, // 获取接口参数
-      //     	method: "GET",
-      //     	load: false,//（默认 true 说明：本接口是否提示加载动画）
-      //     });
-      //     // 储存token
-      //     store.commit("userInfo", tokenResult);
-      //     let result = await $http.request({
-      //     	url: res.url,
-      //     	data: res.data,
-      //     	method: res.method,
-      //     	header: res.header,
-      //     	isPrompt: res.isPrompt,//（默认 true 说明：本接口抛出的错误是否提示）
-      //     	load: res.load,//（默认 true 说明：本接口是否提示加载动画）
-      //     	isFactory: res.isFactory, //（默认 true 说明：本接口是否调用公共的数据处理方法，设置false后isPrompt参数将失去作用）
-      //         resend: res.resend += 1 // 当前重发次数
-      //     });
-      //     // 返回正确的结果(then接受数据)
-      //     return Promise.resolve(result);
-      // }
-      // 返回错误的结果(catch接受数据)
       uni.showToast({
         title: httpData.info || httpData.msg,
         icon: 'none'
@@ -211,48 +160,21 @@ $http.dataFactory = async function (res) {
         statusCode: 0,
         errMsg: httpData.info || httpData.msg
       });
-    } else if (httpData.code == "1004") {
-      if (loginPopupNum <= 0) {
-        loginPopupNum++;
-        uni.showModal({
-          title: "提示",
-          content: "您还未绑定手机号，请先绑定~",
-          confirmText: "去绑定",
-          cancelText: "再逛会",
-          success: (res) => {
-            loginPopupNum--;
-            if (res.confirm) {
-              uni.navigateTo({
-                url: '/pages/user/bindPhone'
-              });
-            }
-          }
-        });
-      }
-      // 返回错误的结果(catch接受数据)
-      return Promise.reject({
-        statusCode: 0,
-        errMsg: "【request】" + (httpData.info || httpData.msg),
-        data: res.data
+    } else if (httpData.code == "0") {
+      uni.showToast({
+        title: httpData.info || httpData.msg,
+        icon: 'none'
       });
-    } else { //其他错误提示
-      if (res.isPrompt) {
-        uni.showToast({
-          title: httpData.info || httpData.msg,
-          icon: "none",
-          duration: 3000
+      setTimeout(() => {
+        uni.reLaunch({
+          url: '/pages/login/login'
         });
-      }
-      // 返回错误的结果(catch接受数据)
+      }, 300)
       return Promise.reject({
         statusCode: 0,
-        errMsg: "【request】" + (httpData.info || httpData.msg),
-        data: res.data
+        errMsg: httpData.info || httpData.msg
       });
     }
-
-    /*********以上只是模板(及共参考)，需要开发者根据各自的接口返回类型修改*********/
-
   } else {
     // 返回错误的结果(catch接受数据)
     return Promise.reject({
