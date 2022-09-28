@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "public-module": "/components/public-module/public-module",
+    "z-navigation": "/components/z-navigation/z-navigation",
+    "train-process": "/pages/number/components/process",
+    "train-results": "/pages/number/components/results"
+  }
+}

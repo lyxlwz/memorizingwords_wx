@@ -176,6 +176,10 @@ $http.dataFactory = async function (res) {
       });
     }
   } else {
+    uni.showToast({
+      title: httpData.info || httpData.msg,
+      icon: 'none'
+    });
     // 返回错误的结果(catch接受数据)
     return Promise.reject({
       statusCode: res.response.statusCode,

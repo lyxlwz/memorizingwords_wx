@@ -69,8 +69,11 @@
   border-radius: 20rpx;
   box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 }
-.u-page.data-v-55df5bb4 .u-cell__value {
-  color: #b6b8b9;
+.u-page.data-v-55df5bb4 .u-cell__body {
+  justify-content: space-between;
+}
+.u-page.data-v-55df5bb4 .u-cell__body__content {
+  flex: none;
 }
 .u-page.data-v-55df5bb4 .u-line {
   border-bottom: 4rpx solid #b6b8b9 !important;

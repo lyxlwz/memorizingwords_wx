@@ -1,0 +1,37 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.num-results.data-v-4cdadada {
+  background: #3d5cff;
+  height: 100vh;
+}
+.num-results .accTraining.data-v-4cdadada {
+  background: #fff;
+  color: #000;
+}
+.num-results .checkAnswers.data-v-4cdadada {
+  padding-top: 50px;
+}
+.num-results .checkAnswers .answer-box.data-v-4cdadada {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+.num-results .btn.data-v-4cdadada {
+  background: #627bff;
+  color: #ddd;
+  font-weight: bold;
+  border: none;
+}
+

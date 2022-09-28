@@ -36,8 +36,8 @@
         style="padding-top: 10rpx;"
       >
         <view
-          class="word-Border-radius padding-xs association text-xs flex-start text-white"
-          style="background: #5670fb;"
+          class="padding-xs association text-xs flex-start text-white"
+          style="background: #5670fb;border-radius:24rpx;"
           @click="wordIsPlay = !wordIsPlay"
         >
           <view class="margin-right-xs">英</view>
@@ -142,8 +142,8 @@
         >
           <view style="display: flex;">
             <view
-              class="word-Border-radius padding-xs text-xs flex-start text-white"
-              style="background: #667efb; margin: 10rpx; "
+              class="padding-xs text-xs flex-start text-white"
+              style="background: #667efb; margin: 10rpx;border-radius:24rpx; "
               @click="wordExampleIsPlay != wordExampleIsPlay"
             >
               <view class="margin-right-xs">英</view>
@@ -232,12 +232,12 @@ export default {
   },
   onShow() {
     this.$nextTick(() => {
-      console.log(this.$refs);
       this.$refs.playWords.creatAudio()
     })
   },
   onUnLoad() {
-    console.log("creatAudio beforeDestroy")
+    this.$refs.playWords.destroyAudio()
+    this.$refs.playExample.destroyAudio()
   },
   components: { playWords, cuEditor },
   methods: {

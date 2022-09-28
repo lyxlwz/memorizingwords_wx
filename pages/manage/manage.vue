@@ -187,6 +187,7 @@
       <u-list
         @scrolltolower="scrolltolower"
         height="calc(80vh - 180rpx)"
+        pagingEnabled
       >
         <u-list-item
           v-for="(item, index) in indexList"
@@ -194,13 +195,19 @@
           @click="click(index)"
           class="test-w-b"
         >
-          <u-cell value="在...中;关于">
+          <u-cell>
             <view
               slot="title"
-              class="flex word-text-middle-1"
+              class="flex word-text-middle-1 margin-right-lg"
             >
-              <view class="margin-right-lg">{{title}}</view>
-              <view>{{title1}}</view>
+              <view class="margin-right-lg">{{item.first_study_date}}</view>
+              <view>{{item.word}}</view>
+            </view>
+            <view
+              slot="value"
+              class="word-text-middle-1"
+            >
+              <view class="text-right">{{item.paraphrase}}</view>
             </view>
           </u-cell>
         </u-list-item>
@@ -215,12 +222,10 @@
 export default {
   data() {
     return {
-		all:'',
+      all: '',
       src: '/static/word/sear.png',
       indexList: [],
       searchVal: 'Product Design',
-      title: "2022-9-6",
-      title1: "on",
       urls: [],
       show: false,
       yaradios: [{
@@ -303,13 +308,17 @@ export default {
         color: "#a6a6a6",
       }
       ],
+      queryData: {
+        count: 20,//单页数据条数
+        page: 1,//页数
+      },
 
     }
   },
   //第一次加载
   onLoad(e) {
     // this.loadmore()
-	this.manageapi()
+    this.manageapi()
     // 隐藏原生的tabbar
     uni.hideTabBar();
   },
@@ -319,20 +328,12 @@ export default {
     uni.hideTabBar();
   },
   methods: {
-	  manageapi(){
-		  this.$http.post('/WordSystem/wordData',
-		    { wordList:'all' },
-		    {
-		      header: { //默认 无 说明：请求头
-		        // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-		      }
-		    }).then(
-		  	 //   this.indexList.name = this.data.word,
-		    // this.indexList.key = this.data.paraphrase
-		    // this.indexList = data
-			console.log("请求成功")
-		    );
-	  },
+    manageapi() {
+      this.$http.post('/WordSystem/wordData',
+        { wordList: 'all', ...this.queryData }).then(res => {
+          this.indexList.push(...res.data)
+        });
+    },
     yes() {
       this.close()
     },
@@ -406,7 +407,8 @@ export default {
       console.log(index)
     },
     scrolltolower() {
-      this.loadmore()
+      this.queryData.page += 1
+      this.manageapi()
     },
     // loadmore() {
     //   for (let i = 0; i <= 15; i++) {
@@ -503,8 +505,11 @@ export default {
 }
 
 .u-page {
-  ::v-deep.u-cell__value {
-    color: #b6b8b9;
+  ::v-deep.u-cell__body {
+    justify-content: space-between;
+  }
+  ::v-deep.u-cell__body__content {
+    flex: none;
   }
 
   ::v-deep.u-line {

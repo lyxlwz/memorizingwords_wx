@@ -405,12 +405,12 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
   },
   onShow: function onShow() {var _this = this;
     this.$nextTick(function () {
-      console.log(_this.$refs);
       _this.$refs.playWords.creatAudio();
     });
   },
   onUnLoad: function onUnLoad() {
-    console.log("creatAudio beforeDestroy");
+    this.$refs.playWords.destroyAudio();
+    this.$refs.playExample.destroyAudio();
   },
   components: { playWords: playWords, cuEditor: cuEditor },
   methods: {

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "random-box": "/pages/number/components/randomBox"
+  }
+}
