@@ -1,5 +1,6 @@
 {
-  "navigationBarTitleText": "功能示例",
+  "navigationBarTitleText": "",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "public-module": "/components/public-module/public-module",
     "z-navigation": "/components/z-navigation/z-navigation"

@@ -1,5 +1,6 @@
 {
-  "navigationBarTitleText": "新增功能",
+  "navigationBarTitleText": "",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "u-input": "/node-modules/uview-ui/components/u-input/u-input",
     "u-line-progress": "/node-modules/uview-ui/components/u-line-progress/u-line-progress",

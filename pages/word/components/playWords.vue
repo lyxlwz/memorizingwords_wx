@@ -49,11 +49,9 @@ export default {
     //录音实例
     creatAudio() {
       this.innerAudioContext = uni.createInnerAudioContext();//创建实例
-      if (this.playId == 'wordLink') {
-        this.innerAudioContext.autoplay = true;//设置是否自动播放
-        // this.innerAudioContext.loop = true;
-        this.innerAudioContext.src = this.audioLink
-      }
+      this.innerAudioContext.autoplay = true;//设置是否自动播放
+      // this.innerAudioContext.loop = true;
+      this.innerAudioContext.src = this.audioLink
 
       this.innerAudioContext.onCanplay(() => {
         if (this.audioPlay) {

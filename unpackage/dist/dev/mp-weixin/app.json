@@ -1,118 +1,64 @@
 {
-  "pages": [
-    "pages/login/login",
-    "pages/index/index",
-    "pages/template/addTemplate",
-    "pages/course/course",
-    "pages/demo/common",
-    "pages/demo/list",
-    "pages/demo/areaSelect",
-    "pages/demo/popup",
-    "pages/demo/prompt",
-    "pages/demo/swipeAction",
-    "pages/demo/parser",
-    "pages/demo/formDemo",
-    "pages/demo/themeColor",
-    "pages/demo/navBarMemo/index",
-    "pages/demo/navBarMemo/demo",
-    "pages/demo/navBarMemo/demo1",
-    "pages/demo/navBarMemo/demo2",
-    "pages/demo/navBarMemo/demo3",
-    "pages/demo/navBarMemo/demo4",
-    "pages/demo/navBarMemo/demo5",
-    "pages/demo/navBarMemo/demo6",
-    "pages/demo/navBarMemo/demo7",
-    "pages/demo/navBarMemo/demo8",
-    "pages/demo/navBarMemo/demo9",
-    "pages/demo/navBarMemo/demo10",
-    "pages/demo/navBarMemo/demo11",
-    "pages/demo/waterfall/common",
-    "pages/demo/waterfall/stableWaterfall",
-    "pages/demo/waterfall/completeWaterfall",
-    "pages/template/webView",
-    "pages/template/common",
-    "pages/user/bindPhone",
-    "pages/user/forget",
-    "pages/user/protocol",
-    "pages/user/register",
-    "pages/sdkDemo/common",
-    "pages/sdkDemo/uploadFile",
-    "pages/sdkDemo/quUploadFile",
-    "pages/sdkDemo/appletsLogin",
-    "pages/sdkDemo/appUpdate",
-    "pages/sdkDemo/location",
-    "pages/sdkDemo/pay",
-    "pages/sdkDemo/permission",
-    "pages/sdkDemo/publicLogin",
-    "pages/sdkDemo/publicSdk",
-    "pages/sdkDemo/request",
-    "pages/sdkDemo/saveImg",
-    "pages/sdkDemo/share",
-    "pages/sdkDemo/socket",
-    "pages/sdkDemo/loginIntercept",
-    "pages/sdkDemo/utils",
-    "pages/template/pay",
-    "pages/shortVideo",
-    "pages/template/home",
-    "pages/template/editInfo",
-    "pages/template/poster/goodsPoster",
-    "pages/template/poster/scanCode",
-    "pages/demo/datePopup",
-    "pages/manage/manage",
-    "pages/word/results",
-    "pages/word/Fallible",
-    "pages/word/today",
-    "pages/word/random",
-    "pages/word/scre",
-    "pages/account/account",
-    "pages/number/number",
-    "pages/search/search"
-  ],
-  "subPackages": [],
-  "window": {
-    "navigationBarTextStyle": "black",
-    "navigationBarBackgroundColor": "#3d5cff",
-    "backgroundColor": "#3d5cff",
-    "navigationStyle": "custom"
-  },
-  "tabBar": {
-    "color": "#444444",
-    "selectedColor": "#FF80AB",
-    "borderStyle": "black",
-    "backgroundColor": "#ffffff",
-    "list": [
-      {
-        "pagePath": "pages/index/index",
-        "iconPath": "static/icon/tab/icon_home.png",
-        "selectedIconPath": "static/icon/tab/icon_search.png",
-        "text": "Home"
-      },
-      {
-        "pagePath": "pages/course/course",
-        "iconPath": "static/icon/tab/icon_manage.png",
-        "selectedIconPath": "static/icon/tab/icon_manage_c.png",
-        "text": "Course"
-      },
-      {
-        "pagePath": "pages/manage/manage",
-        "iconPath": "static/icon/tab/icon_course.png",
-        "selectedIconPath": "static/icon/tab/icon_course_c.png",
-        "text": "Manage"
-      },
-      {
-        "pagePath": "pages/account/account",
-        "iconPath": "static/icon/tab/icon_account.png",
-        "selectedIconPath": "static/icon/tab/icon_account_c.png",
-        "text": "Account"
-      }
-    ]
-  },
-  "permission": {
-    "scope.userLocation": {
-      "desc": "你的位置信息将用于小程序位置接口的效果展示"
-    }
-  },
-  "usingComponents": {
-    "mescroll-body": "/components/mescroll-uni/mescroll-body"
-  }
+    "pages": [
+        "pages/login/login",
+        "pages/index/index",
+        "pages/course/course",
+        "pages/manage/manage",
+        "pages/word/results",
+        "pages/word/Fallible",
+        "pages/word/today",
+        "pages/word/random",
+        "pages/word/scre",
+        "pages/account/account",
+        "pages/number/number",
+        "pages/search/search"
+    ],
+    "subPackages": [],
+    "window": {
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#3d5cff",
+        "backgroundColor": "#3d5cff",
+        "navigationStyle": "custom"
+    },
+    "tabBar": {
+        "color": "#444444",
+        "selectedColor": "#FF80AB",
+        "borderStyle": "black",
+        "backgroundColor": "#ffffff",
+        "list": [
+            {
+                "pagePath": "pages/index/index",
+                "iconPath": "static/icon/tab/icon_home.png",
+                "selectedIconPath": "static/icon/tab/icon_search.png",
+                "text": "Home"
+            },
+            {
+                "pagePath": "pages/course/course",
+                "iconPath": "static/icon/tab/icon_manage.png",
+                "selectedIconPath": "static/icon/tab/icon_manage_c.png",
+                "text": "Course"
+            },
+            {
+                "pagePath": "pages/manage/manage",
+                "iconPath": "static/icon/tab/icon_course.png",
+                "selectedIconPath": "static/icon/tab/icon_course_c.png",
+                "text": "Manage"
+            },
+            {
+                "pagePath": "pages/account/account",
+                "iconPath": "static/icon/tab/icon_account.png",
+                "selectedIconPath": "static/icon/tab/icon_account_c.png",
+                "text": "Account"
+            }
+        ]
+    },
+    "permission": {
+        "scope.userLocation": {
+            "desc": "你的位置信息将用于小程序位置接口的效果展示"
+        }
+    },
+    "usingComponents": {
+        "mescroll-body": "/components/mescroll-uni/mescroll-body"
+    },
+    "sitemapLocation": "sitemap.json"
 }

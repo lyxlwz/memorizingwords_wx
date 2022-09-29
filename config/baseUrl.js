@@ -8,6 +8,9 @@ if (process.env.NODE_ENV === 'development') {
   // 生产环境
   baseUrl = "http://154.213.21.110:80/index.php/index";
 }
+
+const wordVoiceUrl = 'http://154.213.21.110/'
+
 const courtConfig = {
   //微信公众号APPID
   publicAppId: "",
@@ -29,7 +32,7 @@ const courtConfig = {
     link: "https://www.kemean.com/sameCity/18031201/index.html", // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
     imgUrl: "http://qn.kemean.cn/upload/201901/28/23bedfc34597482292ecd6dc107f6342", // 分享图标
     // #endif
-  }
+  },
 };
 //手机号验证正则表达式
 const phoneRegular = /^1\d{10}$/;
@@ -40,5 +43,7 @@ const passwordRegular = /^[a-zA-Z0-9]{4,10}$/;
 export default Object.assign({
   phoneRegular,
   mailRegular,
-  passwordRegular
+  passwordRegular,
+  wordVoiceUrl,
 }, courtConfig);
+

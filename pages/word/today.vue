@@ -1,209 +1,164 @@
 <template>
-  <view class="today">
-    <view>
-      <u-navbar
-        leftText="10/100"
-        bgColor="#3d5cff"
-        color="#cbcdce"
-        leftIconColor="#cbcdce"
-        :autoBack="true"
-      >
-        <view slot="right">
-          <view style="font-size: 30rpx; color:#cbcdce;">
-            学习日期：{{day}}
+  <view class="today wordPageSty">
+    <u-navbar
+      leftText="10/100"
+      bgColor="#3d5cff"
+      color="#cbcdce"
+      leftIconColor="#cbcdce"
+      :autoBack="true"
+    >
+      <view slot="right">
+        <view style="font-size: 30rpx; color:#cbcdce;">
+          学习日期：{{wordObj.study_date}}
+        </view>
+      </view>
+    </u-navbar>
+    <view style="position: relative;top: 20px;">
+      <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
+        <view
+          class="word-text-light-1 flex_x_right"
+          style="font-size: 30rpx;"
+        >
+          分组序号
+        </view>
+        <view
+          class="word-text-light-1 flex_x_right"
+          style="padding-top: 20rpx;font-size: 30rpx;"
+        >
+          单词学习
+        </view>
+      </view>
+      <view class="all">
+        <view
+          class="title test-w-b"
+          @touchend="dbClickWord"
+        >
+          <text v-if="!isEditorWord">{{wordObj.word}}</text>
+          <u-input
+            v-else
+            v-model="wordObj.word"
+            color="#fff"
+            fontSize="50"
+          ></u-input>
+        </view>
+        <view
+          class="flex-start"
+          style="padding-top: 10rpx;"
+        >
+          <view
+            class="padding-xs association text-xs flex-start text-white"
+            style="background: #5670fb;border-radius:24rpx;"
+            @click="wordIsPlay = !wordIsPlay"
+          >
+            <view class="margin-right-xs">英</view>
+            <play-words
+              ref="playWords"
+              play-id="wordLink"
+              :audio-play.sync="wordIsPlay"
+              :audio-link="wordObj.word_voice"
+            ></play-words>
           </view>
-        </view>
-      </u-navbar>
-    </view>
-    <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
-      <view
-        class="word-text-light-1 flex_x_right"
-        style="font-size: 30rpx;"
-      >
-        分组序号
-      </view>
-      <view
-        class="word-text-light-1 flex_x_right"
-        style="padding-top: 20rpx;font-size: 30rpx;"
-      >
-        单词学习
-      </view>
-    </view>
-    <view class="all">
-      <view class="title test-w-b">resort</view>
-      <view
-        class="flex-start"
-        style="padding-top: 10rpx;"
-      >
-        <view
-          class="padding-xs association text-xs flex-start text-white"
-          style="background: #5670fb;border-radius:24rpx;"
-          @click="wordIsPlay = !wordIsPlay"
-        >
-          <view class="margin-right-xs">英</view>
-          <play-words
-            ref="playWords"
-            play-id="wordLink"
-            :audio-play.sync="wordIsPlay"
-            :audio-link="wordLink"
-          ></play-words>
-        </view>
-        <!-- <u-button
-          style="width:auto"
-          class="custom-style"
-          type="primary"
-          size="mini"
-          shape="circle"
-        >
 
-        </u-button> -->
-        <!--  -->
-
-        <!--  -->
-        <view
+          <!--  -->
+          <!-- <view
           class="word-text-light-1 margin-left-xs"
           style="font-size: 30rpx;"
-        >/ rɪˈzɔːrt /</view>
-      </view>
-      <view
-        class="translate padding-top-lg"
-        style="display: flex;"
-      >
-        <view class="noun word-text-light-1">
-          n.
+        >/ rɪˈzɔːrt /</view> -->
         </view>
         <view
-          class="ntranslate word-text-border"
-          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+          class="translate padding-top-lg"
+          style="display: flex;"
         >
-          度假胜地 采用的方法
-        </view>
-      </view>
-      <view style="display: flex;padding-top: 10rpx;">
-        <view class="word-text-light-1">
-          vi.
-        </view>
-        <view
-          class="word-text-border"
-          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
-        >
-          诉诸，采取
-        </view>
-      </view>
-      <!-- 联想 -->
-      <view style="padding-top: 80rpx;">
-        <view
-          class="association word-Border-radius"
-          style="padding: 30rpx 40rpx"
-        >
-          <!-- <view
-            class="word-text-light-1"
-            style="font-size: 30rpx;"
+          <view
+            class="ntranslate word-text-border"
+            style="font-size: 30rpx; padding-left: 20rpx; "
           >
-            热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
-          </view> -->
-          <cu-editor
-            ref="editor"
-            :content="content"
-            @save="onSave"
-          ></cu-editor>
-          <!-- <view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
-		  		<u--input
-		  		  shape="square"
-		  		  height="60rpx"
-		  		  border="none"
-				  color="#CBCDCE"
-		  		  @confirm="confirmInput"
-						  		>
-		  		  <template slot="prefix">
-					  <text>
-					  	<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>
-		  		    </text>
-		  		  </template>
-				  </u--input>
-		  	</view> -->
-
-          <view class="bycorenr margin-top-sm flex_x_right">
+            {{wordObj.paraphrase}}
+          </view>
+        </view>
+        <!-- 联想 -->
+        <view style="padding-top: 80rpx;">
+          <view
+            class="association word-Border-radius"
+            style="padding: 30rpx 40rpx"
+          >
             <view
-              class="word-text-border word-Border-radius Corner"
-              style="font-size: 30rpx; padding: 10rpx 42rpx"
+              class="word_content"
+              v-if="!isEditorMind"
             >
-              联想
+              <u-parse :content="wordObj.connect_in_the_mind"></u-parse>
             </view>
+            <cu-editor
+              v-else
+              ref="wordEditor"
+              :content="wordObj.connect_in_the_mind"
+              @save="onSave"
+            ></cu-editor>
+
+            <view
+              class="bycorenr margin-top-sm flex_x_right"
+              @touchend="dbClickMind"
+            >
+              <view
+                class="word-text-border word-Border-radius Corner"
+                style="font-size: 30rpx; padding: 10rpx 42rpx"
+              >
+                联想
+              </view>
+            </view>
+
+          </view>
+        </view>
+        <!-- 例句 -->
+        <view style="padding-top: 50rpx;">
+          <view
+            class="exp word-Border-radius"
+            style="padding: 30rpx 40rpx;"
+          >
+            <view style="display: flex;">
+              <view
+                class="word-text-light-1"
+                style="font-size: 30rpx;"
+              >
+                {{wordObj.example}}
+              </view>
+            </view>
+
+            <view class=" margin-top-sm flex_x_right">
+              <view
+                class="word-text-border word-Border-radius expl"
+                style="font-size: 30rpx; padding: 10rpx 42rpx"
+              >
+                例句
+              </view>
+            </view>
+
           </view>
 
         </view>
-      </view>
-      <!-- 例句 -->
-      <view style="padding-top: 50rpx;">
-        <view
-          class="exp word-Border-radius"
-          style="padding: 30rpx 40rpx;"
-        >
-          <view style="display: flex;">
-            <view
-              class="padding-xs text-xs flex-start text-white"
-              style="background: #667efb; margin: 10rpx;border-radius:24rpx; "
-              @click="wordExampleIsPlay != wordExampleIsPlay"
-            >
-              <view class="margin-right-xs">英</view>
-              <play-words
-                ref="playExample"
-                play-id="wordExampleLink"
-                :audio-play.sync="wordExampleIsPlay"
-                :audio-link="wordExampleLink"
-              ></play-words>
-            </view>
 
-            <view
-              class="word-text-light-1"
-              style="font-size: 30rpx; padding-left:20rpx"
-            >
-              This place is just so charming, the perfect winter resort.
-            </view>
+        <view
+          class="flex_bet"
+          style="padding: 80rpx 80rpx; display: flex; "
+        >
+          <view
+            class="tab-t word-text-border "
+            style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
+            @click="lastWord"
+          >
+            {{firstLoad ? '不记得' : '上一词'}}
           </view>
 
           <view
-            class="word-text-light-1"
-            style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx"
+            class="tab-b word-text-border "
+            style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
+            @click="nextWord"
           >
-            这个地方实在是太好啦，完美的冬季旅游胜地！
+            {{lastLoad ? '已学习完成' :'下一词'}}
           </view>
-
-          <view class=" margin-top-sm flex_x_right">
-            <view
-              class="word-text-border word-Border-radius expl"
-              style="font-size: 30rpx; padding: 10rpx 42rpx"
-            >
-              例句
-            </view>
-          </view>
-
         </view>
 
       </view>
-
-      <view
-        class="flex_bet"
-        style="padding: 80rpx 80rpx; display: flex; "
-      >
-        <view
-          class="tab-t word-text-border "
-          style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
-          @click="tabt"
-        >
-          上一词
-        </view>
-
-        <view
-          class="tab-b word-text-border "
-          style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
-          @click="tabb"
-        >
-          下一词
-        </view>
-      </view>
-
     </view>
 
     <!-- 公共组件-每个页面必须引入 -->
@@ -215,69 +170,119 @@
 <script>
 import playWords from './components/playWords'
 import cuEditor from '@/components/cu-editor/cu-editor'
+import { mapState, mapMutations } from 'vuex';
+import base from '@/config/baseUrl';
 export default {
   data() {
     return {
-      day: '2021-07-16',
-      type: '1',
-      content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
+      day: new Date().format("yyyy-MM-dd"),
       wordIsPlay: false,
-      wordLink: 'https://tts.youdao.com/fanyivoice?word=word.mp3',
-      wordExampleIsPlay: false,
-      wordExampleLink: 'https://tts.youdao.com/fanyivoice?word=example.mp3',
+      wordObj: {
+        id: 201,
+        word: "",
+        paraphrase: "",
+        connect_in_the_mind: "",
+        example: "",
+        group_id: "",
+        study_date: "",
+        first_study_date: "",
+        word_voice: ""
+      },
+      touchNumWord: 0,
+      isEditorWord: false,
+      touchNumMind: 0,
+      isEditorMind: false,
+      firstLoad: false,
+      lastLoad: false,
     }
   },
   onLoad() {
     this.todayWordList()
   },
   onShow() {
-    this.$nextTick(() => {
-      this.$refs.playWords.creatAudio()
-    })
+
   },
   onUnLoad() {
     this.$refs.playWords.destroyAudio()
     this.$refs.playExample.destroyAudio()
   },
   components: { playWords, cuEditor },
+  computed: {
+    ...mapState(['wordList', 'wordId'])
+  },
   methods: {
+    ...mapMutations(['setWordList', 'setWordId']),
     blue() {
 
     },
     todayWordList() {
       this.$http.get('/WordLearn/todayWordScreening',
         {
-          date: this.day,
-          type: this.type
-        }).then(data => {
-          // this.todayWord(data[0])
-          console.log(data, '成功返回参数')
+          date: '2022-10-23',
+        }).then(res => {
+          this.setWordList(res.temp_word_list)
+          this.setWordId(res.temp_word_list[0])
+          this.todayWord(this.wordId)
+          this.firstLoad = true
         })
     },
-    todayWord(wordId) {
-      this.$http.get('/WordLearn/todayWordScreening',
-        {
-          id: wordId
-        }).then(data => {
-          console.log(data, '成功返回参数')
+    todayWord(word_id) {
+      this.firstLoad = this.wordList[0] == this.wordId
+      this.lastLoad = this.wordId == this.wordList[this.wordList.length - 1]
+      this.$http.get('/WordSystem/wordData',
+        { word_id }).then(res => {
+          this.wordObj = res
+          this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
+          this.$nextTick(() => {
+            this.$refs.playWords.creatAudio()
+          })
         })
     },
     onSave() {
       console.log('富文本编辑器保存');
     },
-
-    tabt() {
-      console.log("上一词")
+    dbClickWord() {
+      this.touchNumWord++
+      setTimeout(() => {
+        if (this.touchNumWord >= 2) {
+          this.isEditorWord = true
+        }
+        this.touchNumWord = 0
+      }, 250)
     },
-    tabb() {
-      console.log("下一词")
+    dbClickMind() {
+      this.touchNumMind++
+      setTimeout(() => {
+        if (this.touchNumMind >= 2) {
+          this.isEditorMind = true
+        }
+        this.touchNumMind = 0
+      }, 250)
+    },
+
+    lastWord() {
+      if (this.firstLoad) {
+        uni.navigateBack({
+          delta: 1,//返回层数，2则上上页
+        })
+      } else {
+        const wordId = (parseFloat(this.wordId) - 1).toString()
+        this.toNewWord(wordId)
+      }
+    },
+    nextWord() {
+      const wordId = (parseFloat(this.wordId) + 1).toString()
+      this.toNewWord(wordId)
+    },
+    toNewWord(wordId) {
+      this.setWordId(wordId)
+      this.todayWord(wordId)
     },
   }
 }
 </script>
 <style lang="scss" scoped>
 .today {
-  height: 120vh;
   background: #3d5cff;
   .all {
     margin: auto;
@@ -300,6 +305,10 @@ export default {
         // height: 60rpx;
         background: #627bff;
         width: 150rpx;
+      }
+      ::v-deep.word_content {
+        color: #cbcdce;
+        font-size: 30rpx;
       }
     }
     .exp {

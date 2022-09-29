@@ -155,7 +155,7 @@
                   <button
                     type="primary"
                     plain=true
-					iconColor="#3d5cff"
+                    iconColor="#3d5cff"
                     style="width: 40%;"
                     @click="no"
                   >取消</button>
@@ -330,7 +330,7 @@ export default {
   },
   methods: {
     manageapi() {
-      this.$http.post('/WordSystem/wordData',
+      this.$http.get('/WordSystem/wordData',
         { wordList: 'all', ...this.queryData }).then(res => {
           this.indexList.push(...res.data)
         });
@@ -454,33 +454,34 @@ export default {
   //   margin-right: 20px;
   //   padding: 20rpx;
   // }
-::v-deep.u-tag--square{margin:20rpx}
+  ::v-deep.u-tag--square {
+    margin: 20rpx;
+  }
   .u-page__tag-item {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
     // justify-content: center;
-	
+
     .tag-item {
       width: 25%;
       margin-right: 5%;
       margin-top: 2%;
       display: flex;
       align-items: center;
-	  
     }
   }
   .u-page__tag-item-i {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
-    
+
     .atag-item {
       width: 25%;
       margin-right: 5%;
 
       margin-top: 2%;
-	  
+
       // display: flex;
       align-items: center;
     }
@@ -489,11 +490,11 @@ export default {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
-    
+
     .yatag-item {
       width: 25%;
       margin-right: 5%;
-      
+
       // display: flex;
       // align-items: center;
     }

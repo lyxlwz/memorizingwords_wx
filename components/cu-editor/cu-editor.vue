@@ -988,7 +988,7 @@ $main-color: #5b8ff9;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  font-size: 28rpx;
+  font-size: 30rpx;
   line-height: 1.5;
   overflow: auto;
   min-height: unset !important;

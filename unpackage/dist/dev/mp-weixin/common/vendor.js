@@ -334,7 +334,7 @@ var promiseInterceptor = {
 
 
 var SYNC_API_RE =
-/^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo|getSystemSetting|getAppAuthorizeSetting/;
+/^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo/;
 
 var CONTEXT_API_RE = /^create|Manager$/;
 
@@ -342,7 +342,7 @@ var CONTEXT_API_RE = /^create|Manager$/;
 var CONTEXT_API_RE_EXC = ['createBLEConnection'];
 
 // 同步例外情况
-var ASYNC_API = ['createBLEConnection', 'createPushMessage'];
+var ASYNC_API = ['createBLEConnection'];
 
 var CALLBACK_API_RE = /^on|^off/;
 
@@ -766,8 +766,8 @@ function populateParameters(result) {var _result$brand =
     appVersion: "0.0.1",
     appVersionCode: "110",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "3.6.3",
-    uniRuntimeVersion: "3.6.3",
+    uniCompileVersion: "3.4.15",
+    uniRuntimeVersion: "3.4.15",
     uniPlatform: undefined || "mp-weixin",
     deviceBrand: deviceBrand,
     deviceModel: model,
@@ -910,19 +910,6 @@ var getWindowInfo = {
   } };
 
 
-var getAppAuthorizeSetting = {
-  returnValue: function returnValue(result) {var
-    locationReducedAccuracy = result.locationReducedAccuracy;
-
-    result.locationAccuracy = 'unsupported';
-    if (locationReducedAccuracy === true) {
-      result.locationAccuracy = 'reduced';
-    } else if (locationReducedAccuracy === false) {
-      result.locationAccuracy = 'full';
-    }
-  } };
-
-
 // import navigateTo from 'uni-helpers/navigate-to'
 
 var protocols = {
@@ -934,8 +921,7 @@ var protocols = {
   showActionSheet: showActionSheet,
   getAppBaseInfo: getAppBaseInfo,
   getDeviceInfo: getDeviceInfo,
-  getWindowInfo: getWindowInfo,
-  getAppAuthorizeSetting: getAppAuthorizeSetting };
+  getWindowInfo: getWindowInfo };
 
 var todos = [
 'vibrate',
@@ -1160,7 +1146,6 @@ function getApiCallbacks(params) {
 
 var cid;
 var cidErrMsg;
-var enabled;
 
 function normalizePushMessage(message) {
   try {
@@ -1172,25 +1157,17 @@ function normalizePushMessage(message) {
 function invokePushCallback(
 args)
 {
-  if (args.type === 'enabled') {
-    enabled = true;
-  } else if (args.type === 'clientId') {
+  if (args.type === 'clientId') {
     cid = args.cid;
     cidErrMsg = args.errMsg;
     invokeGetPushCidCallbacks(cid, args.errMsg);
   } else if (args.type === 'pushMsg') {
-    var message = {
-      type: 'receive',
-      data: normalizePushMessage(args.message) };
+    onPushMessageCallbacks.forEach(function (callback) {
+      callback({
+        type: 'receive',
+        data: normalizePushMessage(args.message) });
 
-    for (var i = 0; i < onPushMessageCallbacks.length; i++) {
-      var callback = onPushMessageCallbacks[i];
-      callback(message);
-      // 该消息已被阻止
-      if (message.stopped) {
-        break;
-      }
-    }
+    });
   } else if (args.type === 'click') {
     onPushMessageCallbacks.forEach(function (callback) {
       callback({
@@ -1210,7 +1187,7 @@ function invokeGetPushCidCallbacks(cid, errMsg) {
   getPushCidCallbacks.length = 0;
 }
 
-function getPushClientId(args) {
+function getPushClientid(args) {
   if (!isPlainObject(args)) {
     args = {};
   }var _getApiCallbacks =
@@ -1222,33 +1199,25 @@ function getPushClientId(args) {
   var hasSuccess = isFn(success);
   var hasFail = isFn(fail);
   var hasComplete = isFn(complete);
+  getPushCidCallbacks.push(function (cid, errMsg) {
+    var res;
+    if (cid) {
+      res = {
+        errMsg: 'getPushClientid:ok',
+        cid: cid };
 
-  Promise.resolve().then(function () {
-    if (typeof enabled === 'undefined') {
-      enabled = false;
-      cid = '';
-      cidErrMsg = 'uniPush is not enabled';
+      hasSuccess && success(res);
+    } else {
+      res = {
+        errMsg: 'getPushClientid:fail' + (errMsg ? ' ' + errMsg : '') };
+
+      hasFail && fail(res);
     }
-    getPushCidCallbacks.push(function (cid, errMsg) {
-      var res;
-      if (cid) {
-        res = {
-          errMsg: 'getPushClientId:ok',
-          cid: cid };
-
-        hasSuccess && success(res);
-      } else {
-        res = {
-          errMsg: 'getPushClientId:fail' + (errMsg ? ' ' + errMsg : '') };
-
-        hasFail && fail(res);
-      }
-      hasComplete && complete(res);
-    });
-    if (typeof cid !== 'undefined') {
-      invokeGetPushCidCallbacks(cid, cidErrMsg);
-    }
+    hasComplete && complete(res);
   });
+  if (typeof cid !== 'undefined') {
+    Promise.resolve().then(function () {return invokeGetPushCidCallbacks(cid, cidErrMsg);});
+  }
 }
 
 var onPushMessageCallbacks = [];
@@ -1272,7 +1241,7 @@ var offPushMessage = function offPushMessage(fn) {
 
 var api = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  getPushClientId: getPushClientId,
+  getPushClientid: getPushClientid,
   onPushMessage: onPushMessage,
   offPushMessage: offPushMessage,
   invokePushCallback: invokePushCallback });
@@ -1290,17 +1259,7 @@ var customize = cached(function (str) {
 function initTriggerEvent(mpInstance) {
   var oldTriggerEvent = mpInstance.triggerEvent;
   var newTriggerEvent = function newTriggerEvent(event) {for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {args[_key3 - 1] = arguments[_key3];}
-    // 事件名统一转驼峰格式，仅处理：当前组件为 vue 组件、当前组件为 vue 组件子组件
-    if (this.$vm || this.dataset && this.dataset.comType) {
-      event = customize(event);
-    } else {
-      // 针对微信/QQ小程序单独补充驼峰格式事件，以兼容历史项目
-      var newEvent = customize(event);
-      if (newEvent !== event) {
-        oldTriggerEvent.apply(this, [newEvent].concat(args));
-      }
-    }
-    return oldTriggerEvent.apply(this, [event].concat(args));
+    return oldTriggerEvent.apply(mpInstance, [customize(event)].concat(args));
   };
   try {
     // 京东小程序 triggerEvent 为只读
@@ -1399,29 +1358,6 @@ function initHooks(mpOptions, hooks, vueOptions) {
   });
 }
 
-function initUnknownHooks(mpOptions, vueOptions) {var excludes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-  findHooks(vueOptions).forEach(function (hook) {return initHook$1(mpOptions, hook, excludes);});
-}
-
-function findHooks(vueOptions) {var hooks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  if (vueOptions) {
-    Object.keys(vueOptions).forEach(function (name) {
-      if (name.indexOf('on') === 0 && isFn(vueOptions[name])) {
-        hooks.push(name);
-      }
-    });
-  }
-  return hooks;
-}
-
-function initHook$1(mpOptions, hook, excludes) {
-  if (excludes.indexOf(hook) === -1 && !hasOwn(mpOptions, hook)) {
-    mpOptions[hook] = function (args) {
-      return this.$vm && this.$vm.__call_hook(hook, args);
-    };
-  }
-}
-
 function initVueComponent(Vue, vueOptions) {
   vueOptions = vueOptions.default || vueOptions;
   var VueComponent;
@@ -1464,7 +1400,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -1559,25 +1495,18 @@ function parsePropType(key, type, defaultValue, file) {
   return type;
 }
 
-function initProperties(props) {var isBehavior = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;var file = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';var options = arguments.length > 3 ? arguments[3] : undefined;
+function initProperties(props) {var isBehavior = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;var file = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   var properties = {};
   if (!isBehavior) {
     properties.vueId = {
       type: String,
       value: '' };
 
-    {
-      if (options.virtualHost) {
-        properties.virtualHostStyle = {
-          type: null,
-          value: '' };
+    // 用于字节跳动小程序模拟抽象节点
+    properties.generic = {
+      type: Object,
+      value: null };
 
-        properties.virtualHostClass = {
-          type: null,
-          value: '' };
-
-      }
-    }
     // scopedSlotsCompiler auto
     properties.scopedSlotsCompiler = {
       type: String,
@@ -1707,7 +1636,7 @@ function getExtraValue(vm, dataPathsArray) {
   return context;
 }
 
-function processEventExtra(vm, extra, event, __args__) {
+function processEventExtra(vm, extra, event) {
   var extraObj = {};
 
   if (Array.isArray(extra) && extra.length) {
@@ -1730,7 +1659,11 @@ function processEventExtra(vm, extra, event, __args__) {
           if (dataPath === '$event') {// $event
             extraObj['$' + index] = event;
           } else if (dataPath === 'arguments') {
-            extraObj['$' + index] = event.detail ? event.detail.__args__ || __args__ : __args__;
+            if (event.detail && event.detail.__args__) {
+              extraObj['$' + index] = event.detail.__args__;
+            } else {
+              extraObj['$' + index] = [event];
+            }
           } else if (dataPath.indexOf('$event.') === 0) {// $event.target.value
             extraObj['$' + index] = vm.__get_value(dataPath.replace('$event.', ''), event);
           } else {
@@ -1757,12 +1690,6 @@ function getObjByArray(arr) {
 
 function processEventArgs(vm, event) {var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];var extra = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];var isCustom = arguments.length > 4 ? arguments[4] : undefined;var methodName = arguments.length > 5 ? arguments[5] : undefined;
   var isCustomMPEvent = false; // wxcomponent 组件，传递原始 event 对象
-
-  // fixed 用户直接触发 mpInstance.triggerEvent
-  var __args__ = isPlainObject(event.detail) ?
-  event.detail.__args__ || [event.detail] :
-  [event.detail];
-
   if (isCustom) {// 自定义事件
     isCustomMPEvent = event.currentTarget &&
     event.currentTarget.dataset &&
@@ -1771,11 +1698,11 @@ function processEventArgs(vm, event) {var args = arguments.length > 2 && argumen
       if (isCustomMPEvent) {
         return [event];
       }
-      return __args__;
+      return event.detail.__args__ || event.detail;
     }
   }
 
-  var extraObj = processEventExtra(vm, extra, event, __args__);
+  var extraObj = processEventExtra(vm, extra, event);
 
   var ret = [];
   args.forEach(function (arg) {
@@ -1784,7 +1711,7 @@ function processEventArgs(vm, event) {var args = arguments.length > 2 && argumen
         ret.push(event.target.value);
       } else {
         if (isCustom && !isCustomMPEvent) {
-          ret.push(__args__[0]);
+          ret.push(event.detail.__args__[0]);
         } else {// wxcomponent 组件或内置组件
           ret.push(event);
         }
@@ -1875,9 +1802,7 @@ function handleEvent(event) {var _this2 = this;
           }
           var handler = handlerCtx[methodName];
           if (!isFn(handler)) {
-            var _type = _this2.$vm.mpType === 'page' ? 'Page' : 'Component';
-            var path = _this2.route || _this2.is;
-            throw new Error("".concat(_type, " \"").concat(path, "\" does not have a method \"").concat(methodName, "\""));
+            throw new Error(" _vm.".concat(methodName, " is not a function"));
           }
           if (isOnce) {
             if (handler.once) {
@@ -2091,7 +2016,6 @@ function parseBaseApp(vm, _ref3)
   initAppLocale(_vue.default, vm, normalizeLocale(wx.getSystemInfoSync().language) || LOCALE_EN);
 
   initHooks(appOptions, hooks);
-  initUnknownHooks(appOptions, vm.$options);
 
   return appOptions;
 }
@@ -2261,7 +2185,7 @@ function parseBaseComponent(vueComponentOptions)
     options: options,
     data: initData(vueOptions, _vue.default.prototype),
     behaviors: initBehaviors(vueOptions, initBehavior),
-    properties: initProperties(vueOptions.props, false, vueOptions.__file, options),
+    properties: initProperties(vueOptions.props, false, vueOptions.__file),
     lifetimes: {
       attached: function attached() {
         var properties = this.properties;
@@ -2370,7 +2294,6 @@ function parseBasePage(vuePageOptions, _ref6)
     this.$vm.$mp.query = query; // 兼容 mpvue
     this.$vm.__call_hook('onLoad', query);
   };
-  initUnknownHooks(pageOptions.methods, vuePageOptions, ['onReady']);
 
   return pageOptions;
 }
@@ -3796,9 +3719,9 @@ module.exports = index_cjs;
 /***/ }),
 
 /***/ 100:
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/color.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/color.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3824,9 +3747,9 @@ color;exports.default = _default;
 /***/ }),
 
 /***/ 1006:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-text/value.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-text/value.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3919,9 +3842,9 @@ color;exports.default = _default;
 /***/ }),
 
 /***/ 1007:
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/button.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/button.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3941,9 +3864,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1008:
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/openType.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/openType.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3975,9 +3898,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 101:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noNetwork.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noNetwork.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4001,9 +3924,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1016:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/props.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/props.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4034,9 +3957,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1017:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/transition.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/transition.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4200,9 +4123,9 @@ var getClassNames = function getClassNames(name) {return {
 /***/ }),
 
 /***/ 1018:
-/*!****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/nvue.ani-map.js ***!
-  \****************************************************************************************************/
+/*!************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/nvue.ani-map.js ***!
+  \************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4277,9 +4200,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 102:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noticeBar.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noticeBar.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4313,9 +4236,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1026:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-status-bar/props.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-status-bar/props.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4330,9 +4253,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 103:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/notify.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/notify.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4361,9 +4284,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1034:
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-safe-bottom/props.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-safe-bottom/props.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4374,9 +4297,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 104:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberBox.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberBox.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4418,9 +4341,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1049:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-line/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-line/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4460,9 +4383,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 105:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberKeyboard.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberKeyboard.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4486,9 +4409,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 106:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/overlay.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/overlay.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4513,9 +4436,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 107:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/parse.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/parse.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4544,9 +4467,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 1071:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-link/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-link/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4592,9 +4515,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 108:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/picker.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/picker.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4631,9 +4554,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 109:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/popup.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/popup.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4669,9 +4592,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 11:
-/*!****************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules sync nonrecursive \.js$ ***!
-  \****************************************************************************/
+/*!************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules sync nonrecursive \.js$ ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4706,9 +4629,9 @@ webpackContext.id = 11;
 /***/ }),
 
 /***/ 110:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radio.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radio.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4742,9 +4665,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 111:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radioGroup.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radioGroup.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4781,9 +4704,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 112:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rate.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rate.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4816,9 +4739,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 113:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/readMore.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/readMore.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4847,9 +4770,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 114:
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/row.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/row.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4873,9 +4796,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 115:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rowNotice.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rowNotice.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4903,9 +4826,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 116:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/scrollList.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/scrollList.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4932,9 +4855,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 117:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/search.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/search.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4978,9 +4901,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 118:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/section.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/section.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5011,9 +4934,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 119:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/skeleton.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/skeleton.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5045,9 +4968,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 12:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/common.js ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/common.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5150,9 +5073,9 @@ var actions = {};exports.actions = actions;
 /***/ }),
 
 /***/ 120:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/slider.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/slider.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5184,9 +5107,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 121:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/statusBar.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/statusBar.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5208,9 +5131,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 122:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/steps.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/steps.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5238,9 +5161,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 123:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/stepsItem.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/stepsItem.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5265,9 +5188,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 124:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/sticky.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/sticky.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5294,9 +5217,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 125:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/subsection.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/subsection.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5326,9 +5249,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 126:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeAction.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeAction.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5350,9 +5273,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 127:
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeActionItem.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeActionItem.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5380,9 +5303,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 128:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swiper.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swiper.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5427,9 +5350,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 129:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipterIndicator.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipterIndicator.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5455,9 +5378,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 13:
-/*!*************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/order.js ***!
-  \*************************************************************/
+/*!*********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/order.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5473,9 +5396,9 @@ var actions = {};exports.actions = actions;
 /***/ }),
 
 /***/ 130:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/switch.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/switch.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5506,9 +5429,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 131:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5537,9 +5460,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 132:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbarItem.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbarItem.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5566,9 +5489,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 133:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabs.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabs.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5607,9 +5530,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 134:
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tag.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tag.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5645,9 +5568,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 135:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/text.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/text.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5691,9 +5614,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 136:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/textarea.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/textarea.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5736,9 +5659,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 137:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toast.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toast.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5774,9 +5697,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 138:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toolbar.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toolbar.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5803,9 +5726,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 139:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tooltip.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tooltip.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5837,9 +5760,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 14:
-/*!************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/user.js ***!
-  \************************************************************/
+/*!********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/user.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5878,9 +5801,9 @@ var actions = {};exports.actions = actions;
 /***/ }),
 
 /***/ 140:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/transition.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/transition.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5905,9 +5828,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 141:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/upload.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/upload.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5950,9 +5873,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 142:
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/zIndex.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/zIndex.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5980,9 +5903,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 143:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/platform.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/platform.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6066,9 +5989,9 @@ platform;exports.default = _default;
 /***/ }),
 
 /***/ 144:
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/style/main.scss ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/style/main.scss ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6079,9 +6002,9 @@ platform;exports.default = _default;
 /***/ }),
 
 /***/ 145:
-/*!*******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/plugins/utils.js ***!
-  \*******************************************************/
+/*!***************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/plugins/utils.js ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6678,9 +6601,9 @@ _vue.default.filter('timeFormat', function (val) {var fmt = arguments.length > 1
 /***/ }),
 
 /***/ 146:
-/*!********************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/baseUrl.js ***!
-  \********************************************************/
+/*!****************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/baseUrl.js ***!
+  \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6692,6 +6615,9 @@ if (true) {
   // baseUrl = "https://twin-ui.com/demo/";
   baseUrl = "http://154.213.21.110:80/index.php/index";
 } else {}
+
+var wordVoiceUrl = 'http://154.213.21.110/';
+
 var courtConfig = {
   //微信公众号APPID
   publicAppId: "",
@@ -6724,15 +6650,16 @@ var passwordRegular = /^[a-zA-Z0-9]{4,10}$/;var _default =
 Object.assign({
   phoneRegular: phoneRegular,
   mailRegular: mailRegular,
-  passwordRegular: passwordRegular },
+  passwordRegular: passwordRegular,
+  wordVoiceUrl: wordVoiceUrl },
 courtConfig);exports.default = _default;
 
 /***/ }),
 
 /***/ 147:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/requestConfig.js ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/requestConfig.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6946,9 +6873,9 @@ $http;exports.default = _default;
 /***/ }),
 
 /***/ 148:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/index.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/index.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6965,9 +6892,9 @@ var _upload = _interopRequireDefault(__webpack_require__(/*! ./upload/upload.js 
 /***/ }),
 
 /***/ 149:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/upload.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/upload.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7260,9 +7187,9 @@ fileUpload = /*#__PURE__*/function (_request) {_inherits(fileUpload, _request);v
 /***/ }),
 
 /***/ 15:
-/*!*************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/video.js ***!
-  \*************************************************************/
+/*!*********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/video.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7280,9 +7207,9 @@ var actions = {};exports.actions = actions;
 /***/ }),
 
 /***/ 150:
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/request.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/request.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7420,9 +7347,9 @@ request = /*#__PURE__*/function () {
 /***/ }),
 
 /***/ 151:
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/utils.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/utils.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7533,9 +7460,9 @@ exports.dispatchRequest = dispatchRequest;var jsonpRequest = function jsonpReque
 /***/ }),
 
 /***/ 152:
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/utils.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/utils.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7929,9 +7856,9 @@ exports.aliUpload = aliUpload;var urlUpload = function urlUpload(requestInfo, da
 /***/ }),
 
 /***/ 153:
-/*!*********************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/qiniuUploader.js ***!
-  \*********************************************************************************************************/
+/*!*****************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/qiniuUploader.js ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -8108,9 +8035,9 @@ exports.aliUpload = aliUpload;var urlUpload = function urlUpload(requestInfo, da
 /***/ }),
 
 /***/ 154:
-/*!*******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/aliUploader.js ***!
-  \*******************************************************************************************************/
+/*!***************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/aliUploader.js ***!
+  \***************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8158,9 +8085,9 @@ module.exports = getAliyunOssKey;
 /***/ }),
 
 /***/ 155:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/Base64.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/Base64.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -8300,9 +8227,9 @@ module.exports = Base64;
 /***/ }),
 
 /***/ 156:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/hmac.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/hmac.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8351,9 +8278,9 @@ module.exports = Crypto;
 /***/ }),
 
 /***/ 157:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/crypto.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/crypto.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -8546,9 +8473,9 @@ module.exports = Crypto;
 /***/ }),
 
 /***/ 158:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/sha1.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/sha1.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8642,9 +8569,9 @@ module.exports = Crypto;
 /***/ }),
 
 /***/ 159:
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/login.js ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/login.js ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8783,29 +8710,72 @@ function judgeLogin(callback) {var type = arguments.length > 1 && arguments[1] !
 /***/ }),
 
 /***/ 16:
-/*!************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/word.js ***!
-  \************************************************************/
+/*!********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/word.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.actions = exports.mutations = exports.state = void 0;var state = {
-  todayWords: [],
-  randomWords: [],
-  fallibleWords: [] };exports.state = state;
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.actions = exports.mutations = exports.state = void 0;var state = {
+  wordList: [],
+  wordId: '' };exports.state = state;
 
-var mutations = {};exports.mutations = mutations;
+var mutations = {
+  //储存单词list
+  setWordList: function setWordList(state, data) {
+    if (data) {
+      state.wordList = data;
 
+
+
+
+      uni.setStorageSync('wordList', state.wordList);
+
+    }
+  },
+  //储存单词id
+  setWordId: function setWordId(state, data) {
+    if (data) {
+      state.wordId = data;
+
+
+
+
+      uni.setStorageSync('wordId', state.wordId);
+
+    }
+  },
+  // 清空单词list
+  emptyWordList: function emptyWordList(state) {
+    state.wordList = [];
+
+
+
+
+    uni.removeStorageSync("wordList");
+
+  },
+  // 清空单词id
+  emptyWorId: function emptyWorId(state) {
+    state.wordId = '';
+
+
+
+
+    uni.removeStorageSync("wordId");
+
+  } };exports.mutations = mutations;
 
 var actions = {};exports.actions = actions;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 
 /***/ 160:
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/utils.js ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/utils.js ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9029,10 +8999,1152 @@ exports.setPayAssign = setPayAssign;var getLatLon = function getLatLon(tip) {
 
 /***/ }),
 
+/***/ 182:
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-parse/props.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
+  props: {
+
+
+
+    content: String,
+    copyLink: {
+      type: Boolean,
+      default: uni.$u.props.parse.copyLink },
+
+    domain: String,
+    errorImg: {
+      type: String,
+      default: uni.$u.props.parse.errorImg },
+
+    lazyLoad: {
+      type: Boolean,
+      default: uni.$u.props.parse.lazyLoad },
+
+    loadingImg: {
+      type: String,
+      default: uni.$u.props.parse.loadingImg },
+
+    pauseVideo: {
+      type: Boolean,
+      default: uni.$u.props.parse.pauseVideo },
+
+    previewImg: {
+      type: Boolean,
+      default: uni.$u.props.parse.previewImg },
+
+    scrollTable: Boolean,
+    selectable: Boolean,
+    setTitle: {
+      type: Boolean,
+      default: uni.$u.props.parse.setTitle },
+
+    showImgMenu: {
+      type: Boolean,
+      default: uni.$u.props.parse.showImgMenu },
+
+    tagStyle: Object,
+    useAnchor: null } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
+/***/ 183:
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-parse/parser.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {
+
+/**
+               * @fileoverview html 解析器
+               */
+// 配置
+function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var config = {
+  // 信任的标签（保持标签名不变）
+  trustTags: makeMap('a,abbr,ad,audio,b,blockquote,br,code,col,colgroup,dd,del,dl,dt,div,em,fieldset,h1,h2,h3,h4,h5,h6,hr,i,img,ins,label,legend,li,ol,p,q,ruby,rt,source,span,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,title,ul,video'),
+  // 块级标签（转为 div，其他的非信任标签转为 span）
+  blockTags: makeMap('address,article,aside,body,caption,center,cite,footer,header,html,nav,pre,section'),
+  // 要移除的标签
+  ignoreTags: makeMap('area,base,canvas,embed,frame,head,iframe,input,link,map,meta,param,rp,script,source,style,textarea,title,track,wbr'),
+  // 自闭合的标签
+  voidTags: makeMap('area,base,br,col,circle,ellipse,embed,frame,hr,img,input,line,link,meta,param,path,polygon,rect,source,track,use,wbr'),
+  // html 实体
+  entities: {
+    lt: '<',
+    gt: '>',
+    quot: '"',
+    apos: "'",
+    ensp: "\u2002",
+    emsp: "\u2003",
+    nbsp: '\xA0',
+    semi: ';',
+    ndash: '–',
+    mdash: '—',
+    middot: '·',
+    lsquo: '‘',
+    rsquo: '’',
+    ldquo: '“',
+    rdquo: '”',
+    bull: '•',
+    hellip: '…' },
+
+  // 默认的标签样式
+  tagStyle: {
+
+    address: 'font-style:italic',
+    big: 'display:inline;font-size:1.2em',
+    caption: 'display:table-caption;text-align:center',
+    center: 'text-align:center',
+    cite: 'font-style:italic',
+    dd: 'margin-left:40px',
+    mark: 'background-color:yellow',
+    pre: 'font-family:monospace;white-space:pre',
+    s: 'text-decoration:line-through',
+    small: 'display:inline;font-size:0.8em',
+    u: 'text-decoration:underline' } };var _uni$getSystemInfoSyn =
+
+
+
+uni.getSystemInfoSync(),windowWidth = _uni$getSystemInfoSyn.windowWidth;
+var blankChar = makeMap(' ,\r,\n,\t,\f');
+var idIndex = 0;
+
+
+
+
+
+
+
+
+
+
+/**
+                  * @description 创建 map
+                  * @param {String} str 逗号分隔
+                  */
+
+function makeMap(str) {
+  var map = Object.create(null);
+  var list = str.split(',');
+
+  for (var i = list.length; i--;) {
+    map[list[i]] = true;
+  }
+
+  return map;
+}
+/**
+   * @description 解码 html 实体
+   * @param {String} str 要解码的字符串
+   * @param {Boolean} amp 要不要解码 &amp;
+   * @returns {String} 解码后的字符串
+   */
+
+function decodeEntity(str, amp) {
+  var i = str.indexOf('&');
+
+  while (i != -1) {
+    var j = str.indexOf(';', i + 3);
+    var code = void 0;
+    if (j == -1) break;
+
+    if (str[i + 1] == '#') {
+      // &#123; 形式的实体
+      code = parseInt((str[i + 2] == 'x' ? '0' : '') + str.substring(i + 2, j));
+      if (!isNaN(code)) str = str.substr(0, i) + String.fromCharCode(code) + str.substr(j + 1);
+    } else {
+      // &nbsp; 形式的实体
+      code = str.substring(i + 1, j);
+      if (config.entities[code] || code == 'amp' && amp) str = str.substr(0, i) + (config.entities[code] || '&') + str.substr(j + 1);
+    }
+
+    i = str.indexOf('&', i + 1);
+  }
+
+  return str;
+}
+/**
+   * @description html 解析器
+   * @param {Object} vm 组件实例
+   */
+
+function parser(vm) {
+  this.options = vm || {};
+  this.tagStyle = Object.assign(config.tagStyle, this.options.tagStyle);
+  this.imgList = vm.imgList || [];
+  this.plugins = vm.plugins || [];
+  this.attrs = Object.create(null);
+  this.stack = [];
+  this.nodes = [];
+}
+/**
+   * @description 执行解析
+   * @param {String} content 要解析的文本
+   */
+
+parser.prototype.parse = function (content) {
+  // 插件处理
+  for (var i = this.plugins.length; i--;) {
+    if (this.plugins[i].onUpdate) content = this.plugins[i].onUpdate(content, config) || content;
+  }
+
+  new lexer(this).parse(content); // 出栈未闭合的标签
+
+  while (this.stack.length) {
+    this.popNode();
+  }
+
+  return this.nodes;
+};
+/**
+    * @description 将标签暴露出来（不被 rich-text 包含）
+    */
+
+parser.prototype.expose = function () {
+
+  for (var i = this.stack.length; i--;) {
+    var item = this.stack[i];
+    if (item.name == 'a' || item.c) return;
+    item.c = 1;
+  }
+};
+/**
+    * @description 处理插件
+    * @param {Object} node 要处理的标签
+    * @returns {Boolean} 是否要移除此标签
+    */
+
+parser.prototype.hook = function (node) {
+  for (var i = this.plugins.length; i--;) {
+    if (this.plugins[i].onParse && this.plugins[i].onParse(node, this) == false) return false;
+  }
+
+  return true;
+};
+/**
+    * @description 将链接拼接上主域名
+    * @param {String} url 需要拼接的链接
+    * @returns {String} 拼接后的链接
+    */
+
+parser.prototype.getUrl = function (url) {var
+  domain = this.options.domain;
+
+  if (url[0] == '/') {
+    // // 开头的补充协议名
+    if (url[1] == '/') url = "".concat(domain ? domain.split('://')[0] : 'http', ":").concat(url); // 否则补充整个域名
+    else if (domain) url = domain + url;
+  } else if (domain && !url.includes('data:') && !url.includes('://')) url = "".concat(domain, "/").concat(url);
+
+  return url;
+};
+/**
+    * @description 解析样式表
+    * @param {Object} node 标签
+    * @returns {Object}
+    */
+
+parser.prototype.parseStyle = function (node) {var
+  attrs = node.attrs;
+  var list = (this.tagStyle[node.name] || '').split(';').concat((attrs.style || '').split(';'));
+  var styleObj = {};
+  var tmp = '';
+
+  if (attrs.id) {
+    // 暴露锚点
+    if (this.options.useAnchor) this.expose();else if (node.name != 'img' && node.name != 'a' && node.name != 'video' && node.name != 'audio') attrs.id = void 0;
+  } // 转换 width 和 height 属性
+
+  if (attrs.width) {
+    styleObj.width = parseFloat(attrs.width) + (attrs.width.includes('%') ? '%' : 'px');
+    attrs.width = void 0;
+  }
+
+  if (attrs.height) {
+    styleObj.height = parseFloat(attrs.height) + (attrs.height.includes('%') ? '%' : 'px');
+    attrs.height = void 0;
+  }
+
+  for (var i = 0, len = list.length; i < len; i++) {
+    var info = list[i].split(':');
+    if (info.length < 2) continue;
+    var key = info.shift().trim().toLowerCase();
+    var value = info.join(':').trim(); // 兼容性的 css 不压缩
+
+    if (value[0] == '-' && value.lastIndexOf('-') > 0 || value.includes('safe')) tmp += ';'.concat(key, ':').concat(value); // 重复的样式进行覆盖
+    else if (!styleObj[key] || value.includes('import') || !styleObj[key].includes('import')) {
+        // 填充链接
+        if (value.includes('url')) {
+          var j = value.indexOf('(') + 1;
+
+          if (j) {
+            while (value[j] == '"' || value[j] == "'" || blankChar[value[j]]) {
+              j++;
+            }
+
+            value = value.substr(0, j) + this.getUrl(value.substr(j));
+          }
+        } // 转换 rpx（rich-text 内部不支持 rpx）
+        else if (value.includes('rpx')) {
+            value = value.replace(/[0-9.]+\s*rpx/g, function ($) {return "".concat(parseFloat($) * windowWidth / 750, "px");});
+          }
+
+        styleObj[key] = value;
+      }
+  }
+
+  node.attrs.style = tmp;
+  return styleObj;
+};
+/**
+    * @description 解析到标签名
+    * @param {String} name 标签名
+    * @private
+    */
+
+parser.prototype.onTagName = function (name) {
+  this.tagName = this.xml ? name : name.toLowerCase();
+  if (this.tagName == 'svg') this.xml = true; // svg 标签内大小写敏感
+};
+/**
+    * @description 解析到属性名
+    * @param {String} name 属性名
+    * @private
+    */
+
+parser.prototype.onAttrName = function (name) {
+  name = this.xml ? name : name.toLowerCase();
+
+  if (name.substr(0, 5) == 'data-') {
+    // data-src 自动转为 src
+    if (name == 'data-src' && !this.attrs.src) this.attrName = 'src'; // a 和 img 标签保留 data- 的属性，可以在 imgtap 和 linktap 事件中使用
+    else if (this.tagName == 'img' || this.tagName == 'a') this.attrName = name; // 剩余的移除以减小大小
+      else this.attrName = void 0;
+  } else {
+    this.attrName = name;
+    this.attrs[name] = 'T'; // boolean 型属性缺省设置
+  }
+};
+/**
+    * @description 解析到属性值
+    * @param {String} val 属性值
+    * @private
+    */
+
+parser.prototype.onAttrVal = function (val) {
+  var name = this.attrName || ''; // 部分属性进行实体解码
+
+  if (name == 'style' || name == 'href') this.attrs[name] = decodeEntity(val, true); // 拼接主域名
+  else if (name.includes('src')) this.attrs[name] = this.getUrl(decodeEntity(val, true));else if (name) this.attrs[name] = val;
+};
+/**
+    * @description 解析到标签开始
+    * @param {Boolean} selfClose 是否有自闭合标识 />
+    * @private
+    */
+
+parser.prototype.onOpenTag = function (selfClose) {
+  // 拼装 node
+  var node = Object.create(null);
+  node.name = this.tagName;
+  node.attrs = this.attrs;
+  this.attrs = Object.create(null);var
+  attrs = node.attrs;
+  var parent = this.stack[this.stack.length - 1];
+  var siblings = parent ? parent.children : this.nodes;
+  var close = this.xml ? selfClose : config.voidTags[node.name]; // 转换 embed 标签
+
+  if (node.name == 'embed') {
+
+    var src = attrs.src || ''; // 按照后缀名和 type 将 embed 转为 video 或 audio
+
+    if (src.includes('.mp4') || src.includes('.3gp') || src.includes('.m3u8') || (attrs.type || '').includes('video')) node.name = 'video';else if (src.includes('.mp3') || src.includes('.wav') || src.includes('.aac') || src.includes('.m4a') || (attrs.type || '').includes('audio')) node.name = 'audio';
+    if (attrs.autostart) attrs.autoplay = 'T';
+    attrs.controls = 'T';
+
+
+
+  }
+  // 处理音视频
+
+  if (node.name == 'video' || node.name == 'audio') {
+    // 设置 id 以便获取 context
+    if (node.name == 'video' && !attrs.id) attrs.id = "v".concat(idIndex++); // 没有设置 controls 也没有设置 autoplay 的自动设置 controls
+
+    if (!attrs.controls && !attrs.autoplay) attrs.controls = 'T'; // 用数组存储所有可用的 source
+
+    node.src = [];
+
+    if (attrs.src) {
+      node.src.push(attrs.src);
+      attrs.src = void 0;
+    }
+
+    this.expose();
+  }
+  // 处理自闭合标签
+
+  if (close) {
+    if (!this.hook(node) || config.ignoreTags[node.name]) {
+      // 通过 base 标签设置主域名
+      if (node.name == 'base' && !this.options.domain) this.options.domain = attrs.href;
+      // 设置 source 标签（仅父节点为 video 或 audio 时有效）
+      else if (node.name == 'source' && parent && (parent.name == 'video' || parent.name == 'audio') && attrs.src) parent.src.push(attrs.src);
+
+      return;
+    } // 解析 style
+
+    var styleObj = this.parseStyle(node); // 处理图片
+
+    if (node.name == 'img') {
+      if (attrs.src) {
+        // 标记 webp
+        if (attrs.src.includes('webp')) node.webp = 'T'; // data url 图片如果没有设置 original-src 默认为不可预览的小图片
+
+        if (attrs.src.includes('data:') && !attrs['original-src']) attrs.ignore = 'T';
+
+        if (!attrs.ignore || node.webp || attrs.src.includes('cloud://')) {
+          for (var i = this.stack.length; i--;) {
+            var item = this.stack[i];
+
+            if (item.name == 'a') {
+              node.a = item.attrs;
+              break;
+            }
+
+            var style = item.attrs.style || '';
+
+            if (style.includes('flex:') && !style.includes('flex:0') && !style.includes('flex: 0') && (!styleObj.width || !styleObj.width.includes('%'))) {
+              styleObj.width = '100% !important';
+              styleObj.height = '';
+
+              for (var j = i + 1; j < this.stack.length; j++) {
+                this.stack[j].attrs.style = (this.stack[j].attrs.style || '').replace('inline-', '');
+              }
+            } else if (style.includes('flex') && styleObj.width == '100%') {
+              for (var _j = i + 1; _j < this.stack.length; _j++) {
+                var _style = this.stack[_j].attrs.style || '';
+
+                if (!_style.includes(';width') && !_style.includes(' width') && _style.indexOf('width') != 0) {
+                  styleObj.width = '';
+                  break;
+                }
+              }
+            } else if (style.includes('inline-block')) {
+              if (styleObj.width && styleObj.width[styleObj.width.length - 1] == '%') {
+                item.attrs.style += ";max-width:".concat(styleObj.width);
+                styleObj.width = '';
+              } else item.attrs.style += ';max-width:100%';
+            }
+
+            item.c = 1;
+          }
+
+          attrs.i = this.imgList.length.toString();
+
+          var _src = attrs['original-src'] || attrs.src;
+
+          if (this.imgList.includes(_src)) {
+            // 如果有重复的链接则对域名进行随机大小写变换避免预览时错位
+            var _i = _src.indexOf('://');
+
+            if (_i != -1) {
+              _i += 3;
+
+              var newSrc = _src.substr(0, _i);
+
+              for (; _i < _src.length; _i++) {
+                if (_src[_i] == '/') break;
+                newSrc += Math.random() > 0.5 ? _src[_i].toUpperCase() : _src[_i];
+              }
+
+              newSrc += _src.substr(_i);
+              _src = newSrc;
+            }
+          }
+
+          this.imgList.push(_src);
+
+
+
+
+
+        }
+      }
+
+      if (styleObj.display == 'inline') styleObj.display = '';
+
+      if (attrs.ignore) {
+        styleObj['max-width'] = styleObj['max-width'] || '100%';
+        attrs.style += ';-webkit-touch-callout:none';
+      }
+      // 设置的宽度超出屏幕，为避免变形，高度转为自动
+
+      if (parseInt(styleObj.width) > windowWidth) styleObj.height = void 0; // 记录是否设置了宽高
+
+      if (styleObj.width) {
+        if (styleObj.width.includes('auto')) styleObj.width = '';else {
+          node.w = 'T';
+          if (styleObj.height && !styleObj.height.includes('auto')) node.h = 'T';
+        }
+      }
+    } else if (node.name == 'svg') {
+      siblings.push(node);
+      this.stack.push(node);
+      this.popNode();
+      return;
+    }
+
+    for (var key in styleObj) {
+      if (styleObj[key]) attrs.style += ';'.concat(key, ':').concat(styleObj[key].replace(' !important', ''));
+    }
+
+    attrs.style = attrs.style.substr(1) || void 0;
+  } else {
+    if (node.name == 'pre' || (attrs.style || '').includes('white-space') && attrs.style.includes('pre')) this.pre = node.pre = true;
+    node.children = [];
+    this.stack.push(node);
+  } // 加入节点树
+
+  siblings.push(node);
+};
+/**
+    * @description 解析到标签结束
+    * @param {String} name 标签名
+    * @private
+    */
+
+parser.prototype.onCloseTag = function (name) {
+  // 依次出栈到匹配为止
+  name = this.xml ? name : name.toLowerCase();
+  var i;
+
+  for (i = this.stack.length; i--;) {
+    if (this.stack[i].name == name) break;
+  }
+
+  if (i != -1) {
+    while (this.stack.length > i) {
+      this.popNode();
+    }
+  } else if (name == 'p' || name == 'br') {
+    var siblings = this.stack.length ? this.stack[this.stack.length - 1].children : this.nodes;
+    siblings.push({
+      name: name,
+      attrs: {} });
+
+  }
+};
+/**
+    * @description 处理标签出栈
+    * @private
+    */
+
+parser.prototype.popNode = function () {
+  var node = this.stack.pop();var
+  attrs = node.attrs;var
+  children = node.children;
+  var parent = this.stack[this.stack.length - 1];
+  var siblings = parent ? parent.children : this.nodes;
+
+  if (!this.hook(node) || config.ignoreTags[node.name]) {
+    // 获取标题
+    if (node.name == 'title' && children.length && children[0].type == 'text' && this.options.setTitle) {
+      uni.setNavigationBarTitle({
+        title: children[0].text });
+
+    }
+    siblings.pop();
+    return;
+  }
+
+  if (node.pre) {
+    // 是否合并空白符标识
+    node.pre = this.pre = void 0;
+
+    for (var i = this.stack.length; i--;) {
+      if (this.stack[i].pre) this.pre = true;
+    }
+  }
+
+  var styleObj = {}; // 转换 svg
+
+  if (node.name == 'svg') {
+
+    var src = '';var _attrs =
+    attrs,style = _attrs.style;
+    attrs.style = '';
+    attrs.xmlns = 'http://www.w3.org/2000/svg';
+
+    (function traversal(node) {
+      src += "<".concat(node.name);
+
+      for (var item in node.attrs) {
+        var val = node.attrs[item];
+
+        if (val) {
+          if (item == 'viewbox') item = 'viewBox';
+          src += ' '.concat(item, '="').concat(val, '"');
+        }
+      }
+
+      if (!node.children) src += '/>';else {
+        src += '>';
+
+        for (var _i2 = 0; _i2 < node.children.length; _i2++) {
+          traversal(node.children[_i2]);
+        }
+
+        src += "</".concat(node.name, ">");
+      }
+    })(node);
+
+    node.name = 'img';
+    node.attrs = {
+      src: "data:image/svg+xml;utf8,".concat(src.replace(/#/g, '%23')),
+      style: style,
+      ignore: 'T' };
+
+    node.children = void 0;
+
+    this.xml = false;
+    return;
+  }
+  // 转换 align 属性
+
+  if (attrs.align) {
+    if (node.name == 'table') {
+      if (attrs.align == 'center') styleObj['margin-inline-start'] = styleObj['margin-inline-end'] = 'auto';else styleObj.float = attrs.align;
+    } else styleObj['text-align'] = attrs.align;
+
+    attrs.align = void 0;
+  } // 转换 font 标签的属性
+
+  if (node.name == 'font') {
+    if (attrs.color) {
+      styleObj.color = attrs.color;
+      attrs.color = void 0;
+    }
+
+    if (attrs.face) {
+      styleObj['font-family'] = attrs.face;
+      attrs.face = void 0;
+    }
+
+    if (attrs.size) {
+      var size = parseInt(attrs.size);
+
+      if (!isNaN(size)) {
+        if (size < 1) size = 1;else if (size > 7) size = 7;
+        styleObj['font-size'] = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'][size - 1];
+      }
+
+      attrs.size = void 0;
+    }
+  }
+  // 一些编辑器的自带 class
+
+  if ((attrs.class || '').includes('align-center')) styleObj['text-align'] = 'center';
+  Object.assign(styleObj, this.parseStyle(node));
+
+  if (parseInt(styleObj.width) > windowWidth) {
+    styleObj['max-width'] = '100%';
+    styleObj['box-sizing'] = 'border-box';
+  }
+
+  if (config.blockTags[node.name]) node.name = 'div'; // 未知标签转为 span，避免无法显示
+  else if (!config.trustTags[node.name] && !this.xml) node.name = 'span';
+  if (node.name == 'a' || node.name == 'ad')
+
+  this.expose();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // 列表处理
+  else if ((node.name == 'ul' || node.name == 'ol') && node.c) {
+      var types = {
+        a: 'lower-alpha',
+        A: 'upper-alpha',
+        i: 'lower-roman',
+        I: 'upper-roman' };
+
+
+      if (types[attrs.type]) {
+        attrs.style += ";list-style-type:".concat(types[attrs.type]);
+        attrs.type = void 0;
+      }
+
+      for (var _i4 = children.length; _i4--;) {
+        if (children[_i4].name == 'li') children[_i4].c = 1;
+      }
+    } // 表格处理
+    else if (node.name == 'table') {
+        // cellpadding、cellspacing、border 这几个常用表格属性需要通过转换实现
+        var padding = parseFloat(attrs.cellpadding);
+        var spacing = parseFloat(attrs.cellspacing);
+        var border = parseFloat(attrs.border);
+
+        if (node.c) {
+          // padding 和 spacing 默认 2
+          if (isNaN(padding)) padding = 2;
+          if (isNaN(spacing)) spacing = 2;
+        }
+
+        if (border) attrs.style += ";border:".concat(border, "px solid gray");
+
+        if (node.flag && node.c) {
+          // 有 colspan 或 rowspan 且含有链接的表格通过 grid 布局实现
+          styleObj.display = 'grid';
+
+          if (spacing) {
+            styleObj['grid-gap'] = "".concat(spacing, "px");
+            styleObj.padding = "".concat(spacing, "px");
+          } // 无间隔的情况下避免边框重叠
+          else if (border) attrs.style += ';border-left:0;border-top:0';
+
+          var width = [];
+          // 表格的列宽
+          var trList = [];
+          // tr 列表
+          var cells = [];
+          // 保存新的单元格
+          var map = {}; // 被合并单元格占用的格子
+
+          (function traversal(nodes) {
+            for (var _i5 = 0; _i5 < nodes.length; _i5++) {
+              if (nodes[_i5].name == 'tr') trList.push(nodes[_i5]);else traversal(nodes[_i5].children || []);
+            }
+          })(children);
+
+          for (var row = 1; row <= trList.length; row++) {
+            var col = 1;
+
+            for (var j = 0; j < trList[row - 1].children.length; j++, col++) {
+              var td = trList[row - 1].children[j];
+
+              if (td.name == 'td' || td.name == 'th') {
+                // 这个格子被上面的单元格占用，则列号++
+                while (map["".concat(row, ".").concat(col)]) {
+                  col++;
+                }
+
+                var _style2 = td.attrs.style || '';
+                var start = _style2.indexOf('width') ? _style2.indexOf(';width') : 0; // 提取出 td 的宽度
+
+                if (start != -1) {
+                  var end = _style2.indexOf(';', start + 6);
+
+                  if (end == -1) end = _style2.length;
+                  if (!td.attrs.colspan) width[col] = _style2.substring(start ? start + 7 : 6, end);
+                  _style2 = _style2.substr(0, start) + _style2.substr(end);
+                }
+
+                _style2 += (border ? ';border:'.concat(border, 'px solid gray') + (spacing ? '' : ';border-right:0;border-bottom:0') : '') + (padding ? ';padding:'.concat(padding, 'px') : ''); // 处理列合并
+
+                if (td.attrs.colspan) {
+                  _style2 += ';grid-column-start:'.concat(col, ';grid-column-end:').concat(col + parseInt(td.attrs.colspan));
+                  if (!td.attrs.rowspan) _style2 += ';grid-row-start:'.concat(row, ';grid-row-end:').concat(row + 1);
+                  col += parseInt(td.attrs.colspan) - 1;
+                } // 处理行合并
+
+                if (td.attrs.rowspan) {
+                  _style2 += ';grid-row-start:'.concat(row, ';grid-row-end:').concat(row + parseInt(td.attrs.rowspan));
+                  if (!td.attrs.colspan) _style2 += ';grid-column-start:'.concat(col, ';grid-column-end:').concat(col + 1); // 记录下方单元格被占用
+
+                  for (var k = 1; k < td.attrs.rowspan; k++) {
+                    map["".concat(row + k, ".").concat(col)] = 1;
+                  }
+                }
+
+                if (_style2) td.attrs.style = _style2;
+                cells.push(td);
+              }
+            }
+
+            if (row == 1) {
+              var temp = '';
+
+              for (var _i6 = 1; _i6 < col; _i6++) {
+                temp += "".concat(width[_i6] ? width[_i6] : 'auto', " ");
+              }
+
+              styleObj['grid-template-columns'] = temp;
+            }
+          }
+
+          node.children = cells;
+        } else {
+          // 没有使用合并单元格的表格通过 table 布局实现
+          if (node.c) styleObj.display = 'table';
+          if (!isNaN(spacing)) styleObj['border-spacing'] = "".concat(spacing, "px");
+
+          if (border || padding) {
+            // 遍历
+            (function traversal(nodes) {
+              for (var _i7 = 0; _i7 < nodes.length; _i7++) {
+                var _td = nodes[_i7];
+
+                if (_td.name == 'th' || _td.name == 'td') {
+                  if (border) _td.attrs.style = 'border:'.concat(border, 'px solid gray;').concat(_td.attrs.style || '');
+                  if (padding) _td.attrs.style = 'padding:'.concat(padding, 'px;').concat(_td.attrs.style || '');
+                } else if (_td.children) traversal(_td.children);
+              }
+            })(children);
+          }
+        } // 给表格添加一个单独的横向滚动层
+
+        if (this.options.scrollTable && !(attrs.style || '').includes('inline')) {
+          var table = _objectSpread({}, node);
+          node.name = 'div';
+          node.attrs = {
+            style: 'overflow:auto' };
+
+          node.children = [table];
+          attrs = table.attrs;
+        }
+      } else if ((node.name == 'td' || node.name == 'th') && (attrs.colspan || attrs.rowspan)) {
+        for (var _i8 = this.stack.length; _i8--;) {
+          if (this.stack[_i8].name == 'table') {
+            this.stack[_i8].flag = 1; // 指示含有合并单元格
+
+            break;
+          }
+        }
+      } // 转换 ruby
+      else if (node.name == 'ruby') {
+          node.name = 'span';
+
+          for (var _i9 = 0; _i9 < children.length - 1; _i9++) {
+            if (children[_i9].type == 'text' && children[_i9 + 1].name == 'rt') {
+              children[_i9] = {
+                name: 'div',
+                attrs: {
+                  style: 'display:inline-block' },
+
+                children: [{
+                  name: 'div',
+                  attrs: {
+                    style: 'font-size:50%;text-align:start' },
+
+                  children: children[_i9 + 1].children },
+                children[_i9]] };
+
+              children.splice(_i9 + 1, 1);
+            }
+          }
+        } else if (node.c) {
+          node.c = 2;
+
+          for (var _i10 = node.children.length; _i10--;) {
+            if (!node.children[_i10].c || node.children[_i10].name == 'table') node.c = 1;
+          }
+        }
+  if ((styleObj.display || '').includes('flex') && !node.c) {
+    for (var _i11 = children.length; _i11--;) {
+      var _item = children[_i11];
+
+      if (_item.f) {
+        _item.attrs.style = (_item.attrs.style || '') + _item.f;
+        _item.f = void 0;
+      }
+    }
+  } // flex 布局时部分样式需要提取到 rich-text 外层
+
+  var flex = parent && (parent.attrs.style || '').includes('flex')
+  // 检查基础库版本 virtualHost 是否可用
+  && !(node.c && wx.getNFCAdapter);
+
+
+
+  if (flex) node.f = ';max-width:100%';
+
+  for (var key in styleObj) {
+    if (styleObj[key]) {
+      var val = ';'.concat(key, ':').concat(styleObj[key].replace(' !important', ''));
+
+      if (flex && (key.includes('flex') && key != 'flex-direction' || key == 'align-self' || styleObj[key][0] == '-' || key == 'width' && val.includes('%'))) {
+        node.f += val;
+        if (key == 'width') attrs.style += ';width:100%';
+      } else
+      {attrs.style += val;}
+    }
+  }
+
+  attrs.style = attrs.style.substr(1) || void 0;
+};
+/**
+    * @description 解析到文本
+    * @param {String} text 文本内容
+    */
+
+parser.prototype.onText = function (text) {
+  if (!this.pre) {
+    // 合并空白符
+    var trim = '';
+    var flag;
+
+    for (var i = 0, len = text.length; i < len; i++) {
+      if (!blankChar[text[i]]) trim += text[i];else {
+        if (trim[trim.length - 1] != ' ') trim += ' ';
+        if (text[i] == '\n' && !flag) flag = true;
+      }
+    } // 去除含有换行符的空串
+
+    if (trim == ' ' && flag) return;
+    text = trim;
+  }
+
+  var node = Object.create(null);
+  node.type = 'text';
+  node.text = decodeEntity(text);
+
+  if (this.hook(node)) {
+    var siblings = this.stack.length ? this.stack[this.stack.length - 1].children : this.nodes;
+    siblings.push(node);
+  }
+};
+/**
+    * @description html 词法分析器
+    * @param {Object} handler 高层处理器
+    */
+
+function lexer(handler) {
+  this.handler = handler;
+}
+/**
+   * @description 执行解析
+   * @param {String} content 要解析的文本
+   */
+
+lexer.prototype.parse = function (content) {
+  this.content = content || '';
+  this.i = 0; // 标记解析位置
+
+  this.start = 0; // 标记一个单词的开始位置
+
+  this.state = this.text; // 当前状态
+
+  for (var len = this.content.length; this.i != -1 && this.i < len;) {
+    this.state();
+  }
+};
+/**
+    * @description 检查标签是否闭合
+    * @param {String} method 如果闭合要进行的操作
+    * @returns {Boolean} 是否闭合
+    * @private
+    */
+
+lexer.prototype.checkClose = function (method) {
+  var selfClose = this.content[this.i] == '/';
+
+  if (this.content[this.i] == '>' || selfClose && this.content[this.i + 1] == '>') {
+    if (method) this.handler[method](this.content.substring(this.start, this.i));
+    this.i += selfClose ? 2 : 1;
+    this.start = this.i;
+    this.handler.onOpenTag(selfClose);
+
+    if (this.handler.tagName == 'script') {
+      this.i = this.content.indexOf('</', this.i);
+
+      if (this.i != -1) {
+        this.i += 2;
+        this.start = this.i;
+      }
+
+      this.state = this.endTag;
+    } else this.state = this.text;
+
+    return true;
+  }
+
+  return false;
+};
+/**
+    * @description 文本状态
+    * @private
+    */
+
+lexer.prototype.text = function () {
+  this.i = this.content.indexOf('<', this.i); // 查找最近的标签
+
+  if (this.i == -1) {
+    // 没有标签了
+    if (this.start < this.content.length) this.handler.onText(this.content.substring(this.start, this.content.length));
+    return;
+  }
+
+  var c = this.content[this.i + 1];
+
+  if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
+    // 标签开头
+    if (this.start != this.i) this.handler.onText(this.content.substring(this.start, this.i));
+    this.start = ++this.i;
+    this.state = this.tagName;
+  } else if (c == '/' || c == '!' || c == '?') {
+    if (this.start != this.i) this.handler.onText(this.content.substring(this.start, this.i));
+    var next = this.content[this.i + 2];
+
+    if (c == '/' && (next >= 'a' && next <= 'z' || next >= 'A' && next <= 'Z')) {
+      // 标签结尾
+      this.i += 2;
+      this.start = this.i;
+      return this.state = this.endTag;
+    } // 处理注释
+
+    var end = '-->';
+    if (c != '!' || this.content[this.i + 2] != '-' || this.content[this.i + 3] != '-') end = '>';
+    this.i = this.content.indexOf(end, this.i);
+
+    if (this.i != -1) {
+      this.i += end.length;
+      this.start = this.i;
+    }
+  } else this.i++;
+};
+/**
+    * @description 标签名状态
+    * @private
+    */
+
+lexer.prototype.tagName = function () {
+  if (blankChar[this.content[this.i]]) {
+    // 解析到标签名
+    this.handler.onTagName(this.content.substring(this.start, this.i));
+
+    while (blankChar[this.content[++this.i]]) {
+
+    }
+
+    if (this.i < this.content.length && !this.checkClose()) {
+      this.start = this.i;
+      this.state = this.attrName;
+    }
+  } else if (!this.checkClose('onTagName')) this.i++;
+};
+/**
+    * @description 属性名状态
+    * @private
+    */
+
+lexer.prototype.attrName = function () {
+  var c = this.content[this.i];
+
+  if (blankChar[c] || c == '=') {
+    // 解析到属性名
+    this.handler.onAttrName(this.content.substring(this.start, this.i));
+    var needVal = c == '=';
+    var len = this.content.length;
+
+    while (++this.i < len) {
+      c = this.content[this.i];
+
+      if (!blankChar[c]) {
+        if (this.checkClose()) return;
+
+        if (needVal) {
+          // 等号后遇到第一个非空字符
+          this.start = this.i;
+          return this.state = this.attrVal;
+        }
+
+        if (this.content[this.i] == '=') needVal = true;else {
+          this.start = this.i;
+          return this.state = this.attrName;
+        }
+      }
+    }
+  } else if (!this.checkClose('onAttrName')) this.i++;
+};
+/**
+    * @description 属性值状态
+    * @private
+    */
+
+lexer.prototype.attrVal = function () {
+  var c = this.content[this.i];
+  var len = this.content.length; // 有冒号的属性
+
+  if (c == '"' || c == "'") {
+    this.start = ++this.i;
+    this.i = this.content.indexOf(c, this.i);
+    if (this.i == -1) return;
+    this.handler.onAttrVal(this.content.substring(this.start, this.i));
+  } // 没有冒号的属性
+  else {
+      for (; this.i < len; this.i++) {
+        if (blankChar[this.content[this.i]]) {
+          this.handler.onAttrVal(this.content.substring(this.start, this.i));
+          break;
+        } else if (this.checkClose('onAttrVal')) return;
+      }
+    }
+
+  while (blankChar[this.content[++this.i]]) {
+
+  }
+
+  if (this.i < len && !this.checkClose()) {
+    this.start = this.i;
+    this.state = this.attrName;
+  }
+};
+/**
+    * @description 结束标签状态
+    * @returns {String} 结束的标签名
+    * @private
+    */
+
+lexer.prototype.endTag = function () {
+  var c = this.content[this.i];
+
+  if (blankChar[c] || c == '>' || c == '/') {
+    this.handler.onCloseTag(this.content.substring(this.start, this.i));
+
+    if (c != '>') {
+      this.i = this.content.indexOf('>', this.i);
+      if (this.i == -1) return;
+    }
+
+    this.start = ++this.i;
+    this.state = this.text;
+  } else this.i++;
+};
+
+module.exports = parser;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
 /***/ 189:
-/*!***************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image sync ^\.\/image.*\.png$ ***!
-  \***************************************************************************/
+/*!***********************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image sync ^\.\/image.*\.png$ ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9200,9 +10312,9 @@ function normalizeComponent (
 /***/ }),
 
 /***/ 190:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image0.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image0.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9211,9 +10323,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 191:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image1.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image1.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9222,9 +10334,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 192:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image2.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image2.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9233,9 +10345,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 193:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image3.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image3.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9244,9 +10356,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 194:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image4.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image4.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9255,9 +10367,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 195:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image5.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image5.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9266,9 +10378,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 196:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image6.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image6.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9277,9 +10389,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 197:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image7.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image7.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9288,9 +10400,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /***/ }),
 
 /***/ 198:
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image8.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image8.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9330,9 +10442,9 @@ module.exports = g;
 /***/ }),
 
 /***/ 20:
-/*!*********************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/index.js ***!
-  \*********************************************************************/
+/*!*****************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/index.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9420,9 +10532,9 @@ var install = function install(Vue) {
 /***/ }),
 
 /***/ 21:
-/*!********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mixin.js ***!
-  \********************************************************************************/
+/*!****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mixin.js ***!
+  \****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9589,86 +10701,10 @@ var install = function install(Vue) {
 
 /***/ }),
 
-/***/ 217:
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/mescroll-uni/mescroll-mixins.js ***!
-  \*********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; // mescroll-body 和 mescroll-uni 通用
-
-// import MescrollUni from "./mescroll-uni.vue";
-// import MescrollBody from "./mescroll-body.vue";
-
-var MescrollMixin = {
-  // components: { // 非H5端无法通过mixin注册组件, 只能在main.js中注册全局组件或具体界面中注册
-  // 	MescrollUni,
-  // 	MescrollBody
-  // },
-  data: function data() {
-    return {
-      mescroll: null //mescroll实例对象
-    };
-  },
-  // 注册系统自带的下拉刷新 (配置down.native为true时生效, 还需在pages配置enablePullDownRefresh:true;详请参考mescroll-native的案例)
-  onPullDownRefresh: function onPullDownRefresh() {
-    this.mescroll && this.mescroll.onPullDownRefresh();
-  },
-  // 注册列表滚动事件,用于判定在顶部可下拉刷新,在指定位置可显示隐藏回到顶部按钮 (此方法为页面生命周期,无法在子组件中触发, 仅在mescroll-body生效)
-  onPageScroll: function onPageScroll(e) {
-    this.mescroll && this.mescroll.onPageScroll(e);
-  },
-  // 注册滚动到底部的事件,用于上拉加载 (此方法为页面生命周期,无法在子组件中触发, 仅在mescroll-body生效)
-  onReachBottom: function onReachBottom() {
-    this.mescroll && this.mescroll.onReachBottom();
-  },
-  methods: {
-    // mescroll组件初始化的回调,可获取到mescroll对象
-    mescrollInit: function mescrollInit(mescroll) {
-      this.mescroll = mescroll;
-      this.mescrollInitByRef(); // 兼容字节跳动小程序
-    },
-    // 以ref的方式初始化mescroll对象 (兼容字节跳动小程序: http://www.mescroll.com/qa.html?v=20200107#q26)
-    mescrollInitByRef: function mescrollInitByRef() {
-      if (!this.mescroll || !this.mescroll.resetUpScroll) {
-        var mescrollRef = this.$refs.mescrollRef;
-        if (mescrollRef) this.mescroll = mescrollRef.mescroll;
-      }
-    },
-    // 下拉刷新的回调 (mixin默认resetUpScroll)
-    downCallback: function downCallback() {var _this = this;
-      if (this.mescroll.optUp.use) {
-        this.mescroll.resetUpScroll();
-      } else {
-        setTimeout(function () {
-          _this.mescroll.endSuccess();
-        }, 500);
-      }
-    },
-    // 上拉加载的回调
-    upCallback: function upCallback() {var _this2 = this;
-      // mixin默认延时500自动结束加载
-      setTimeout(function () {
-        _this2.mescroll.endErr();
-      }, 500);
-    } },
-
-  mounted: function mounted() {
-    this.mescrollInitByRef(); // 兼容字节跳动小程序, 避免未设置@init或@init此时未能取到ref的情况
-  } };var _default =
-
-
-
-MescrollMixin;exports.default = _default;
-
-/***/ }),
-
 /***/ 22:
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mpMixin.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mpMixin.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9682,9 +10718,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 23:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/index.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/index.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9696,9 +10732,9 @@ _Request.default;exports.default = _default;
 /***/ }),
 
 /***/ 24:
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/Request.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/Request.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9905,9 +10941,9 @@ Request = /*#__PURE__*/function () {
 /***/ }),
 
 /***/ 25:
-/*!******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/dispatchRequest.js ***!
-  \******************************************************************************************************/
+/*!**************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/dispatchRequest.js ***!
+  \**************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9919,9 +10955,9 @@ function _default(config) {return (0, _index.default)(config);};exports.default 
 /***/ }),
 
 /***/ 26:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/adapters/index.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/adapters/index.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10028,9 +11064,9 @@ function _default(config) {return new Promise(function (resolve, reject) {
 /***/ }),
 
 /***/ 27:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/buildURL.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/buildURL.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10108,9 +11144,9 @@ function buildURL(url, params) {
 /***/ }),
 
 /***/ 28:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10250,9 +11286,9 @@ function isUndefined(val) {
 /***/ }),
 
 /***/ 29:
-/*!****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/buildFullPath.js ***!
-  \****************************************************************************************************/
+/*!************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/buildFullPath.js ***!
+  \************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10745,9 +11781,9 @@ function resolveLocaleChain(locale) {
 /***/ }),
 
 /***/ 30:
-/*!*******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/isAbsoluteURL.js ***!
-  \*******************************************************************************************************/
+/*!***************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/isAbsoluteURL.js ***!
+  \***************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10770,9 +11806,9 @@ function isAbsoluteURL(url) {
 /***/ }),
 
 /***/ 31:
-/*!*****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/combineURLs.js ***!
-  \*****************************************************************************************************/
+/*!*************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/combineURLs.js ***!
+  \*************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10795,9 +11831,9 @@ function combineURLs(baseURL, relativeURL) {
 /***/ }),
 
 /***/ 32:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/settle.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/settle.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10822,9 +11858,9 @@ function settle(resolve, reject, response) {var
 /***/ }),
 
 /***/ 33:
-/*!*********************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/InterceptorManager.js ***!
-  \*********************************************************************************************************/
+/*!*****************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/InterceptorManager.js ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10883,9 +11919,9 @@ InterceptorManager;exports.default = _default;
 /***/ }),
 
 /***/ 34:
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/mergeConfig.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/mergeConfig.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10997,9 +12033,9 @@ function _default(globalsConfig) {var config2 = arguments.length > 1 && argument
 /***/ }),
 
 /***/ 35:
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/defaults.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/defaults.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11036,9 +12072,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 36:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils/clone.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils/clone.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -13369,1907 +14405,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-
-/***/ }),
-
-/***/ 398:
-/*!*******************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/pages/demo/waterfall/data.js ***!
-  \*******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = [{
-  "name": "冰希黎一日情人金字塔香水3件套女士持久淡香大牌正品",
-  "img": "http://qn.kemean.cn/upload/202004/15/5c9a58ea389148f782f684c0d93134e1?imageView2/0/w/800",
-  "priceShop": "¥1.0",
-  "priceDiscount": "¥0.1",
-  "numSales": 4,
-  "ptPrice": null,
-  "shopName": "AD品牌旗舰店",
-  "objId": 1509 },
-{
-  "name": "秭归九月红早红橙5斤/10斤中果装橙子",
-  "img": "http://qn.kemean.cn/upload/201912/27/7e8dfcfdc8bd45b484502f9c6ed25220?imageView2/0/w/800",
-  "priceShop": "¥69.0",
-  "priceDiscount": "¥23.0",
-  "numSales": 273,
-  "ptPrice": null,
-  "shopName": "商家云旗舰店",
-  "objId": 748 },
-{
-  "name": "三只松鼠坚果大礼包礼盒大吉大利套餐1266g",
-  "img": "http://qn.kemean.cn/upload/201912/06/48c3c8b3b6924b8bbb112888edd4747a?imageView2/0/w/800",
-  "priceShop": "¥158.0",
-  "priceDiscount": "¥82.0",
-  "numSales": 419,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1102 },
-{
-  "name": "康怡乐（koyle） 涮烤一体锅麦饭石电烧烤炉家用无烟电烤盘不粘烤肉涮烤火锅鸳鸯火锅YH-KY15 涮烤一体锅（大号圆款）",
-  "img": "http://qn.kemean.cn/upload/201912/10/dca8997195ba49d3b79cbfeb627d0bec?imageView2/0/w/800",
-  "priceShop": "¥998.0",
-  "priceDiscount": "¥499.0",
-  "numSales": 326,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1170 },
-{
-  "name": "西域美农古澈玉葡萄干500g 新疆吐鲁番提子",
-  "img": "http://qn.kemean.cn/upload/201911/09/56a1740ddcbd4c3a9b94f9c04d48b353?imageView2/0/w/800",
-  "priceShop": "¥30.9",
-  "priceDiscount": "¥18.9",
-  "numSales": 312,
-  "ptPrice": null,
-  "shopName": "西域美农旗舰店",
-  "objId": 646 },
-{
-  "name": "三只松鼠坚果大礼包礼盒万事亨通套餐1588g",
-  "img": "http://qn.kemean.cn/upload/201912/06/5cf59abc872643a4bb2a26a062a83bf6?imageView2/0/w/800",
-  "priceShop": "¥268.0",
-  "priceDiscount": "¥162.0",
-  "numSales": 309,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1104 },
-{
-  "name": "费列罗榛果威化巧克力钻石装16粒",
-  "img": "http://qn.kemean.cn/upload/201912/18/646638e423d34144b74a0d333832fed6?imageView2/0/w/800",
-  "priceShop": "¥68.0",
-  "priceDiscount": "¥58.8",
-  "numSales": 308,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1363 },
-{
-  "name": "泉氏净水器家用厨房卫生间水龙头过滤器自来水滤水器前置净化水机",
-  "img": "http://qn.kemean.cn/upload/201911/06/8ca473e5fc6645a0b88987a6a1015bfb?imageView2/0/w/800",
-  "priceShop": "¥220.0",
-  "priceDiscount": "¥55.0",
-  "numSales": 308,
-  "ptPrice": "¥44.0",
-  "shopName": "深圳市泉氏清科技有限公司",
-  "objId": 180 },
-{
-  "name": "欧锐铂（ORVIBO） 和美e家涮烤一体电火锅",
-  "img": "http://qn.kemean.cn/upload/201912/10/2e2eb512e5914b38a5433946f1a2c935?imageView2/0/w/800",
-  "priceShop": "¥1219.0",
-  "priceDiscount": "¥608.0",
-  "numSales": 275,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1166 },
-{
-  "name": "苏泊尔 （SUPOR）温馨之家 三件套T1360T",
-  "img": "http://qn.kemean.cn/upload/201911/12/2675d3619e944830ba88f65f71f1d621?imageView2/0/w/800",
-  "priceShop": "¥399.0",
-  "priceDiscount": "¥169.0",
-  "numSales": 213,
-  "ptPrice": null,
-  "shopName": "苏泊尔专卖店",
-  "objId": 732 },
-{
-  "name": "西域美农山药脆片50g*3袋薄片脆薯片好吃的吃货休闲零食小吃",
-  "img": "http://qn.kemean.cn/upload/201911/09/ce79652bc5f740398ff2ab4698c47683?imageView2/0/w/800",
-  "priceShop": "¥46.9",
-  "priceDiscount": "¥20.9",
-  "numSales": 208,
-  "ptPrice": null,
-  "shopName": "西域美农旗舰店",
-  "objId": 647 },
-{
-  "name": "【香港直邮】格丽松Guerisson奇迹马油面霜70g",
-  "img": "http://qn.kemean.cn/upload/201911/07/b1d49ff7502c40b8b25423983657601f?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥79.0",
-  "numSales": 207,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 284 },
-{
-  "name": "蕉下小黑伞250线系列 折叠晴雨伞女防紫外线太阳遮阳伞",
-  "img": "http://qn.kemean.cn/upload/201911/28/1d8dc888d9274382a5b83c50ce4718d1?imageView2/0/w/800",
-  "priceShop": "¥299.0",
-  "priceDiscount": "¥169.0",
-  "numSales": 207,
-  "ptPrice": null,
-  "shopName": "索芙特专卖店",
-  "objId": 747 },
-{
-  "name": "【西域美农红枣核桃派300g】新疆特产手工零食红枣核桃糕",
-  "img": "http://qn.kemean.cn/upload/201911/09/2b1029ad48634c0ea6b763feecead123?imageView2/0/w/800",
-  "priceShop": "¥54.0",
-  "priceDiscount": "¥29.9",
-  "numSales": 206,
-  "ptPrice": null,
-  "shopName": "西域美农旗舰店",
-  "objId": 645 },
-{
-  "name": "优妮马油洗发水去屑止痒修护柔顺清爽男女通用茶麸留香亮黑净屑洗发乳",
-  "img": "http://qn.kemean.cn/upload/201911/20/b475daf488d949a2884f20142e3e7440?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥29.0",
-  "numSales": 191,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 819 },
-{
-  "name": "德泽 记忆棉套装组合（腰枕+U型枕）",
-  "img": "http://qn.kemean.cn/upload/201912/13/61b22d96ad9f4cf98266a24ab9b6accc?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥286.0",
-  "numSales": 190,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1247 },
-{
-  "name": "【香港直邮】Dior迪奥口红烈焰蓝金唇膏口红 888#哑光",
-  "img": "http://qn.kemean.cn/upload/201911/07/ef3fdbdd84e840ea90feb286273785e7?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 183,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 307 },
-{
-  "name": "广发草原手撕风干牛肉原味",
-  "img": "http://qn.kemean.cn/upload/201912/18/0d71f5b807f943f5b277c0075d4e9c00?imageView2/0/w/800",
-  "priceShop": "¥49.0",
-  "priceDiscount": "¥46.8",
-  "numSales": 182,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1354 },
-{
-  "name": "康派2020新款真皮女包时尚简约欧美外贸单肩斜跨包（加大版）",
-  "img": "http://qn.kemean.cn/upload/201911/20/0bcd06f79978486da2ae78e0cf301667?imageView2/0/w/800",
-  "priceShop": "¥169.0",
-  "priceDiscount": "¥69.0",
-  "numSales": 164,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 802 },
-{
-  "name": "索芙特真萃养颜橄榄油160ml护肤护发卸妆油",
-  "img": "http://qn.kemean.cn/upload/201911/28/563c4c78563d43cc9be022fc61f1772d?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥19.9",
-  "numSales": 158,
-  "ptPrice": null,
-  "shopName": "索芙特专卖店",
-  "objId": 655 },
-{
-  "name": "康派工厂直销时尚真皮女士单肩包刺绣风格斜挎包",
-  "img": "http://qn.kemean.cn/upload/201911/20/970ec654fb844be2bb4c47dc98e55268?imageView2/0/w/800",
-  "priceShop": "¥499.0",
-  "priceDiscount": "¥209.0",
-  "numSales": 136,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 808 },
-{
-  "name": "苏泊尔 （SUPOR）炫彩不粘 煎锅PJ24M6",
-  "img": "http://qn.kemean.cn/upload/201911/12/151f3e0ad4c344a2af2077b02a4b95a7?imageView2/0/w/800",
-  "priceShop": "¥299.0",
-  "priceDiscount": "¥129.0",
-  "numSales": 128,
-  "ptPrice": null,
-  "shopName": "苏泊尔专卖店",
-  "objId": 730 },
-{
-  "name": "优妮 马油护发素发膜男女通用飘逸补水发膜（免蒸）400ml",
-  "img": "http://qn.kemean.cn/upload/201911/20/b5a2aeddf46a46339eaa450a228bd8de?imageView2/0/w/800",
-  "priceShop": "¥89.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 82,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 816 },
-{
-  "name": "麦饭石煎锅多功能不粘平底锅三合一早餐锅",
-  "img": "http://qn.kemean.cn/upload/201912/23/eceef738dc2c49d6887adc5e8a99aa4f?imageView2/0/w/800",
-  "priceShop": "¥488.0",
-  "priceDiscount": "¥168.0",
-  "numSales": 76,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1383 },
-{
-  "name": "迪迪尼卡麦饭石奶锅蒸锅不粘锅20CM奶锅",
-  "img": "http://qn.kemean.cn/upload/201912/23/d644a681cd9447cca22aa9adeeb7b969?imageView2/0/w/800",
-  "priceShop": "¥488.0",
-  "priceDiscount": "¥188.0",
-  "numSales": 69,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1385 },
-{
-  "name": "张小盒时尚行李箱纯铝合金框潮流拉杆箱男女万向轮登机箱",
-  "img": "http://qn.kemean.cn/upload/201912/08/9e588a3ab6424c42ab42b2ad9cbfa79b?imageView2/0/w/800",
-  "priceShop": "¥1500.0",
-  "priceDiscount": "¥789.0",
-  "numSales": 39,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1125 },
-{
-  "name": "双面煎锅不粘锅早餐平底锅小熊双面煎锅",
-  "img": "http://qn.kemean.cn/upload/201912/23/53d049f894504399aaef75b5f50dcc21?imageView2/0/w/800",
-  "priceShop": "¥368.0",
-  "priceDiscount": "¥168.0",
-  "numSales": 32,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1384 },
-{
-  "name": "迪迪尼卡麦饭石不粘锅平底炒锅三代32CM炒锅",
-  "img": "http://qn.kemean.cn/upload/201912/23/6880d0000838435197670195aa78516b?imageView2/0/w/800",
-  "priceShop": "¥378.0",
-  "priceDiscount": "¥198.0",
-  "numSales": 14,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1381 },
-{
-  "name": "迪迪尼卡麦饭石汤锅不粘锅电磁炉燃气蒸锅家用小炖锅24CM汤锅",
-  "img": "http://qn.kemean.cn/upload/201912/23/9995d08a5b94436493ab98214d06c322?imageView2/0/w/800",
-  "priceShop": "¥498.0",
-  "priceDiscount": "¥198.0",
-  "numSales": 8,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1382 },
-{
-  "name": "新鲜山西红富士苹果当季水果整箱包邮",
-  "img": "http://qn.kemean.cn/upload/201911/07/b345f622de504a2ba9c8bc872d5e9841?imageView2/0/w/800",
-  "priceShop": "¥59.9",
-  "priceDiscount": "¥24.8",
-  "numSales": 7,
-  "ptPrice": null,
-  "shopName": "运城市博雨电子商务有限公司",
-  "objId": 334 },
-{
-  "name": "阿道夫人参自然洗发水（祛屑止痒）500g02218",
-  "img": "http://qn.kemean.cn/upload/201911/07/3b4ca910a5004b02829c3bbed514027a?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 7,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 213 },
-{
-  "name": "秭归中华红橙血橙子",
-  "img": "http://qn.kemean.cn/upload/202003/12/e8521e91ef6c44c08f19043c0f3c0425?imageView2/0/w/800",
-  "priceShop": "¥49.0",
-  "priceDiscount": "¥39.0",
-  "numSales": 6,
-  "ptPrice": null,
-  "shopName": "商家云旗舰店",
-  "objId": 1453 },
-{
-  "name": "苏泊尔（SUPOR）不锈钢厨房刀具套装菜刀水果刀果蔬刀果皮刀厨房多用剪刀TK1718T",
-  "img": "http://qn.kemean.cn/upload/201911/11/5b456a1ad892462296f9b694e2423a0a?imageView2/0/w/800",
-  "priceShop": "¥399.0",
-  "priceDiscount": "¥189.0",
-  "numSales": 5,
-  "ptPrice": null,
-  "shopName": "苏泊尔专卖店",
-  "objId": 696 },
-{
-  "name": "【香港直邮】LANEIGE兰芝水衡护肤水乳套装 补水保湿水衡滋养（清爽型）",
-  "img": "http://qn.kemean.cn/upload/201911/07/c3f9a916193c47198d9b78eec60e742a?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥268.0",
-  "numSales": 3,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 218 },
-{
-  "name": "康玶时光",
-  "img": "http://qn.kemean.cn/upload/201911/13/619f1c0814eb41caa97963c35d44a9b8?imageView2/0/w/800",
-  "priceShop": "¥30.0",
-  "priceDiscount": "¥15.0",
-  "numSales": 3,
-  "ptPrice": null,
-  "shopName": "四海盛宴",
-  "objId": 740 },
-{
-  "name": "【年终大促】樱花薰衣草/法国香水洗衣液2L持久留香01310",
-  "img": "http://qn.kemean.cn/upload/201911/07/ebf975e7edb740169f687852185947bc?imageView2/0/w/800",
-  "priceShop": "¥49.9",
-  "priceDiscount": "¥29.9",
-  "numSales": 2,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 342 },
-{
-  "name": "西域美农红枣小魅枣500g*2阿克苏魅枣若羌灰枣红枣",
-  "img": "http://qn.kemean.cn/upload/201911/09/5b1258b8019142e994f2e87be5210b11?imageView2/0/w/800",
-  "priceShop": "¥49.0",
-  "priceDiscount": "¥20.9",
-  "numSales": 2,
-  "ptPrice": null,
-  "shopName": "西域美农旗舰店",
-  "objId": 642 },
-{
-  "name": "【香港直邮】BYPHASSE蓓昂斯卸妆水温和清洁500ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/81fd39255c4341f89036a29837da626b?imageView2/0/w/800",
-  "priceShop": "¥118.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 1,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 277 },
-{
-  "name": "【双11大促】百雀羚 三生花控油清肌净肤泥膜50g（深层清洁 净肤面膜）120157",
-  "img": "http://qn.kemean.cn/upload/201911/07/6c4eeb6e49d6465da160bded3c8a8f35?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 1,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 292 },
-{
-  "name": "泉氏净水器家用10寸透明前置过滤器通用PPF棉滤芯自来水净水机过滤器",
-  "img": "http://qn.kemean.cn/upload/201911/07/5b1493019fad4f86bfaa29be9c4ba26e?imageView2/0/w/800",
-  "priceShop": "¥188.0",
-  "priceDiscount": "¥66.8",
-  "numSales": 1,
-  "ptPrice": "¥40.08",
-  "shopName": "深圳市泉氏清科技有限公司",
-  "objId": 185 },
-{
-  "name": "（NLMI）那拉米/泰国皇家天然乳胶枕头宝宝儿童动物薄睡枕/卡通矮抱枕低靠枕/ （猴）63*35*5cm",
-  "img": "http://qn.kemean.cn/upload/201911/07/831d070d906e430ba05d0b63655aefb6?imageView2/0/w/800",
-  "priceShop": "¥399.0",
-  "priceDiscount": "¥339.0",
-  "numSales": 1,
-  "ptPrice": "¥203.4",
-  "shopName": "森尼健康家纺专营店",
-  "objId": 187 },
-{
-  "name": "西域美农树上黄葡萄干250g*2 新疆特",
-  "img": "http://qn.kemean.cn/upload/201911/08/1270453fb57f4dbaaceacc3a5c9d17ad?imageView2/0/w/800",
-  "priceShop": "¥39.9",
-  "priceDiscount": "¥18.9",
-  "numSales": 1,
-  "ptPrice": null,
-  "shopName": "西域美农旗舰店",
-  "objId": 454 },
-{
-  "name": "原创设计北欧后现代简约客厅/餐厅吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/28/d5cb3b069ca545b8b313d6385728efe8?imageView2/0/w/800",
-  "priceShop": "¥635.0",
-  "priceDiscount": "¥345.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1024 },
-{
-  "name": "德泽 全棉印花被 纯棉被子 单被 空调被 夏被150*200CM",
-  "img": "http://qn.kemean.cn/upload/201912/14/e762dff2615d4d7595b9815f038f8dce?imageView2/0/w/800",
-  "priceShop": "¥628.0",
-  "priceDiscount": "¥598.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1280 },
-{
-  "name": "德泽 全棉印花被 纯棉被子 单被 空调被 夏被150*200CM",
-  "img": "http://qn.kemean.cn/upload/201912/14/e762dff2615d4d7595b9815f038f8dce?imageView2/0/w/800",
-  "priceShop": "¥628.0",
-  "priceDiscount": "¥598.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1281 },
-{
-  "name": "原创设计北欧后现代简约客厅/餐厅吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/28/f113a0d0100d49da9da2d76695755b1d?imageView2/0/w/800",
-  "priceShop": "¥600.0",
-  "priceDiscount": "¥325.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1026 },
-{
-  "name": "德泽 臻品暖绒棉花被 被子 单被 空调被 夏被 200*230CM",
-  "img": "http://qn.kemean.cn/upload/201912/14/8d4a858a2c2c4e0fa7ed328e8156eced?imageView2/0/w/800",
-  "priceShop": "¥629.0",
-  "priceDiscount": "¥499.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1282 },
-{
-  "name": "德泽 活性贡棉四件套 幸福叶羽 被套床单枕套 床单230*240cm 被套200*230cm 适用于1.5M/1.8M床",
-  "img": "http://qn.kemean.cn/upload/201912/14/c224da9028d24c16b3c11cd5e7e3c2e1?imageView2/0/w/800",
-  "priceShop": "¥998.0",
-  "priceDiscount": "¥798.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1283 },
-{
-  "name": "德泽 爱丁堡至尊鹅绒被 被子棉被冬被被芯鹅绒 200*230cm/2500克",
-  "img": "http://qn.kemean.cn/upload/201912/14/5e58478813e84cfe866bf9cb2dad92d3?imageView2/0/w/800",
-  "priceShop": "¥1288.0",
-  "priceDiscount": "¥999.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1284 },
-{
-  "name": "【香港直邮】Dr.Jart+蒂佳婷银管BB霜40ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/b6dda1efed864c4c8c716becae97988e?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥105.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 261 },
-{
-  "name": "德泽 金典纯羊毛被 被子被芯冬被 200*230cm/2000g",
-  "img": "http://qn.kemean.cn/upload/201912/14/92aba9d139bf48668e37c32a5ef0a103?imageView2/0/w/800",
-  "priceShop": "¥1199.0",
-  "priceDiscount": "¥969.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1285 },
-{
-  "name": "原创设计北欧后现代简约客厅/楼梯吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/28/cd105fc4ed0a4501b8ddcc82bc9c0975?imageView2/0/w/800",
-  "priceShop": "¥1110.0",
-  "priceDiscount": "¥605.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1030 },
-{
-  "name": "德泽 臻品暖绒棉花被（秋冬款）棉被被子被芯 200*230cm/2000g",
-  "img": "http://qn.kemean.cn/upload/201912/14/78e02c5f443541fcada9b967aa2b2fa4?imageView2/0/w/800",
-  "priceShop": "¥1266.0",
-  "priceDiscount": "¥999.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1286 },
-{
-  "name": "原创北欧后现代简约马卡龙卧室/客厅吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/28/a3e61a85db3a440b9e757b5a4667b931?imageView2/0/w/800",
-  "priceShop": "¥1245.0",
-  "priceDiscount": "¥675.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1031 },
-{
-  "name": "德泽 纯棉活性印花四件套 缤纷花语 枕套被套床单 适用于1.8M床 床单：230*250cm 被套：200*230cm",
-  "img": "http://qn.kemean.cn/upload/201912/14/5b7aa13d165247a58778b890fc3caadf?imageView2/0/w/800",
-  "priceShop": "¥1199.0",
-  "priceDiscount": "¥400.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1287 },
-{
-  "name": "【香港直邮】Dr.Jart+/蒂佳婷V7素颜霜裸妆遮瑕保湿50ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/d6664dd8baf445bcb038fa702250e3db?imageView2/0/w/800",
-  "priceShop": "¥228.0",
-  "priceDiscount": "¥158.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 264 },
-{
-  "name": "原创北欧后现代简约马卡龙卧室/客厅吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/93222dbb1765421db84f537395867349?imageView2/0/w/800",
-  "priceShop": "¥1746.0",
-  "priceDiscount": "¥945.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1032 },
-{
-  "name": "德泽 全棉磨毛加厚四件套 唐之韵 全棉四件套枕套被套床单 适用于1.8M床（床单：250*250cm 被套：200*230cm）",
-  "img": "http://qn.kemean.cn/upload/201912/14/70201e386a964687b1ad3662a6b5150a?imageView2/0/w/800",
-  "priceShop": "¥1990.0",
-  "priceDiscount": "¥1599.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1288 },
-{
-  "name": "/葆缇嘉 防脱发精华导入液 60ML",
-  "img": "http://qn.kemean.cn/upload/201911/19/778c762f2e844ae6bc04b0097747aa57?imageView2/0/w/800",
-  "priceShop": "¥368.0",
-  "priceDiscount": "¥312.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 777 },
-{
-  "name": "原创北欧后现代简约马卡龙卧室/客厅吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/830a8bac476847b88b355bb2da4e82f6?imageView2/0/w/800",
-  "priceShop": "¥2214.0",
-  "priceDiscount": "¥1199.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1033 },
-{
-  "name": "德泽 全棉贡缎提花手工蚕丝被 被芯被子冬被200x230cm 1800克",
-  "img": "http://qn.kemean.cn/upload/201912/14/aea91b7b8ad24b38882b8b1627b37e61?imageView2/0/w/800",
-  "priceShop": "¥3880.0",
-  "priceDiscount": "¥2800.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1289 },
-{
-  "name": "【香港直邮】Dr.Jart+蒂佳婷蓝色药丸面膜5片/盒",
-  "img": "http://qn.kemean.cn/upload/201911/07/6ef1d1e0c87f45f0a3854239a1ce4b87?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 266 },
-{
-  "name": "无印良品 纯色系全棉色织水洗棉四件套 WYLP-CSQMSZ",
-  "img": "http://qn.kemean.cn/upload/201912/14/d853d39ef9954f35b0fecbde76843c31?imageView2/0/w/800",
-  "priceShop": "¥898.0",
-  "priceDiscount": "¥434.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1290 },
-{
-  "name": "紫色3支套刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/cf7b7170f566420b83a663c00051f6b0?imageView2/0/w/800",
-  "priceShop": "¥59.0",
-  "priceDiscount": "¥37.5",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1291 },
-{
-  "name": "葆缇嘉 强效防脱安瓶 10ML*10 ",
-  "img": "http://qn.kemean.cn/upload/201911/19/1abeac734a90484c9afd7a6e65621fbe?imageView2/0/w/800",
-  "priceShop": "¥428.0",
-  "priceDiscount": "¥360.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 780 },
-{
-  "name": "6支小妖精套刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/2ade3ac065d64057a5004bb6d1c8d2cd?imageView2/0/w/800",
-  "priceShop": "¥299.0",
-  "priceDiscount": "¥168.1",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1292 },
-{
-  "name": "【香港直邮】Dr.Jart+蒂佳婷绿色药丸面膜5片/盒",
-  "img": "http://qn.kemean.cn/upload/201911/07/2ddffea99b9f45c48c7ddd46bc91bc5b?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 269 },
-{
-  "name": "葆缇嘉 生发膳食补充胶囊 30粒/盒 ",
-  "img": "http://qn.kemean.cn/upload/201911/19/3476dd73d0864e07a9f804e49599ff59?imageView2/0/w/800",
-  "priceShop": "¥280.0",
-  "priceDiscount": "¥250.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 781 },
-{
-  "name": "白色双头套刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/e917ed4b9f5741ebb371c93b9efc18b5?imageView2/0/w/800",
-  "priceShop": "¥98.0",
-  "priceDiscount": "¥50.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1293 },
-{
-  "name": "葆缇嘉黄金系列手部护理",
-  "img": "http://qn.kemean.cn/upload/201911/19/f4bbf462eb7a40b2a53b40dfb2d9176b?imageView2/0/w/800",
-  "priceShop": "¥220.0",
-  "priceDiscount": "¥150.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 782 },
-{
-  "name": "7支套刷 肤色",
-  "img": "http://qn.kemean.cn/upload/201912/14/e33963cdd7234f638868cdbf50f452e1?imageView2/0/w/800",
-  "priceShop": "¥46.0",
-  "priceDiscount": "¥28.8",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1294 },
-{
-  "name": "【香港直邮】Banila CO芭妮兰卸妆膏脸部温和清洁卸妆100ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/bc208e430e7843c882d5fbdebc70ac94?imageView2/0/w/800",
-  "priceShop": "¥158.0",
-  "priceDiscount": "¥89.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 271 },
-{
-  "name": "葆缇嘉黄金系列活性珍珠精华",
-  "img": "http://qn.kemean.cn/upload/201911/19/afb7c348d80840b1ac40dce081ed071c?imageView2/0/w/800",
-  "priceShop": "¥600.0",
-  "priceDiscount": "¥508.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 783 },
-{
-  "name": "砰然心动",
-  "img": "http://qn.kemean.cn/upload/201912/14/6453ef97480e450391c123bd9991ef71?imageView2/0/w/800",
-  "priceShop": "¥299.0",
-  "priceDiscount": "¥186.3",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1295 },
-{
-  "name": "百雀羚草本系列水嫩倍现臻美套装12527新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/9da12843d7b34a6ca6ccfbd79f502b08?imageView2/0/w/800",
-  "priceShop": "¥268.0",
-  "priceDiscount": "¥228.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 272 },
-{
-  "name": "葆缇嘉黄金系列抗衰老保湿面膜",
-  "img": "http://qn.kemean.cn/upload/201911/19/9599bdbd94c84d2d97c53647071debb1?imageView2/0/w/800",
-  "priceShop": "¥218.0",
-  "priceDiscount": "¥180.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 784 },
-{
-  "name": "七彩套刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/0ce24e07845045cda4933dd63e9d470c?imageView2/0/w/800",
-  "priceShop": "¥118.0",
-  "priceDiscount": "¥70.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1296 },
-{
-  "name": "【香港直邮】Banila CO芭妮兰zero卸妆膏脸部眼唇温和清洁卸妆180ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/9eab399c0613421b9b183e429952d3ac?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥139.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 273 },
-{
-  "name": "闪亮系列6支套刷&专业刷包",
-  "img": "http://qn.kemean.cn/upload/201912/14/88ef29dbc59b45d9920d931c40d7c675?imageView2/0/w/800",
-  "priceShop": "¥149.0",
-  "priceDiscount": "¥93.1",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1297 },
-{
-  "name": "葆缇嘉黄金系列干细胞新生面霜",
-  "img": "http://qn.kemean.cn/upload/201911/19/b1c0d5d7e4074ef988481c8bea16a3b8?imageView2/0/w/800",
-  "priceShop": "¥499.0",
-  "priceDiscount": "¥465.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "bottgadilungavita海外旗舰店",
-  "objId": 786 },
-{
-  "name": "樱花系列9支套刷&专业刷包",
-  "img": "http://qn.kemean.cn/upload/201912/14/681623089258415b83bce43370d0440b?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥123.8",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1298 },
-{
-  "name": "曼佗油茶籽油725ML花海版",
-  "img": "http://qn.kemean.cn/upload/201911/19/3da0febba0a44b0894ca118173f28443?imageView2/0/w/800",
-  "priceShop": "¥150.0",
-  "priceDiscount": "¥110.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 787 },
-{
-  "name": "红粉系列9支套刷&专业刷包",
-  "img": "http://qn.kemean.cn/upload/201912/14/216aa0b2bbb94634a0e145f582ddc725?imageView2/0/w/800",
-  "priceShop": "¥228.0",
-  "priceDiscount": "¥142.5",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1299 },
-{
-  "name": "百雀羚草本精萃惊喜套装12541新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/c1a5db1ff4474f1bbda5b308dc403620?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥138.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 276 },
-{
-  "name": "曼佗油茶籽油725MLx2",
-  "img": "http://qn.kemean.cn/upload/201911/19/1f15a2e3a21f4bd88683255de6399b49?imageView2/0/w/800",
-  "priceShop": "¥250.0",
-  "priceDiscount": "¥230.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 788 },
-{
-  "name": "SY大号腮红刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/90624e995c6343b492eb30d4232290ec?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥80.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1300 },
-{
-  "name": "曼佗油茶籽油725MLx3",
-  "img": "http://qn.kemean.cn/upload/201911/19/6a7f252e2e584629b5b472bb2d032e7d?imageView2/0/w/800",
-  "priceShop": "¥350.0",
-  "priceDiscount": "¥320.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 789 },
-{
-  "name": "SY大号粉扑刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/839a30daafeb401eb0f8c5fa90e4c30f?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥105.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1301 },
-{
-  "name": "激情系列10支",
-  "img": "http://qn.kemean.cn/upload/201912/14/629b3218986d4fb1a0591408110b7dee?imageView2/0/w/800",
-  "priceShop": "¥229.0",
-  "priceDiscount": "¥142.5",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1302 },
-{
-  "name": "激情系列7支套刷&专业刷包",
-  "img": "http://qn.kemean.cn/upload/201912/14/080c803013734907918ae3875a190709?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥105.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1303 },
-{
-  "name": "曼佗油茶籽油2L单瓶装",
-  "img": "http://qn.kemean.cn/upload/201911/19/fd8a322318754944a25636dd11446661?imageView2/0/w/800",
-  "priceShop": "¥250.0",
-  "priceDiscount": "¥220.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 792 },
-{
-  "name": "SY大号轮廓刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/50d85b65f91d497da05a4ca05f8c7fba?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥105.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1304 },
-{
-  "name": "曼佗神露食用植物调和油5L",
-  "img": "http://qn.kemean.cn/upload/201911/19/cb58c5d4ed18413886204f4189729d14?imageView2/0/w/800",
-  "priceShop": "¥150.0",
-  "priceDiscount": "¥120.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 793 },
-{
-  "name": "SY粉底刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/3baf905153734454b6ca67fe22d0cc81?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥80.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1305 },
-{
-  "name": "曼佗神露食用植物调和油2L",
-  "img": "http://qn.kemean.cn/upload/201911/19/ec47dc4803f14d73b97f8bb560452fa7?imageView2/0/w/800",
-  "priceShop": "¥90.0",
-  "priceDiscount": "¥65.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 794 },
-{
-  "name": "SY3D立体眉刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/4b03907e6f04419e8bb2314f5499ee0e?imageView2/0/w/800",
-  "priceShop": "¥78.0",
-  "priceDiscount": "¥48.8",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1306 },
-{
-  "name": "百雀羚水能量焕耀套装12954新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/0ce535c737b043cb9da3df08385043a0?imageView2/0/w/800",
-  "priceShop": "¥538.0",
-  "priceDiscount": "¥488.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 283 },
-{
-  "name": "曼佗神露食用植物调和油1.8L",
-  "img": "http://qn.kemean.cn/upload/201911/19/238292ec305a45c2ad0f849dfaaadab9?imageView2/0/w/800",
-  "priceShop": "¥85.0",
-  "priceDiscount": "¥60.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 795 },
-{
-  "name": "SY眼影刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/331002436ef94c5d81dd0314aa852913?imageView2/0/w/800",
-  "priceShop": "¥68.0",
-  "priceDiscount": "¥42.5",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1307 },
-{
-  "name": "曼佗神露食用植物调和油1.5Lx2",
-  "img": "http://qn.kemean.cn/upload/201911/19/58bc3aadc8f8481bb4eff0d040c712db?imageView2/0/w/800",
-  "priceShop": "¥120.0",
-  "priceDiscount": "¥100.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 796 },
-{
-  "name": "SY唇刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/e524046adf8947d48ac1dd94a58afe24?imageView2/0/w/800",
-  "priceShop": "¥68.0",
-  "priceDiscount": "¥42.5",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1308 },
-{
-  "name": "康派网红爆款女包欧美时尚斜跨包",
-  "img": "http://qn.kemean.cn/upload/201911/19/5e857702a22a430c8834b85f4b358fd2?imageView2/0/w/800",
-  "priceShop": "¥229.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 797 },
-{
-  "name": "5支化妆刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/1526fd4ddd8448a99024d9d6357507fd?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥23.8",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1309 },
-{
-  "name": "百雀羚焕采莹润亮肤面膜22ml*5片X3盒 20607",
-  "img": "http://qn.kemean.cn/upload/201911/07/94c3e04a171f48959679aacca4a37aea?imageView2/0/w/800",
-  "priceShop": "¥264.0",
-  "priceDiscount": "¥188.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 286 },
-{
-  "name": "曼佗山茶籽沐浴套装450MLx2",
-  "img": "http://qn.kemean.cn/upload/201911/19/14479805889e48a39bcfeb7022f85771?imageView2/0/w/800",
-  "priceShop": "¥90.0",
-  "priceDiscount": "¥75.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 798 },
-{
-  "name": "女神双头套刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/0807c3059e0e4615a8514c0409cd929e?imageView2/0/w/800",
-  "priceShop": "¥98.0",
-  "priceDiscount": "¥50.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1310 },
-{
-  "name": "【香港直邮】SNP海洋燕窝水库保湿补水面膜11片/盒",
-  "img": "http://qn.kemean.cn/upload/201911/07/dbd70b310a0e40f6a675184e3fa50a41?imageView2/0/w/800",
-  "priceShop": "¥128.0",
-  "priceDiscount": "¥75.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 287 },
-{
-  "name": "曼佗山茶籽沐浴套装750MLx2",
-  "img": "http://qn.kemean.cn/upload/201911/19/50e100ac011c43ec8c767ac33ce40204?imageView2/0/w/800",
-  "priceShop": "¥110.0",
-  "priceDiscount": "¥85.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "曼佗茶油品牌店",
-  "objId": 799 },
-{
-  "name": "多功能化妆刷",
-  "img": "http://qn.kemean.cn/upload/201912/14/8974487c9a8f420b8aa9be2b70b8b1ee?imageView2/0/w/800",
-  "priceShop": "¥189.0",
-  "priceDiscount": "¥142.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1311 },
-{
-  "name": "【香港直邮】SHANGPREE香蒲丽绿公主眼膜贴祛淡化细纹黑眼圈60片/盒",
-  "img": "http://qn.kemean.cn/upload/201911/07/78cf48795cc74f8f87be71efea07d20d?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥108.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 288 },
-{
-  "name": "电动洗刷器",
-  "img": "http://qn.kemean.cn/upload/201912/14/dc9a949eeb1d40c0ab81a1e0e9e7fab8?imageView2/0/w/800",
-  "priceShop": "¥99.0",
-  "priceDiscount": "¥75.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1312 },
-{
-  "name": "【香港直邮】SHANGPREE香蒲丽红参果修复眼膜贴淡化黑眼圈细皱纹60片/盒",
-  "img": "http://qn.kemean.cn/upload/201911/07/64d8cf8f43314e4081a3efec98a24e67?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥108.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 289 },
-{
-  "name": "康派2020新款真皮女包时尚简约欧美外贸单肩斜跨包（标准版）",
-  "img": "http://qn.kemean.cn/upload/201911/20/f9c021bd4a084ee79519be65ed2e59f6?imageView2/0/w/800",
-  "priceShop": "¥159.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 801 },
-{
-  "name": "歪头洁面仪",
-  "img": "http://qn.kemean.cn/upload/201912/14/626b0406c322474e967aaf4ec80b26f0?imageView2/0/w/800",
-  "priceShop": "¥199.0",
-  "priceDiscount": "¥103.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1313 },
-{
-  "name": "【香港直邮】Embryolisse保湿妆前乳隔离霜75ml",
-  "img": "http://qn.kemean.cn/upload/201911/07/62e701937f544c60bdbfa91bff9ccbd8?imageView2/0/w/800",
-  "priceShop": "¥198.0",
-  "priceDiscount": "¥128.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 290 },
-{
-  "name": "圆贝洁面仪/4个色（红/粉/蓝/绿）",
-  "img": "http://qn.kemean.cn/upload/201912/14/7c2ced4f143b400ba95562000a8b8e5d?imageView2/0/w/800",
-  "priceShop": "¥299.0",
-  "priceDiscount": "¥87.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1314 },
-{
-  "name": "【双11特促】百雀羚至臻皙白亮采眼部精华液20g118581",
-  "img": "http://qn.kemean.cn/upload/201911/07/70bba58321214c3c8ec7f353da35a2ae?imageView2/0/w/800",
-  "priceShop": "¥238.0",
-  "priceDiscount": "¥88.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 291 },
-{
-  "name": "康派爆款热线小CK同款女式单肩包时尚PU斜挎包",
-  "img": "http://qn.kemean.cn/upload/201911/20/e812b6672d5e4ab2abbb8011f1c4c8a6?imageView2/0/w/800",
-  "priceShop": "¥399.0",
-  "priceDiscount": "¥119.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 803 },
-{
-  "name": "眼部去皱美眼仪",
-  "img": "http://qn.kemean.cn/upload/201912/14/3f84310be21a4da4a68b556050262a6f?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥40.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1315 },
-{
-  "name": "康派时尚亮片女式小方包韩版PU斜挎包",
-  "img": "http://qn.kemean.cn/upload/201911/20/689e9a82558e4639975c74e987881b9b?imageView2/0/w/800",
-  "priceShop": "¥199.0",
-  "priceDiscount": "¥69.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 804 },
-{
-  "name": "滚轮瘦脸仪",
-  "img": "http://qn.kemean.cn/upload/201912/14/573af8aaaf744b9a8c111616059ceff4?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥49.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1316 },
-{
-  "name": "百雀羚草本系列水能量焕彩洁容膏80g12756",
-  "img": "http://qn.kemean.cn/upload/201911/07/c3be584f270a45caa023b1728b22c0cb?imageView2/0/w/800",
-  "priceShop": "¥118.0",
-  "priceDiscount": "¥98.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 293 },
-{
-  "name": "康派热销小CK同款时尚亮片女包五金流苏装饰女式斜挎包",
-  "img": "http://qn.kemean.cn/upload/201911/20/0cd41dc4aabf4a2eafa30aa19999648e?imageView2/0/w/800",
-  "priceShop": "¥399.0",
-  "priceDiscount": "¥89.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "康派皮具旗舰店",
-  "objId": 805 },
-{
-  "name": "荷叶黄金美容棒",
-  "img": "http://qn.kemean.cn/upload/201912/14/c17f610aee0f4b43a421f8b7bd30d02b?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥0.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1317 },
-{
-  "name": "百雀羚草本系列水能量焕颜美容液90ml12794",
-  "img": "http://qn.kemean.cn/upload/201911/07/0e97758b581642ad966f3d68dcb9d202?imageView2/0/w/800",
-  "priceShop": "¥188.0",
-  "priceDiscount": "¥168.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 294 },
-{
-  "name": "咪然 2019现磨鲜米 东北大米 珍珠粥米 黑龙江原产地饭香珍珠米5kg",
-  "img": "http://qn.kemean.cn/upload/201912/14/ef812630a686486286009a7d0b589741?imageView2/0/w/800",
-  "priceShop": "¥108.0",
-  "priceDiscount": "¥77.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1318 },
-{
-  "name": "原创设计北欧后现代简约客厅/卧室吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/31/a87b7e0362cb4da090ed9e99509e5acd?imageView2/0/w/800",
-  "priceShop": "¥720.0",
-  "priceDiscount": "¥390.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1063 },
-{
-  "name": "咪然 稻花香香米五常大米 东北大米10斤 黑龙江原产地直供现磨新米 真空袋装5kg",
-  "img": "http://qn.kemean.cn/upload/201912/14/3b16c032cb9e4d1a8be4b7c08abad6e0?imageView2/0/w/800",
-  "priceShop": "¥135.0",
-  "priceDiscount": "¥128.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1319 },
-{
-  "name": "咪然 东北直供长粒香米5斤 2019新上市现磨鲜米 东北大米 黑龙江大米2.5kg",
-  "img": "http://qn.kemean.cn/upload/201912/14/05dfe010ad564ecabe410ad0e4cc4334?imageView2/0/w/800",
-  "priceShop": "¥68.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1320 },
-{
-  "name": "优妮护发喷雾修复干燥毛躁免洗柔顺顺滑精华素营养水保湿补水精油",
-  "img": "http://qn.kemean.cn/upload/201911/20/800a2d0440f2470f99e81738e6f067bc?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥29.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 809 },
-{
-  "name": "原创设计北欧后现代简约客厅/卧室吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/31/8fa8353b56814d3e8c77bd1e751d8102?imageView2/0/w/800",
-  "priceShop": "¥1020.0",
-  "priceDiscount": "¥549.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1065 },
-{
-  "name": "咪然 东北直供现磨鲜米 长粒香米 东北大米 原粮地直供真空包装大米5KG",
-  "img": "http://qn.kemean.cn/upload/201912/14/56bc654a255449d1b02287bd3989ab71?imageView2/0/w/800",
-  "priceShop": "¥115.0",
-  "priceDiscount": "¥97.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1321 },
-{
-  "name": "优妮啫喱水保湿定型发蜡男女士卷发定型保湿亮泽持久留香发胶",
-  "img": "http://qn.kemean.cn/upload/201911/20/a275e311bbda400780268f3267512aaa?imageView2/0/w/800",
-  "priceShop": "¥35.0",
-  "priceDiscount": "¥28.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 810 },
-{
-  "name": "咪然东北大米10斤正宗五常稻花香香米五常水稻研究所监制现磨新米原粮原产地直发5kg",
-  "img": "http://qn.kemean.cn/upload/201912/14/3747ab8442d94a5aa2ccfbf28b769988?imageView2/0/w/800",
-  "priceShop": "¥235.0",
-  "priceDiscount": "¥224.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1322 },
-{
-  "name": "【香港直邮】Dior迪奥口红烈焰蓝金唇膏口红 999#哑光",
-  "img": "http://qn.kemean.cn/upload/201911/07/8182a0e2c4a44bda89d2a74f978ad642?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 299 },
-{
-  "name": "优妮马油倒膜膏正品修复干枯补水顺滑防毛躁柔顺头发发膜焗油膏",
-  "img": "http://qn.kemean.cn/upload/201911/20/54296f3f3c06477cba2494583b42fcf7?imageView2/0/w/800",
-  "priceShop": "¥119.0",
-  "priceDiscount": "¥89.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 811 },
-{
-  "name": "咪然 东北大米 正宗五常有机稻花香大米 五常水稻研究所监制现磨新米 原粮原产地袋装2.5kg",
-  "img": "http://qn.kemean.cn/upload/201912/14/81137fb5e99c4772aa25200dce71d8fd?imageView2/0/w/800",
-  "priceShop": "¥168.0",
-  "priceDiscount": "¥161.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1323 },
-{
-  "name": "优妮马油茶麸护发素修复干枯烫染受损补水柔顺顺滑男女正品改善毛躁",
-  "img": "http://qn.kemean.cn/upload/201911/20/f9934932a41243a09b17e1cfc20753a7?imageView2/0/w/800",
-  "priceShop": "¥57.0",
-  "priceDiscount": "¥49.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 812 },
-{
-  "name": "咪然 富硒现磨鲜米 煮粥大米 黑龙江大米 东北原粮地直供真空包装1kg袋装",
-  "img": "http://qn.kemean.cn/upload/201912/14/4bf9cccdb8784923905e5bcc9b016e14?imageView2/0/w/800",
-  "priceShop": "¥43.0",
-  "priceDiscount": "¥33.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1324 },
-{
-  "name": "【香港直邮】Dior迪奥口红烈焰蓝金唇膏口红 999#滋润 ",
-  "img": "http://qn.kemean.cn/upload/201911/07/bdff93f4312d47c7819996a08143c29c?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 301 },
-{
-  "name": "优妮无患子洗发水沐浴露套装控油清爽去屑柔顺持久留香保湿60ML*2-保质期2021年11月",
-  "img": "http://qn.kemean.cn/upload/201911/20/9cf228ceb3624dc1b0af765db9c1bccc?imageView2/0/w/800",
-  "priceShop": "¥29.0",
-  "priceDiscount": "¥19.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 813 },
-{
-  "name": "原创设计北欧后现代简约客厅/卧室吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/31/e9fe7ece23984d9d9491c0444a52be24?imageView2/0/w/800",
-  "priceShop": "¥1115.0",
-  "priceDiscount": "¥605.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1069 },
-{
-  "name": "咪然 富硒现磨鲜米 煮粥大米 黑龙江大米 东北原粮地直供真空包装5kg袋装",
-  "img": "http://qn.kemean.cn/upload/201912/14/a60dc4f6af914dfb86d582a4e909495e?imageView2/0/w/800",
-  "priceShop": "¥150.0",
-  "priceDiscount": "¥121.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1325 },
-{
-  "name": "优妮马油洗发水护发洗护去屑止痒修护持久留香去油随机体验装10ML8",
-  "img": "http://qn.kemean.cn/upload/201911/20/b0e917eff801456ca7e8bc51b5e2bdd3?imageView2/0/w/800",
-  "priceShop": "¥19.9",
-  "priceDiscount": "¥9.9",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 814 },
-{
-  "name": "原创设计北欧后现代简约卧室/客厅家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/d39ac4daa8124ef4b246895f697af1bf?imageView2/0/w/800",
-  "priceShop": "¥655.0",
-  "priceDiscount": "¥655.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1070 },
-{
-  "name": "咪然 富硒现磨鲜米 煮粥大米 黑龙江大米 东北原粮地直供真空包装2.5kg袋装",
-  "img": "http://qn.kemean.cn/upload/201912/14/1079660b35b54abfb0dbaf4a6c2049d8?imageView2/0/w/800",
-  "priceShop": "¥78.0",
-  "priceDiscount": "¥77.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1326 },
-{
-  "name": "索芙特汉方1kg留香补水保湿留香补水保湿",
-  "img": "http://qn.kemean.cn/upload/201911/28/557f0b949fe1420fb75e3aada5e514a5?imageView2/0/w/800",
-  "priceShop": "¥29.9",
-  "priceDiscount": "¥19.9",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "索芙特专卖店",
-  "objId": 303 },
-{
-  "name": "优妮马油丝滑水漾洗发乳 无患子洗发水修复受损 水润柔顺",
-  "img": "http://qn.kemean.cn/upload/201911/20/75a6f8c2c5054c1b8fde4241ed4185f9?imageView2/0/w/800",
-  "priceShop": "¥55.0",
-  "priceDiscount": "¥49.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 815 },
-{
-  "name": "原创设计北欧后现代简约卧室/客厅家居马卡龙吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/b13b2f380eaa4e0ba34da60f906bef9f?imageView2/0/w/800",
-  "priceShop": "¥1476.0",
-  "priceDiscount": "¥799.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1071 },
-{
-  "name": "咪然 东北直供现磨鲜米 长粒香米 东北大米 原粮地直供真空包装大米5KG",
-  "img": "http://qn.kemean.cn/upload/201912/14/f88edf6570ca414c96f63f3e854a9272?imageView2/0/w/800",
-  "priceShop": "¥118.0",
-  "priceDiscount": "¥103.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1327 },
-{
-  "name": "【香港直邮】Dior迪奥口红烈焰蓝金唇膏口红 999#金属",
-  "img": "http://qn.kemean.cn/upload/201911/07/9646ac480d3045f98e626117842e51ac?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 304 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/3a03f91e6d1b45eba80810ee8efdc40e?imageView2/0/w/800",
-  "priceShop": "¥1615.0",
-  "priceDiscount": "¥875.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1072 },
-{
-  "name": "无印良品 条纹系全棉色织水洗棉四件套 WYLP-TWQMSZ",
-  "img": "http://qn.kemean.cn/upload/201912/14/6da690f90b294702b3d6ed5bbc889570?imageView2/0/w/800",
-  "priceShop": "¥898.0",
-  "priceDiscount": "¥434.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "左立直营店",
-  "objId": 1328 },
-{
-  "name": "迪菲娜蜗牛套盒680ml+380ml03483新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/a078866a13e14c6db70d189ad2afeea5?imageView2/0/w/800",
-  "priceShop": "¥118.0",
-  "priceDiscount": "¥98.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 305 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/aad5d482e7b7458b9b8da52829ad006c?imageView2/0/w/800",
-  "priceShop": "¥1989.0",
-  "priceDiscount": "¥1079.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1073 },
-{
-  "name": "迪菲娜洋甘菊精油滋养修护沐浴乳液900ml03285",
-  "img": "http://qn.kemean.cn/upload/201911/07/c5e53ff52e0e4e9b9dcc1a2d16b6b8e5?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 306 },
-{
-  "name": "马油生姜洗发水去屑止痒茶麸无患子洗发露持久留香女控油男士随机220",
-  "img": "http://qn.kemean.cn/upload/201911/20/3ce796b83c5243f98c0a59bb045c6f8f?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥29.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 818 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/599b62f144a9448388c51c4228ef50e7?imageView2/0/w/800",
-  "priceShop": "¥1368.0",
-  "priceDiscount": "¥741.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1074 },
-{
-  "name": "原创设计北欧后现代简约餐厅/楼道/酒吧吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/14/a3b62c71f2a245d38072d2d350f669e4?imageView2/0/w/800",
-  "priceShop": "¥1029.0",
-  "priceDiscount": "¥635.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1330 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/374bfea0a52a4dd6946b99f390dc772d?imageView2/0/w/800",
-  "priceShop": "¥1640.0",
-  "priceDiscount": "¥888.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1075 },
-{
-  "name": "原创设计北欧后现代简约餐厅/楼道/酒吧吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/14/990aa3b40f424c18a05448fe1fdb310c?imageView2/0/w/800",
-  "priceShop": "¥1827.0",
-  "priceDiscount": "¥1129.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1331 },
-{
-  "name": "迪菲娜茶树原液头皮净爽去屑洗发露680ml003421",
-  "img": "http://qn.kemean.cn/upload/201911/07/3ab2cfa3332148f18d423e3adf118458?imageView2/0/w/800",
-  "priceShop": "¥88.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 308 },
-{
-  "name": "优妮马油丝滑水漾洗发乳 无患子洗发水修复受损 ",
-  "img": "http://qn.kemean.cn/upload/201911/20/646aac0720de429d96da28a422d1a55a?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥29.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 820 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/48bebf93b1ac40539f4bcf2c73e66a1a?imageView2/0/w/800",
-  "priceShop": "¥1995.0",
-  "priceDiscount": "¥1080.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1076 },
-{
-  "name": "原创设计北欧后现代卧室/客厅/餐厅家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/14/0eb633c5524f4fe8943e6afcda38895c?imageView2/0/w/800",
-  "priceShop": "¥1215.0",
-  "priceDiscount": "¥750.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1332 },
-{
-  "name": "【香港直邮】Dior迪奥口红烈焰蓝金唇膏口红 520#星星色",
-  "img": "http://qn.kemean.cn/upload/201911/07/adc159b72f92431bb344c48543154dcc?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 309 },
-{
-  "name": "优妮洗发水沐浴露套装正品家庭装补水柔顺滑",
-  "img": "http://qn.kemean.cn/upload/201911/20/e868e209f67c42ab92b5f9e3b8e55fab?imageView2/0/w/800",
-  "priceShop": "¥89.0",
-  "priceDiscount": "¥68.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "广州聚惠商贸有限公司",
-  "objId": 821 },
-{
-  "name": "原创设计北欧后现代卧室/客厅马卡龙家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201911/29/6fd9a4fc1a2d436d82c99e61d7de484d?imageView2/0/w/800",
-  "priceShop": "¥2253.0",
-  "priceDiscount": "¥1220.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1077 },
-{
-  "name": "相宜本草红景天焕亮明星挚爱礼盒13861新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/e12a306e1cd14a2cb24ce3584b82a3ed?imageView2/0/w/800",
-  "priceShop": "¥386.0",
-  "priceDiscount": "¥328.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 310 },
-{
-  "name": "中国风传统剪纸 梅/兰/竹/菊四件套",
-  "img": "http://qn.kemean.cn/upload/201911/30/6790b1ceb607442bae03022059b3428b?imageView2/0/w/800",
-  "priceShop": "¥2000.0",
-  "priceDiscount": "¥2000.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "商家云旗舰店",
-  "objId": 1078 },
-{
-  "name": "原创设计北欧后现代卧室/客厅/餐厅家居吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/14/e680c26069344f1da7374ad4ee4c7308?imageView2/0/w/800",
-  "priceShop": "¥1569.0",
-  "priceDiscount": "¥969.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1334 },
-{
-  "name": "【香港直邮】Dior迪奥魅惑釉唇膏漆光唇彩口红740#",
-  "img": "http://qn.kemean.cn/upload/201911/07/2cfd79762e1d423489efb6c38a819935?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 311 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/楼道壁灯",
-  "img": "http://qn.kemean.cn/upload/201911/30/1e31bbee9a844ba890b96e77e4797fbb?imageView2/0/w/800",
-  "priceShop": "¥245.0",
-  "priceDiscount": "¥132.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1079 },
-{
-  "name": "索芙特香水沐浴露670g持久留香改善粗糙干燥",
-  "img": "http://qn.kemean.cn/upload/201911/28/7603fac0b14c4dc99ca81f0685e78d8c?imageView2/0/w/800",
-  "priceShop": "¥39.0",
-  "priceDiscount": "¥26.9",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "索芙特专卖店",
-  "objId": 312 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/楼道壁灯",
-  "img": "http://qn.kemean.cn/upload/201911/30/73bc6c5ad16742cc9b9bc6782d696a1e?imageView2/0/w/800",
-  "priceShop": "¥333.0",
-  "priceDiscount": "¥179.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1080 },
-{
-  "name": "欧莱雅复颜抗皱紧致滋润眼霜15ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/91985ec7a9ba46c79057b204f4373e34?imageView2/0/w/800",
-  "priceShop": "¥240.0",
-  "priceDiscount": "¥179.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1336 },
-{
-  "name": "【香港直邮】Dior迪奥魅惑釉唇膏漆光唇彩口红744#",
-  "img": "http://qn.kemean.cn/upload/201911/07/984e34c064484ff4ad5d84977094b512?imageView2/0/w/800",
-  "priceShop": "¥358.0",
-  "priceDiscount": "¥235.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 313 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/楼道壁灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/313dcba0bcb545159616093d1fe33568?imageView2/0/w/800",
-  "priceShop": "¥475.0",
-  "priceDiscount": "¥255.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1081 },
-{
-  "name": "欧莱雅复颜清乳柔肤水130ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/3b0cd2a5738f4986929a26adada02084?imageView2/0/w/800",
-  "priceShop": "¥190.0",
-  "priceDiscount": "¥169.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1337 },
-{
-  "name": "【香港直邮】Dior迪奥粉漾诱惑变色润唇膏口红001#粉色",
-  "img": "http://qn.kemean.cn/upload/201911/07/e732e2e9b08a44c6ba2d826a69abcd78?imageView2/0/w/800",
-  "priceShop": "¥298.0",
-  "priceDiscount": "¥215.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 314 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/书房/客厅家居台灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/76a2505a5f784b799710644d4d8c6c86?imageView2/0/w/800",
-  "priceShop": "¥309.0",
-  "priceDiscount": "¥169.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1082 },
-{
-  "name": "欧莱雅清润葡萄籽保湿柔肤水130ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/07925ec78323490d802971828a0df666?imageView2/0/w/800",
-  "priceShop": "¥155.0",
-  "priceDiscount": "¥99.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1338 },
-{
-  "name": "【香港直邮】Dior迪奥粉漾诱惑变色润唇膏口红004#橘色",
-  "img": "http://qn.kemean.cn/upload/201911/07/adf83e68c1d64aacb94c9ead6a3d9d8c?imageView2/0/w/800",
-  "priceShop": "¥298.0",
-  "priceDiscount": "¥215.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 315 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/书房/客厅家居台灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/4908be5dcd4646acb4655b3583767f4f?imageView2/0/w/800",
-  "priceShop": "¥402.0",
-  "priceDiscount": "¥219.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1083 },
-{
-  "name": "欧莱雅小黑瓶青春密码酵素精华肌底液30ml/50ml/70ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/f9de32afdd504a41bc8e2545efe0da44?imageView2/0/w/800",
-  "priceShop": "¥280.0",
-  "priceDiscount": "¥199.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1339 },
-{
-  "name": "相宜本草睡莲水灵肌沁润臻享礼盒13571新旧款随机发货",
-  "img": "http://qn.kemean.cn/upload/201911/07/76b56c2e63e440b08189fb4ca2406db3?imageView2/0/w/800",
-  "priceShop": "¥458.0",
-  "priceDiscount": "¥428.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 316 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/书房/客厅家居台灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/ad7975f7692b4c6090e4ee31cf0434cb?imageView2/0/w/800",
-  "priceShop": "¥285.0",
-  "priceDiscount": "¥155.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1084 },
-{
-  "name": "欧莱雅小黑瓶青春密码酵素精华肌底液30ml/50ml/70ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/f9de32afdd504a41bc8e2545efe0da44?imageView2/0/w/800",
-  "priceShop": "¥280.0",
-  "priceDiscount": "¥199.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1340 },
-{
-  "name": "【香港直邮】YSL圣罗兰方管口红 1#正红色",
-  "img": "http://qn.kemean.cn/upload/201911/07/75b6f1465e4a46e8a9ded38f7602dcb5?imageView2/0/w/800",
-  "priceShop": "¥398.0",
-  "priceDiscount": "¥229.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 317 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/楼道壁灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/1a99dee3d8854778ad484c3dc08e21c3?imageView2/0/w/800",
-  "priceShop": "¥210.0",
-  "priceDiscount": "¥115.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1085 },
-{
-  "name": "欧莱雅清润葡萄籽保湿乳液110ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/904788dc20234d11aec1d4e02724e477?imageView2/0/w/800",
-  "priceShop": "¥169.0",
-  "priceDiscount": "¥129.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1341 },
-{
-  "name": "相宜本草红景天焕亮精华液40g10396",
-  "img": "http://qn.kemean.cn/upload/201911/07/00032dee7a734d8f97bcdf06d109d35f?imageView2/0/w/800",
-  "priceShop": "¥238.0",
-  "priceDiscount": "¥198.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 318 },
-{
-  "name": "原创设计北欧后现代简约卧室/床头/楼道壁灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/0d296f900f974d7f8147f6fdb9fd8368?imageView2/0/w/800",
-  "priceShop": "¥339.0",
-  "priceDiscount": "¥185.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1086 },
-{
-  "name": "【香港直邮】YSL圣罗兰方管口红 13#橘红色",
-  "img": "http://qn.kemean.cn/upload/201911/07/11bd0775e75a4f1587602e7d33ded2fc?imageView2/0/w/800",
-  "priceShop": "¥398.0",
-  "priceDiscount": "¥229.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 319 },
-{
-  "name": "原创设计北欧后现代简约客厅/卧室/书房/阳台落地灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/0edf7250aecd4152bd2462604e20044b?imageView2/0/w/800",
-  "priceShop": "¥719.0",
-  "priceDiscount": "¥469.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1087 },
-{
-  "name": "欧莱雅清润葡萄籽保湿特润凝霜50ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/1b263aa4f63643fa9d7a61a7d00f9957?imageView2/0/w/800",
-  "priceShop": "¥160.0",
-  "priceDiscount": "¥129.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1343 },
-{
-  "name": "【香港直邮】YSL圣罗兰方管口红 17#西柚粉",
-  "img": "http://qn.kemean.cn/upload/201911/07/5cc63b5622b54b0eb2d9b8526d50eecd?imageView2/0/w/800",
-  "priceShop": "¥398.0",
-  "priceDiscount": "¥229.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 320 },
-{
-  "name": "原创设计北欧后现代简约客厅/楼梯灯螺旋吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/d96689596701484787e7974096f60541?imageView2/0/w/800",
-  "priceShop": "¥854.0",
-  "priceDiscount": "¥459.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1088 },
-{
-  "name": "欧莱雅男士水能保湿强润霜50ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/62bdcd6a1560460788c2a7111b5d6549?imageView2/0/w/800",
-  "priceShop": "¥79.0",
-  "priceDiscount": "¥59.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1344 },
-{
-  "name": "【香港直邮】YSL圣罗兰方管口红 52#星星色",
-  "img": "http://qn.kemean.cn/upload/201911/07/00a659269a72452d99228ce5a8528fdc?imageView2/0/w/800",
-  "priceShop": "¥398.0",
-  "priceDiscount": "¥229.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "帝耀美妆全球购",
-  "objId": 321 },
-{
-  "name": "原创设计北欧后现代简约客厅/楼梯灯螺旋吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/285500eebd094aa9aa73cb16f3c88438?imageView2/0/w/800",
-  "priceShop": "¥1290.0",
-  "priceDiscount": "¥699.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1089 },
-{
-  "name": "欧莱雅复颜洁面乳125ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/eb78688166d44ab4aa5ec42ccce16c5c?imageView2/0/w/800",
-  "priceShop": "¥129.0",
-  "priceDiscount": "¥99.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1345 },
-{
-  "name": "相宜本草红景天幼白精华水120ml03442",
-  "img": "http://qn.kemean.cn/upload/201911/07/1a3e9802b7644e79b629183a894d1b18?imageView2/0/w/800",
-  "priceShop": "¥109.0",
-  "priceDiscount": "¥88.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 322 },
-{
-  "name": "原创设计北欧后现代简约客厅/楼梯灯螺旋吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/e74757691c804b81aae3b206660139a8?imageView2/0/w/800",
-  "priceShop": "¥2346.0",
-  "priceDiscount": "¥1269.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1090 },
-{
-  "name": "欧莱雅清润葡萄籽水嫩洁面乳125ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/d2cead460a8847a3a9b63ac42757e37c?imageView2/0/w/800",
-  "priceShop": "¥109.0",
-  "priceDiscount": "¥78.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1346 },
-{
-  "name": "相宜本草红景天幼白精华乳120g03466",
-  "img": "http://qn.kemean.cn/upload/201911/07/2402e48191214f13a3862694a2a676ed?imageView2/0/w/800",
-  "priceShop": "¥119.0",
-  "priceDiscount": "¥98.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 323 },
-{
-  "name": "原创设计北欧后现代简约餐厅书房吊灯",
-  "img": "http://qn.kemean.cn/upload/201912/02/6f4ecc2640844b9ba3d75cd326713fd2?imageView2/0/w/800",
-  "priceShop": "¥525.0",
-  "priceDiscount": "¥284.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "和光时创旗舰店",
-  "objId": 1091 },
-{
-  "name": "欧莱雅复颜紧致滋润晚霜50ml",
-  "img": "http://qn.kemean.cn/upload/201912/16/8848d51d45fc479c98e85f471fc3a083?imageView2/0/w/800",
-  "priceShop": "¥219.0",
-  "priceDiscount": "¥169.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "九九自营店",
-  "objId": 1347 },
-{
-  "name": "花迷.净颜睡莲净润卸妆水400ML （特供）90312",
-  "img": "http://qn.kemean.cn/upload/201911/07/1b1cb9f784ba4faebff80b42849f7039?imageView2/0/w/800",
-  "priceShop": "¥139.0",
-  "priceDiscount": "¥88.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "美妆一号商城旗舰店",
-  "objId": 324 },
-{
-  "name": "泉氏净水器水龙头过滤器家用厨房卫生间自来水滤水器前置净化水机",
-  "img": "http://qn.kemean.cn/upload/201912/03/8223dd2c4f2c4297aca3b6716ea8d6fb?imageView2/0/w/800",
-  "priceShop": "¥320.0",
-  "priceDiscount": "¥108.0",
-  "numSales": 0,
-  "ptPrice": null,
-  "shopName": "深圳市泉氏清科技有限公司",
-  "objId": 1092 }];exports.default = _default;
 
 /***/ }),
 
@@ -20799,7 +19934,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -20820,14 +19955,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -20913,7 +20048,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -21099,12 +20234,9 @@ function internalMixin(Vue) {
 
   Vue.prototype.$emit = function(event) {
     if (this.$scope && event) {
-      var triggerEvent = this.$scope['_triggerEvent'] || this.$scope['triggerEvent'];
-      if (triggerEvent) {
-        triggerEvent.call(this.$scope, event, {
-          __args__: toArray(arguments, 1)
-        });
-      }
+      (this.$scope['_triggerEvent'] || this.$scope['triggerEvent']).call(this.$scope, event, {
+        __args__: toArray(arguments, 1)
+      });
     }
     return oldEmit.apply(this, arguments)
   };
@@ -21271,8 +20403,7 @@ var LIFECYCLE_HOOKS$1 = [
     // 'onReady', // 兼容旧版本，应该移除该事件
     'onPageShow',
     'onPageHide',
-    'onPageResize',
-    'onUploadDouyinVideo'
+    'onPageResize'
 ];
 function lifecycleMixin$1(Vue) {
 
@@ -21344,17 +20475,17 @@ module.exports = Array.isArray || function (arr) {
 /***/ }),
 
 /***/ 41:
-/*!*******************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/util/route.js ***!
-  \*******************************************************************************/
+/*!***************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/util/route.js ***!
+  \***************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 42));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}function _createClass(Constructor, protoProps, staticProps) {if (protoProps) _defineProperties(Constructor.prototype, protoProps);if (staticProps) _defineProperties(Constructor, staticProps);return Constructor;} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              * 路由跳转方法，该方法相对于直接使用uni.xxx的好处是使用更加简单快捷
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              * 并且带有路由拦截功能
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              */var
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  * 路由跳转方法，该方法相对于直接使用uni.xxx的好处是使用更加简单快捷
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  * 并且带有路由拦截功能
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  */var
 
 Router = /*#__PURE__*/function () {
   function Router() {_classCallCheck(this, Router);
@@ -21535,219 +20666,6 @@ if (hadRuntime) {
   }
 }
 
-
-/***/ }),
-
-/***/ 439:
-/*!*****************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/plugins/md5.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/*  
- * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message  
- * Digest Algorithm, as defined in RFC 1321.  
- * Version 1.1 Copyright (C) Paul Johnston 1999 - 2002.  
- * Code also contributed by Greg Holt  
- * See http://pajhome.org.uk/site/legal.html for details.  
- */
-
-/*  
-     * Add integers, wrapping at 2^32. This uses 16-bit operations internally  
-     * to work around bugs in some JS interpreters.  
-     */
-function safe_add(x, y) {
-  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return msw << 16 | lsw & 0xFFFF;
-}
-
-/*  
-   * Bitwise rotate a 32-bit number to the left.  
-   */
-function rol(num, cnt) {
-  return num << cnt | num >>> 32 - cnt;
-}
-
-/*  
-   * These functions implement the four basic operations the algorithm uses.  
-   */
-function cmn(q, a, b, x, s, t) {
-  return safe_add(rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b);
-}
-function ff(a, b, c, d, x, s, t) {
-  return cmn(b & c | ~b & d, a, b, x, s, t);
-}
-function gg(a, b, c, d, x, s, t) {
-  return cmn(b & d | c & ~d, a, b, x, s, t);
-}
-function hh(a, b, c, d, x, s, t) {
-  return cmn(b ^ c ^ d, a, b, x, s, t);
-}
-function ii(a, b, c, d, x, s, t) {
-  return cmn(c ^ (b | ~d), a, b, x, s, t);
-}
-
-/*  
-   * Calculate the MD5 of an array of little-endian words, producing an array  
-   * of little-endian words.  
-   */
-function coreMD5(x) {
-  var a = 1732584193;
-  var b = -271733879;
-  var c = -1732584194;
-  var d = 271733878;
-
-  for (var i = 0; i < x.length; i += 16) {
-    var olda = a;
-    var oldb = b;
-    var oldc = c;
-    var oldd = d;
-
-    a = ff(a, b, c, d, x[i + 0], 7, -680876936);
-    d = ff(d, a, b, c, x[i + 1], 12, -389564586);
-    c = ff(c, d, a, b, x[i + 2], 17, 606105819);
-    b = ff(b, c, d, a, x[i + 3], 22, -1044525330);
-    a = ff(a, b, c, d, x[i + 4], 7, -176418897);
-    d = ff(d, a, b, c, x[i + 5], 12, 1200080426);
-    c = ff(c, d, a, b, x[i + 6], 17, -1473231341);
-    b = ff(b, c, d, a, x[i + 7], 22, -45705983);
-    a = ff(a, b, c, d, x[i + 8], 7, 1770035416);
-    d = ff(d, a, b, c, x[i + 9], 12, -1958414417);
-    c = ff(c, d, a, b, x[i + 10], 17, -42063);
-    b = ff(b, c, d, a, x[i + 11], 22, -1990404162);
-    a = ff(a, b, c, d, x[i + 12], 7, 1804603682);
-    d = ff(d, a, b, c, x[i + 13], 12, -40341101);
-    c = ff(c, d, a, b, x[i + 14], 17, -1502002290);
-    b = ff(b, c, d, a, x[i + 15], 22, 1236535329);
-
-    a = gg(a, b, c, d, x[i + 1], 5, -165796510);
-    d = gg(d, a, b, c, x[i + 6], 9, -1069501632);
-    c = gg(c, d, a, b, x[i + 11], 14, 643717713);
-    b = gg(b, c, d, a, x[i + 0], 20, -373897302);
-    a = gg(a, b, c, d, x[i + 5], 5, -701558691);
-    d = gg(d, a, b, c, x[i + 10], 9, 38016083);
-    c = gg(c, d, a, b, x[i + 15], 14, -660478335);
-    b = gg(b, c, d, a, x[i + 4], 20, -405537848);
-    a = gg(a, b, c, d, x[i + 9], 5, 568446438);
-    d = gg(d, a, b, c, x[i + 14], 9, -1019803690);
-    c = gg(c, d, a, b, x[i + 3], 14, -187363961);
-    b = gg(b, c, d, a, x[i + 8], 20, 1163531501);
-    a = gg(a, b, c, d, x[i + 13], 5, -1444681467);
-    d = gg(d, a, b, c, x[i + 2], 9, -51403784);
-    c = gg(c, d, a, b, x[i + 7], 14, 1735328473);
-    b = gg(b, c, d, a, x[i + 12], 20, -1926607734);
-
-    a = hh(a, b, c, d, x[i + 5], 4, -378558);
-    d = hh(d, a, b, c, x[i + 8], 11, -2022574463);
-    c = hh(c, d, a, b, x[i + 11], 16, 1839030562);
-    b = hh(b, c, d, a, x[i + 14], 23, -35309556);
-    a = hh(a, b, c, d, x[i + 1], 4, -1530992060);
-    d = hh(d, a, b, c, x[i + 4], 11, 1272893353);
-    c = hh(c, d, a, b, x[i + 7], 16, -155497632);
-    b = hh(b, c, d, a, x[i + 10], 23, -1094730640);
-    a = hh(a, b, c, d, x[i + 13], 4, 681279174);
-    d = hh(d, a, b, c, x[i + 0], 11, -358537222);
-    c = hh(c, d, a, b, x[i + 3], 16, -722521979);
-    b = hh(b, c, d, a, x[i + 6], 23, 76029189);
-    a = hh(a, b, c, d, x[i + 9], 4, -640364487);
-    d = hh(d, a, b, c, x[i + 12], 11, -421815835);
-    c = hh(c, d, a, b, x[i + 15], 16, 530742520);
-    b = hh(b, c, d, a, x[i + 2], 23, -995338651);
-
-    a = ii(a, b, c, d, x[i + 0], 6, -198630844);
-    d = ii(d, a, b, c, x[i + 7], 10, 1126891415);
-    c = ii(c, d, a, b, x[i + 14], 15, -1416354905);
-    b = ii(b, c, d, a, x[i + 5], 21, -57434055);
-    a = ii(a, b, c, d, x[i + 12], 6, 1700485571);
-    d = ii(d, a, b, c, x[i + 3], 10, -1894986606);
-    c = ii(c, d, a, b, x[i + 10], 15, -1051523);
-    b = ii(b, c, d, a, x[i + 1], 21, -2054922799);
-    a = ii(a, b, c, d, x[i + 8], 6, 1873313359);
-    d = ii(d, a, b, c, x[i + 15], 10, -30611744);
-    c = ii(c, d, a, b, x[i + 6], 15, -1560198380);
-    b = ii(b, c, d, a, x[i + 13], 21, 1309151649);
-    a = ii(a, b, c, d, x[i + 4], 6, -145523070);
-    d = ii(d, a, b, c, x[i + 11], 10, -1120210379);
-    c = ii(c, d, a, b, x[i + 2], 15, 718787259);
-    b = ii(b, c, d, a, x[i + 9], 21, -343485551);
-
-    a = safe_add(a, olda);
-    b = safe_add(b, oldb);
-    c = safe_add(c, oldc);
-    d = safe_add(d, oldd);
-  }
-  return [a, b, c, d];
-}
-
-/*  
-   * Convert an array of little-endian words to a hex string.  
-   */
-function binl2hex(binarray) {
-  var hex_tab = "0123456789abcdef";
-  var str = "";
-  for (var i = 0; i < binarray.length * 4; i++) {
-    str += hex_tab.charAt(binarray[i >> 2] >> i % 4 * 8 + 4 & 0xF) +
-    hex_tab.charAt(binarray[i >> 2] >> i % 4 * 8 & 0xF);
-  }
-  return str;
-}
-
-/*  
-   * Convert an array of little-endian words to a base64 encoded string.  
-   */
-function binl2b64(binarray) {
-  var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  var str = "";
-  for (var i = 0; i < binarray.length * 32; i += 6) {
-    str += tab.charAt(binarray[i >> 5] << i % 32 & 0x3F |
-    binarray[i >> 5 + 1] >> 32 - i % 32 & 0x3F);
-  }
-  return str;
-}
-
-/*  
-   * Convert an 8-bit character string to a sequence of 16-word blocks, stored  
-   * as an array, and append appropriate padding for MD4/5 calculation.  
-   * If any of the characters are >255, the high byte is silently ignored.  
-   */
-function str2binl(str) {
-  var nblk = (str.length + 8 >> 6) + 1; // number of 16-word blocks    
-  var blks = new Array(nblk * 16);
-  for (var i = 0; i < nblk * 16; i++) {blks[i] = 0;}
-  for (var i = 0; i < str.length; i++) {
-    blks[i >> 2] |= (str.charCodeAt(i) & 0xFF) << i % 4 * 8;}
-  blks[i >> 2] |= 0x80 << i % 4 * 8;
-  blks[nblk * 16 - 2] = str.length * 8;
-  return blks;
-}
-
-/*  
-   * Convert a wide-character string to a sequence of 16-word blocks, stored as  
-   * an array, and append appropriate padding for MD4/5 calculation.  
-   */
-function strw2binl(str) {
-  var nblk = (str.length + 4 >> 5) + 1; // number of 16-word blocks    
-  var blks = new Array(nblk * 16);
-  for (var i = 0; i < nblk * 16; i++) {blks[i] = 0;}
-  for (var i = 0; i < str.length; i++) {
-    blks[i >> 1] |= str.charCodeAt(i) << i % 2 * 16;}
-  blks[i >> 1] |= 0x80 << i % 2 * 16;
-  blks[nblk * 16 - 2] = str.length * 16;
-  return blks;
-}
-
-/*  
-   * External interface  
-   */
-function md5(str) {return binl2hex(coreMD5(str2binl(str)));}
-function hexMD5w(str) {return binl2hex(coreMD5(strw2binl(str)));}
-function b64MD5(str) {return binl2b64(coreMD5(str2binl(str)));}
-function b64MD5w(str) {return binl2b64(coreMD5(strw2binl(str)));}
-/* Backward compatibility */
-function calcMD5(str) {return binl2hex(coreMD5(str2binl(str)));}
-module.exports = md5;
 
 /***/ }),
 
@@ -22484,9 +21402,9 @@ module.exports = md5;
 /***/ }),
 
 /***/ 45:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/colorGradient.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/colorGradient.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22628,9 +21546,9 @@ function colorToRgba(color, alpha) {
 /***/ }),
 
 /***/ 46:
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/test.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/test.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22926,9 +21844,9 @@ function regExp(o) {
 /***/ }),
 
 /***/ 47:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/debounce.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/debounce.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22966,9 +21884,9 @@ debounce;exports.default = _default;
 /***/ }),
 
 /***/ 48:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/throttle.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/throttle.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23007,9 +21925,9 @@ throttle;exports.default = _default;
 /***/ }),
 
 /***/ 49:
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/index.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/index.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23723,9 +22641,9 @@ function setConfig(_ref3)
 /***/ }),
 
 /***/ 5:
-/*!*************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/pages.json ***!
-  \*************************************************/
+/*!*********************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/pages.json ***!
+  \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -23734,9 +22652,9 @@ function setConfig(_ref3)
 /***/ }),
 
 /***/ 50:
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/digit.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/digit.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23910,9 +22828,9 @@ function enableBoundaryChecking() {var flag = arguments.length > 0 && arguments[
 /***/ }),
 
 /***/ 51:
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/config.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/config.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23954,9 +22872,9 @@ if (true) {
 /***/ }),
 
 /***/ 52:
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24154,9 +23072,9 @@ _upload.default);exports.default = _default;
 /***/ }),
 
 /***/ 53:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/actionSheet.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/actionSheet.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24188,9 +23106,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 54:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/album.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/album.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24222,9 +23140,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 55:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/alert.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/alert.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24253,9 +23171,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 56:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24290,9 +23208,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 57:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatarGroup.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatarGroup.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24322,9 +23240,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 58:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/backtop.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/backtop.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24357,9 +23275,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 59:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/badge.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/badge.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24393,9 +23311,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 60:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/button.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/button.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24444,9 +23362,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 61:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/calendar.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/calendar.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24495,9 +23413,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 62:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/carKeyboard.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/carKeyboard.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24519,9 +23437,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 63:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cell.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cell.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24563,9 +23481,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 64:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cellGroup.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cellGroup.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24589,9 +23507,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 65:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkbox.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkbox.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24625,9 +23543,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 66:
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkboxGroup.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkboxGroup.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24663,9 +23581,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 67:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/circleProgress.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/circleProgress.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24687,9 +23605,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 68:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/code.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/code.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24717,9 +23635,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 69:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/codeInput.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/codeInput.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24754,9 +23672,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 70:
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/col.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/col.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24782,9 +23700,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 71:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapse.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapse.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24808,9 +23726,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 72:
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapseItem.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapseItem.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24842,9 +23760,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 726:
-/*!******************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/mescroll-uni/mescroll-uni.js ***!
-  \******************************************************************************/
+/*!**************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/mescroll-uni/mescroll-uni.js ***!
+  \**************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25719,9 +24637,9 @@ MeScroll.prototype.setBounce = function (isBounce) {
 /***/ }),
 
 /***/ 727:
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/mescroll-uni/mescroll-uni-option.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/mescroll-uni/mescroll-uni-option.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25764,9 +24682,9 @@ GlobalOption;exports.default = _default;
 /***/ }),
 
 /***/ 73:
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/columnNotice.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/columnNotice.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25797,9 +24715,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 74:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countDown.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countDown.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25824,9 +24742,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 740:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-input/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-input/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26015,9 +24933,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 748:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-line-progress/props.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-line-progress/props.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26052,9 +24970,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 75:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countTo.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countTo.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26086,9 +25004,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 76:
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/datetimePicker.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/datetimePicker.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26131,9 +25049,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 77:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/divider.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/divider.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26162,9 +25080,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 777:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-search/props.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-search/props.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26289,9 +25207,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 78:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/empty.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/empty.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26322,43 +25240,10 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 
-/***/ 785:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-gap/props.js ***!
-  \**************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
-  props: {
-    // 背景颜色（默认transparent）
-    bgColor: {
-      type: String,
-      default: uni.$u.props.gap.bgColor },
-
-    // 分割槽高度，单位px（默认30）
-    height: {
-      type: [String, Number],
-      default: uni.$u.props.gap.height },
-
-    // 与上一个组件的距离
-    marginTop: {
-      type: [String, Number],
-      default: uni.$u.props.gap.marginTop },
-
-    // 与下一个组件的距离
-    marginBottom: {
-      type: [String, Number],
-      default: uni.$u.props.gap.marginBottom } } };exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
-
-/***/ }),
-
 /***/ 79:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/form.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/form.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26387,9 +25272,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 793:
-/*!****************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/componentConfig.js ***!
-  \****************************************************************/
+/*!************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/componentConfig.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26474,9 +25359,9 @@ var platform = uni.getSystemInfoSync().platform;var _default =
 /***/ }),
 
 /***/ 80:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/formItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/formItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26505,9 +25390,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 81:
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gap.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gap.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26533,9 +25418,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 82:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/grid.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/grid.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26559,9 +25444,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 83:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gridItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gridItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26583,769 +25468,10 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 
-/***/ 836:
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/jyf-parser/libs/MpHtmlParser.js ***!
-  \*********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(uni) {function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}function _createClass(Constructor, protoProps, staticProps) {if (protoProps) _defineProperties(Constructor.prototype, protoProps);if (staticProps) _defineProperties(Constructor, staticProps);return Constructor;} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * html 解析器
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * @tutorial https://github.com/jin-yufeng/Parser
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * @version 20200513
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * @author JinYufeng
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * @listens MIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               */
-var cfg = __webpack_require__(/*! ./config.js */ 837),
-blankChar = cfg.blankChar,
-CssHandler = __webpack_require__(/*! ./CssHandler.js */ 838),
-windowWidth = uni.getSystemInfoSync().windowWidth;
-var emoji;var
-MpHtmlParser = /*#__PURE__*/function () {"use strict";
-  function MpHtmlParser(data) {var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};_classCallCheck(this, MpHtmlParser);
-    this.attrs = {};
-    this.CssHandler = new CssHandler(options.tagStyle, windowWidth);
-    this.data = data;
-    this.domain = options.domain;
-    this.DOM = [];
-    this.i = this.start = this.audioNum = this.imgNum = this.videoNum = 0;
-    options.prot = (this.domain || '').includes('://') ? this.domain.split('://')[0] : 'http';
-    this.options = options;
-    this.state = this.Text;
-    this.STACK = [];
-  }_createClass(MpHtmlParser, [{ key: "parse", value: function parse()
-    {
-      if (emoji) this.data = emoji.parseEmoji(this.data);
-      for (var c; c = this.data[this.i]; this.i++) {
-        this.state(c);}
-      if (this.state == this.Text) this.setText();
-      while (this.STACK.length) {this.popNode(this.STACK.pop());}
-      if (this.DOM.length) {
-        this.DOM[0].PoweredBy = 'Parser';
-        if (this.title) this.DOM[0].title = this.title;
-      }
-      return this.DOM;
-    }
-    // 设置属性
-  }, { key: "setAttr", value: function setAttr() {
-      var name = this.attrName.toLowerCase();
-      if (cfg.trustAttrs[name]) {
-        var val = this.attrVal;
-        if (val) {
-          if (name == 'src') this.attrs[name] = this.getUrl(this.decode(val, 'amp'));else
-          if (name == 'href' || name == 'style') this.attrs[name] = this.decode(val, 'amp');else
-          this.attrs[name] = val;
-        } else if (cfg.boolAttrs[name]) this.attrs[name] = 'T';
-      }
-      this.attrVal = '';
-      while (blankChar[this.data[this.i]]) {this.i++;}
-      if (this.isClose()) this.setNode();else
-      {
-        this.start = this.i;
-        this.state = this.AttrName;
-      }
-    }
-    // 设置文本节点
-  }, { key: "setText", value: function setText() {
-      var back,text = this.section();
-      if (!text) return;
-      text = cfg.onText && cfg.onText(text, function () {return back = true;}) || text;
-      if (back) {
-        this.data = this.data.substr(0, this.start) + text + this.data.substr(this.i);
-        var j = this.start + text.length;
-        for (this.i = this.start; this.i < j; this.i++) {this.state(this.data[this.i]);}
-        return;
-      }
-      if (!this.pre) {
-        // 合并空白符
-        var tmp = [];
-        for (var i = text.length, c; c = text[--i];) {
-          if (!blankChar[c] || !blankChar[tmp[0]] && (c = ' ')) tmp.unshift(c);}
-        text = tmp.join('');
-      }
-      this.siblings().push({
-        type: 'text',
-        text: this.decode(text) });
-
-    }
-    // 设置元素节点
-  }, { key: "setNode", value: function setNode() {
-      var node = {
-        name: this.tagName.toLowerCase(),
-        attrs: this.attrs },
-
-      close = cfg.selfClosingTags[node.name];
-      this.attrs = {};
-      if (!cfg.ignoreTags[node.name]) {
-        this.matchAttr(node);
-        if (!close) {
-          node.children = [];
-          if (node.name == 'pre' && cfg.highlight) {
-            this.remove(node);
-            this.pre = node.pre = true;
-          }
-          this.siblings().push(node);
-          this.STACK.push(node);
-        } else if (!cfg.filter || cfg.filter(node, this) != false)
-        this.siblings().push(node);
-      } else {
-        if (!close) this.remove(node);else
-        if (node.name == 'source') {
-          var parent = this.parent();
-          if (parent && (parent.name == 'video' || parent.name == 'audio') && node.attrs.src)
-          parent.attrs.source.push(node.attrs.src);
-        } else if (node.name == 'base' && !this.domain) this.domain = node.attrs.href;
-      }
-      if (this.data[this.i] == '/') this.i++;
-      this.start = this.i + 1;
-      this.state = this.Text;
-    }
-    // 移除标签
-  }, { key: "remove", value: function remove(node) {var _this = this;
-      var name = node.name,
-      j = this.i;
-      // 处理 svg
-      var handleSvg = function handleSvg() {
-        var src = _this.data.substring(j, _this.i + 1);
-        if (!node.attrs.xmlns) src = ' xmlns="http://www.w3.org/2000/svg"' + src;
-        var i = j;
-        while (_this.data[j] != '<') {j--;}
-        src = _this.data.substring(j, i) + src;
-        var parent = _this.parent();
-        if (node.attrs.width == '100%' && parent && (parent.attrs.style || '').includes('inline'))
-        parent.attrs.style = 'width:300px;max-width:100%;' + parent.attrs.style;
-        _this.siblings().push({
-          name: 'img',
-          attrs: {
-            src: 'data:image/svg+xml;utf8,' + src.replace(/#/g, '%23'),
-            ignore: 'T' } });
-
-
-      };
-      if (node.name == 'svg' && this.data[j] == '/') return handleSvg(this.i++);
-      while (1) {
-        if ((this.i = this.data.indexOf('</', this.i + 1)) == -1) {
-          if (name == 'pre' || name == 'svg') this.i = j;else
-          this.i = this.data.length;
-          return;
-        }
-        this.start = this.i += 2;
-        while (!blankChar[this.data[this.i]] && !this.isClose()) {this.i++;}
-        if (this.section().toLowerCase() == name) {
-          // 代码块高亮
-          if (name == 'pre') {
-            this.data = this.data.substr(0, j + 1) + cfg.highlight(this.data.substring(j + 1, this.i - 5), node.attrs) +
-            this.data.substr(this.i - 5);
-            return this.i = j;
-          } else if (name == 'style')
-          this.CssHandler.getStyle(this.data.substring(j + 1, this.i - 7));else
-          if (name == 'title')
-          this.title = this.data.substring(j + 1, this.i - 7);
-          if ((this.i = this.data.indexOf('>', this.i)) == -1) this.i = this.data.length;
-          if (name == 'svg') handleSvg();
-          return;
-        }
-      }
-    }
-    // 处理属性
-  }, { key: "matchAttr", value: function matchAttr(node) {
-      var attrs = node.attrs,
-      style = this.CssHandler.match(node.name, attrs, node) + (attrs.style || ''),
-      styleObj = {};
-      if (attrs.id) {
-        if (this.options.compress & 1) attrs.id = void 0;else
-        if (this.options.useAnchor) this.bubble();
-      }
-      if (this.options.compress & 2 && attrs.class) attrs.class = void 0;
-      switch (node.name) {
-        case 'a':
-        case 'ad':
-          this.bubble();
-          break;
-
-
-
-
-
-
-        case 'font':
-          if (attrs.color) {
-            styleObj['color'] = attrs.color;
-            attrs.color = void 0;
-          }
-          if (attrs.face) {
-            styleObj['font-family'] = attrs.face;
-            attrs.face = void 0;
-          }
-          if (attrs.size) {
-            var size = parseInt(attrs.size);
-            if (size < 1) size = 1;else
-            if (size > 7) size = 7;
-            var map = ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'];
-            styleObj['font-size'] = map[size - 1];
-            attrs.size = void 0;
-          }
-          break;
-        case 'video':
-        case 'audio':
-          if (!attrs.id) attrs.id = node.name + ++this["".concat(node.name, "Num")];else
-          this["".concat(node.name, "Num")]++;
-          if (node.name == 'video') {
-            if (this.videoNum > 3)
-            node.lazyLoad = 1;
-            if (attrs.width) {
-              styleObj.width = parseFloat(attrs.width) + (attrs.width.includes('%') ? '%' : 'px');
-              attrs.width = void 0;
-            }
-            if (attrs.height) {
-              styleObj.height = parseFloat(attrs.height) + (attrs.height.includes('%') ? '%' : 'px');
-              attrs.height = void 0;
-            }
-          }
-          attrs.source = [];
-          if (attrs.src) attrs.source.push(attrs.src);
-          if (!attrs.controls && !attrs.autoplay)
-          console.warn("\u5B58\u5728\u6CA1\u6709 controls \u5C5E\u6027\u7684 ".concat(node.name, " \u6807\u7B7E\uFF0C\u53EF\u80FD\u5BFC\u81F4\u65E0\u6CD5\u64AD\u653E"), node);
-          this.bubble();
-          break;
-        case 'td':
-        case 'th':
-          if (attrs.colspan || attrs.rowspan)
-          for (var k = this.STACK.length, item; item = this.STACK[--k];) {
-            if (item.name == 'table') {
-              item.c = void 0;
-              break;
-            }}}
-
-      if (attrs.align) {
-        styleObj['text-align'] = attrs.align;
-        attrs.align = void 0;
-      }
-      // 压缩 style
-      var styles = style.split(';');
-      style = '';
-      for (var i = 0, len = styles.length; i < len; i++) {
-        var info = styles[i].split(':');
-        if (info.length < 2) continue;
-        var _key = info[0].trim().toLowerCase(),
-        _value = info.slice(1).join(':').trim();
-        if (_value.includes('-webkit') || _value.includes('-moz') || _value.includes('-ms') || _value.includes('-o') || _value.
-        includes(
-        'safe'))
-        style += ";".concat(_key, ":").concat(_value);else
-        if (!styleObj[_key] || _value.includes('import') || !styleObj[_key].includes('import'))
-        styleObj[_key] = _value;
-      }
-      if (node.name == 'img') {
-        if (attrs['data-src']) {
-          attrs.src = attrs.src || attrs['data-src'];
-          attrs['data-src'] = void 0;
-        }
-        if (attrs.src && !attrs.ignore) {
-          if (this.bubble())
-          attrs.i = (this.imgNum++).toString();else
-          attrs.ignore = 'T';
-        }
-        if (attrs.ignore) styleObj['max-width'] = '100%';
-        var width;
-        if (styleObj.width) width = styleObj.width;else
-        if (attrs.width) width = attrs.width.includes('%') ? attrs.width : attrs.width + 'px';
-        if (width) {
-          styleObj.width = width;
-          attrs.width = '100%';
-          if (parseInt(width) > windowWidth) {
-            styleObj.height = '';
-            if (attrs.height) attrs.height = void 0;
-          }
-        }
-        if (styleObj.height) {
-          attrs.height = styleObj.height;
-          styleObj.height = '';
-        } else if (attrs.height && !attrs.height.includes('%'))
-        attrs.height += 'px';
-      }
-      for (var key in styleObj) {
-        var value = styleObj[key];
-        if (key.includes('flex') || key == 'order' || key == 'self-align') node.c = 1;
-        // 填充链接
-        if (value.includes('url')) {
-          var j = value.indexOf('(');
-          if (j++ != -1) {
-            while (value[j] == '"' || value[j] == "'" || blankChar[value[j]]) {j++;}
-            value = value.substr(0, j) + this.getUrl(value.substr(j));
-          }
-        }
-        // 转换 rpx
-        else if (value.includes('rpx'))
-          value = value.replace(/[0-9.]+\s*rpx/g, function ($) {return parseFloat($) * windowWidth / 750 + 'px';});else
-          if (key == 'white-space' && value.includes('pre'))
-          this.pre = node.pre = true;
-        style += ";".concat(key, ":").concat(value);
-      }
-      style = style.substr(1);
-      if (style) attrs.style = style;
-    }
-    // 节点出栈处理
-  }, { key: "popNode", value: function popNode(node) {
-      // 空白符处理
-      if (node.pre) {
-        node.pre = this.pre = void 0;
-        for (var i = this.STACK.length; i--;) {
-          if (this.STACK[i].pre)
-          this.pre = true;}
-      }
-      var siblings = this.siblings(),
-      len = siblings.length,
-      childs = node.children;
-      if (node.name == 'head' || cfg.filter && cfg.filter(node, this) == false)
-      return siblings.pop();
-      var attrs = node.attrs;
-      // 替换一些标签名
-      if (cfg.blockTags[node.name]) node.name = 'div';else
-      if (!cfg.trustTags[node.name]) node.name = 'span';
-      // 去除块标签前后空串
-      if (node.name == 'div' || node.name == 'p' || node.name[0] == 't') {
-        if (len > 1 && siblings[len - 2].text == ' ')
-        siblings.splice(--len - 1, 1);
-        if (childs.length && childs[childs.length - 1].text == ' ')
-        childs.pop();
-      }
-      // 处理列表
-      if (node.c && (node.name == 'ul' || node.name == 'ol')) {
-        if ((node.attrs.style || '').includes('list-style:none')) {
-          for (var _i = 0, child; child = childs[_i++];) {
-            if (child.name == 'li')
-            child.name = 'div';}
-        } else if (node.name == 'ul') {
-          var floor = 1;
-          for (var _i2 = this.STACK.length; _i2--;) {
-            if (this.STACK[_i2].name == 'ul') floor++;}
-          if (floor != 1)
-          for (var _i3 = childs.length; _i3--;) {
-            childs[_i3].floor = floor;}
-        } else {
-          for (var _i4 = 0, num = 1, _child; _child = childs[_i4++];) {
-            if (_child.name == 'li') {
-              _child.type = 'ol';
-              _child.num = function (num, type) {
-                if (type == 'a') return String.fromCharCode(97 + (num - 1) % 26);
-                if (type == 'A') return String.fromCharCode(65 + (num - 1) % 26);
-                if (type == 'i' || type == 'I') {
-                  num = (num - 1) % 99 + 1;
-                  var one = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'],
-                  ten = ['X', 'XX', 'XXX', 'XL', 'L', 'LX', 'LXX', 'LXXX', 'XC'],
-                  res = (ten[Math.floor(num / 10) - 1] || '') + (one[num % 10 - 1] || '');
-                  if (type == 'i') return res.toLowerCase();
-                  return res;
-                }
-                return num;
-              }(num++, attrs.type) + '.';
-            }}
-        }
-      }
-      // 处理表格的边框
-      if (node.name == 'table') {
-        var padding = attrs.cellpadding,
-        spacing = attrs.cellspacing,
-        border = attrs.border;
-        if (node.c) {
-          this.bubble();
-          if (!padding) padding = 2;
-          if (!spacing) spacing = 2;
-        }
-        if (border) attrs.style = "border:".concat(border, "px solid gray;").concat(attrs.style || '');
-        if (spacing) attrs.style = "border-spacing:".concat(spacing, "px;").concat(attrs.style || '');
-        if (border || padding)
-        (function f(ns) {
-          for (var i = 0, n; n = ns[i]; i++) {
-            if (n.name == 'th' || n.name == 'td') {
-              if (border) n.attrs.style = "border:".concat(border, "px solid gray;").concat(n.attrs.style);
-              if (padding) n.attrs.style = "padding:".concat(padding, "px;").concat(n.attrs.style);
-            } else f(n.children || []);
-          }
-        })(childs);
-        if (this.options.autoscroll) {
-          var table = Object.assign({}, node);
-          node.name = 'div';
-          node.attrs = {
-            style: 'overflow:scroll' };
-
-          node.children = [table];
-        }
-      }
-      this.CssHandler.pop && this.CssHandler.pop(node);
-      // 自动压缩
-      if (node.name == 'div' && !Object.keys(attrs).length && childs.length == 1 && childs[0].name == 'div')
-      siblings[len - 1] = childs[0];
-    }
-    // 工具函数
-  }, { key: "bubble", value: function bubble() {
-      for (var i = this.STACK.length, item; item = this.STACK[--i];) {
-        if (cfg.richOnlyTags[item.name]) {
-          if (item.name == 'table' && !Object.hasOwnProperty.call(item, 'c')) item.c = 1;
-          return false;
-        }
-        item.c = 1;
-      }
-      return true;
-    } }, { key: "decode", value: function decode(
-    val, amp) {
-      var i = -1,
-      j,en;
-      while (1) {
-        if ((i = val.indexOf('&', i + 1)) == -1) break;
-        if ((j = val.indexOf(';', i + 2)) == -1) break;
-        if (val[i + 1] == '#') {
-          en = parseInt((val[i + 2] == 'x' ? '0' : '') + val.substring(i + 2, j));
-          if (!isNaN(en)) val = val.substr(0, i) + String.fromCharCode(en) + val.substr(j + 1);
-        } else {
-          en = val.substring(i + 1, j);
-          if (cfg.entities[en] || en == amp)
-          val = val.substr(0, i) + (cfg.entities[en] || '&') + val.substr(j + 1);
-        }
-      }
-      return val;
-    } }, { key: "getUrl", value: function getUrl(
-    url) {
-      if (url[0] == '/') {
-        if (url[1] == '/') url = this.options.prot + ':' + url;else
-        if (this.domain) url = this.domain + url;
-      } else if (this.domain && url.indexOf('data:') != 0 && !url.includes('://'))
-      url = this.domain + '/' + url;
-      return url;
-    } }, { key: "isClose", value: function isClose()
-    {
-      return this.data[this.i] == '>' || this.data[this.i] == '/' && this.data[this.i + 1] == '>';
-    } }, { key: "section", value: function section()
-    {
-      return this.data.substring(this.start, this.i);
-    } }, { key: "parent", value: function parent()
-    {
-      return this.STACK[this.STACK.length - 1];
-    } }, { key: "siblings", value: function siblings()
-    {
-      return this.STACK.length ? this.parent().children : this.DOM;
-    }
-    // 状态机
-  }, { key: "Text", value: function Text(c) {
-      if (c == '<') {
-        var next = this.data[this.i + 1],
-        isLetter = function isLetter(c) {return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';};
-        if (isLetter(next)) {
-          this.setText();
-          this.start = this.i + 1;
-          this.state = this.TagName;
-        } else if (next == '/') {
-          this.setText();
-          if (isLetter(this.data[++this.i + 1])) {
-            this.start = this.i + 1;
-            this.state = this.EndTag;
-          } else
-          this.Comment();
-        } else if (next == '!') {
-          this.setText();
-          this.Comment();
-        }
-      }
-    } }, { key: "Comment", value: function Comment()
-    {
-      var key;
-      if (this.data.substring(this.i + 2, this.i + 4) == '--') key = '-->';else
-      if (this.data.substring(this.i + 2, this.i + 9) == '[CDATA[') key = ']]>';else
-      key = '>';
-      if ((this.i = this.data.indexOf(key, this.i + 2)) == -1) this.i = this.data.length;else
-      this.i += key.length - 1;
-      this.start = this.i + 1;
-      this.state = this.Text;
-    } }, { key: "TagName", value: function TagName(
-    c) {
-      if (blankChar[c]) {
-        this.tagName = this.section();
-        while (blankChar[this.data[this.i]]) {this.i++;}
-        if (this.isClose()) this.setNode();else
-        {
-          this.start = this.i;
-          this.state = this.AttrName;
-        }
-      } else if (this.isClose()) {
-        this.tagName = this.section();
-        this.setNode();
-      }
-    } }, { key: "AttrName", value: function AttrName(
-    c) {
-      var blank = blankChar[c];
-      if (blank) {
-        this.attrName = this.section();
-        c = this.data[this.i];
-      }
-      if (c == '=') {
-        if (!blank) this.attrName = this.section();
-        while (blankChar[this.data[++this.i]]) {;}
-        this.start = this.i--;
-        this.state = this.AttrValue;
-      } else if (blank) this.setAttr();else
-      if (this.isClose()) {
-        this.attrName = this.section();
-        this.setAttr();
-      }
-    } }, { key: "AttrValue", value: function AttrValue(
-    c) {
-      if (c == '"' || c == "'") {
-        this.start++;
-        if ((this.i = this.data.indexOf(c, this.i + 1)) == -1) return this.i = this.data.length;
-        this.attrVal = this.section();
-        this.i++;
-      } else {
-        for (; !blankChar[this.data[this.i]] && !this.isClose(); this.i++) {;}
-        this.attrVal = this.section();
-      }
-      this.setAttr();
-    } }, { key: "EndTag", value: function EndTag(
-    c) {
-      if (blankChar[c] || c == '>' || c == '/') {
-        var name = this.section().toLowerCase();
-        for (var i = this.STACK.length; i--;) {
-          if (this.STACK[i].name == name) break;}
-        if (i != -1) {
-          var node;
-          while ((node = this.STACK.pop()).name != name) {;}
-          this.popNode(node);
-        } else if (name == 'p' || name == 'br')
-        this.siblings().push({
-          name: name,
-          attrs: {} });
-
-        this.i = this.data.indexOf('>', this.i);
-        this.start = this.i + 1;
-        if (this.i == -1) this.i = this.data.length;else
-        this.state = this.Text;
-      }
-    } }]);return MpHtmlParser;}();
-
-module.exports = MpHtmlParser;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
-
-/***/ }),
-
-/***/ 837:
-/*!***************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/jyf-parser/libs/config.js ***!
-  \***************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/* 配置文件 */
-
-var canIUse = wx.canIUse('editor'); // 高基础库标识，用于兼容
-
-module.exports = {
-  // 过滤器函数
-  filter: null,
-  // 代码高亮函数
-  highlight: null,
-  // 文本处理函数
-  onText: null,
-  // 实体编码列表
-  entities: {
-    quot: '"',
-    apos: "'",
-    semi: ';',
-    nbsp: '\xA0',
-    ensp: "\u2002",
-    emsp: "\u2003",
-    ndash: '–',
-    mdash: '—',
-    middot: '·',
-    lsquo: '‘',
-    rsquo: '’',
-    ldquo: '“',
-    rdquo: '”',
-    bull: '•',
-    hellip: '…' },
-
-  blankChar: makeMap(' ,\xA0,\t,\r,\n,\f'),
-  // 块级标签，将被转为 div
-  blockTags: makeMap('address,article,aside,body,caption,center,cite,footer,header,html,nav,section' + (
-
-  canIUse ? '' :
-
-  ',pre')),
-  // 将被移除的标签
-  ignoreTags: makeMap(
-  'area,base,basefont,canvas,command,frame,input,isindex,keygen,link,map,meta,param,script,source,style,svg,textarea,title,track,use,wbr' + (
-
-  canIUse ? ',rp' : '') +
-
-
-  ',embed,iframe'),
-
-
-  // 只能被 rich-text 显示的标签
-  richOnlyTags: makeMap('a,colgroup,fieldset,legend,picture,table' + (
-
-  canIUse ? ',bdi,bdo,caption,rt,ruby' : '')),
-
-
-  // 自闭合的标签
-  selfClosingTags: makeMap(
-  'area,base,basefont,br,col,circle,ellipse,embed,frame,hr,img,input,isindex,keygen,line,link,meta,param,path,polygon,rect,source,track,use,wbr'),
-
-  // 信任的属性
-  trustAttrs: makeMap(
-  'align,alt,app-id,author,autoplay,border,cellpadding,cellspacing,class,color,colspan,controls,data-src,dir,face,height,href,id,ignore,loop,media,muted,name,path,poster,rowspan,size,span,src,start,style,type,unit-id,width,xmlns'),
-
-  // bool 型的属性
-  boolAttrs: makeMap('autoplay,controls,ignore,loop,muted'),
-  // 信任的标签
-  trustTags: makeMap(
-  'a,abbr,ad,audio,b,blockquote,br,code,col,colgroup,dd,del,dl,dt,div,em,fieldset,h1,h2,h3,h4,h5,h6,hr,i,img,ins,label,legend,li,ol,p,q,source,span,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,title,ul,video' + (
-
-  canIUse ? ',bdi,bdo,caption,pre,rt,ruby' : '')),
-
-
-
-
-
-  // 默认的标签样式
-  userAgentStyles: {
-    address: 'font-style:italic',
-    big: 'display:inline;font-size:1.2em',
-    blockquote: 'background-color:#ffffff;border-left:3px solid #dbdbdb;color:#6c6c6c;padding:5px 0 5px 10px',
-    caption: 'display:table-caption;text-align:center',
-    center: 'text-align:center',
-    cite: 'font-style:italic',
-    dd: 'margin-left:40px',
-    mark: 'background-color:yellow',
-    pre: 'font-family:monospace;white-space:pre;overflow:scroll',
-    s: 'text-decoration:line-through',
-    small: 'display:inline;font-size:0.8em',
-    u: 'text-decoration:underline' } };
-
-
-
-function makeMap(str) {
-  var map = {},
-  list = str.split(',');
-  for (var i = list.length; i--;) {
-    map[list[i]] = true;}
-  return map;
-}
-
-/***/ }),
-
-/***/ 838:
-/*!*******************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/jyf-parser/libs/CssHandler.js ***!
-  \*******************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}function _createClass(Constructor, protoProps, staticProps) {if (protoProps) _defineProperties(Constructor.prototype, protoProps);if (staticProps) _defineProperties(Constructor, staticProps);return Constructor;}var cfg = __webpack_require__(/*! ./config.js */ 837),
-isLetter = function isLetter(c) {return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';};var
-CssHandler = /*#__PURE__*/function () {"use strict";
-  function CssHandler(tagStyle) {_classCallCheck(this, CssHandler);
-    var styles = Object.assign({}, cfg.userAgentStyles);
-    for (var item in tagStyle) {
-      styles[item] = (styles[item] ? styles[item] + ';' : '') + tagStyle[item];}
-    this.styles = styles;
-  }_createClass(CssHandler, [{ key: "getStyle", value: function getStyle(
-    data) {
-      this.styles = new CssParser(data, this.styles).parse();
-    } }, { key: "match", value: function match(
-    name, attrs) {
-      var tmp,matched = (tmp = this.styles[name]) ? tmp + ';' : '';
-      if (attrs.class) {
-        var items = attrs.class.split(' ');
-        for (var i = 0, item; item = items[i]; i++) {
-          if (tmp = this.styles['.' + item])
-          matched += tmp + ';';}
-      }
-      if (tmp = this.styles['#' + attrs.id])
-      matched += tmp + ';';
-      return matched;
-    } }]);return CssHandler;}();
-
-module.exports = CssHandler;var
-CssParser = /*#__PURE__*/function () {"use strict";
-  function CssParser(data, init) {_classCallCheck(this, CssParser);
-    this.data = data;
-    this.floor = 0;
-    this.i = 0;
-    this.list = [];
-    this.res = init;
-    this.state = this.Space;
-  }_createClass(CssParser, [{ key: "parse", value: function parse()
-    {
-      for (var c; c = this.data[this.i]; this.i++) {
-        this.state(c);}
-      return this.res;
-    } }, { key: "section", value: function section()
-    {
-      return this.data.substring(this.start, this.i);
-    }
-    // 状态机
-  }, { key: "Space", value: function Space(c) {
-      if (c == '.' || c == '#' || isLetter(c)) {
-        this.start = this.i;
-        this.state = this.Name;
-      } else if (c == '/' && this.data[this.i + 1] == '*')
-      this.Comment();else
-      if (!cfg.blankChar[c] && c != ';')
-      this.state = this.Ignore;
-    } }, { key: "Comment", value: function Comment()
-    {
-      this.i = this.data.indexOf('*/', this.i) + 1;
-      if (!this.i) this.i = this.data.length;
-      this.state = this.Space;
-    } }, { key: "Ignore", value: function Ignore(
-    c) {
-      if (c == '{') this.floor++;else
-      if (c == '}' && ! --this.floor) this.state = this.Space;
-    } }, { key: "Name", value: function Name(
-    c) {
-      if (cfg.blankChar[c]) {
-        this.list.push(this.section());
-        this.state = this.NameSpace;
-      } else if (c == '{') {
-        this.list.push(this.section());
-        this.Content();
-      } else if (c == ',') {
-        this.list.push(this.section());
-        this.Comma();
-      } else if (!isLetter(c) && (c < '0' || c > '9') && c != '-' && c != '_')
-      this.state = this.Ignore;
-    } }, { key: "NameSpace", value: function NameSpace(
-    c) {
-      if (c == '{') this.Content();else
-      if (c == ',') this.Comma();else
-      if (!cfg.blankChar[c]) this.state = this.Ignore;
-    } }, { key: "Comma", value: function Comma()
-    {
-      while (cfg.blankChar[this.data[++this.i]]) {;}
-      if (this.data[this.i] == '{') this.Content();else
-      {
-        this.start = this.i--;
-        this.state = this.Name;
-      }
-    } }, { key: "Content", value: function Content()
-    {
-      this.start = ++this.i;
-      if ((this.i = this.data.indexOf('}', this.i)) == -1) this.i = this.data.length;
-      var content = this.section();
-      for (var i = 0, item; item = this.list[i++];) {
-        if (this.res[item]) this.res[item] += ';' + content;else
-        this.res[item] = content;}
-      this.list = [];
-      this.state = this.Space;
-    } }]);return CssParser;}();
-
-/***/ }),
-
 /***/ 84:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/icon.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/icon.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27388,9 +25514,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 /***/ }),
 
 /***/ 85:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/image.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/image.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27427,9 +25553,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 86:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexAnchor.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexAnchor.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27455,9 +25581,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 867:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-text/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-text/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27574,9 +25700,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 87:
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexList.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexList.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27602,9 +25728,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 873:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-popup/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-popup/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27690,9 +25816,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 88:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/input.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/input.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27747,9 +25873,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 881:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-tag/props.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-tag/props.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27840,9 +25966,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 89:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/keyboard.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/keyboard.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27879,9 +26005,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 894:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-image/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-image/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27972,9 +26098,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 9:
-/*!*****************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/index.js ***!
-  \*****************************************************/
+/*!*************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/index.js ***!
+  \*************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28001,9 +26127,9 @@ store;exports.default = _default;
 /***/ }),
 
 /***/ 90:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/line.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/line.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28030,9 +26156,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 900:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-list/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-list/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28116,9 +26242,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 908:
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-list-item/props.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-list-item/props.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28134,9 +26260,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 91:
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/lineProgress.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/lineProgress.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28162,9 +26288,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 916:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-cell/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-cell/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28281,9 +26407,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 92:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/link.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/link.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28316,9 +26442,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 /***/ }),
 
 /***/ 924:
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-navbar/props.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-navbar/props.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28409,9 +26535,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 /***/ }),
 
 /***/ 93:
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/list.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/list.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28446,9 +26572,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 932:
-/*!*******************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/cu-editor/util.js ***!
-  \*******************************************************************/
+/*!***************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/cu-editor/util.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28471,9 +26597,9 @@ var handleHtmlImage = function handleHtmlImage() {var html = arguments.length > 
 /***/ }),
 
 /***/ 94:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/listItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/listItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28495,9 +26621,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 95:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingIcon.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingIcon.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28534,9 +26660,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 /***/ }),
 
 /***/ 952:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-overlay/props.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-overlay/props.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28567,9 +26693,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 /***/ }),
 
 /***/ 96:
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingPage.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingPage.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28598,9 +26724,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 97:
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadmore.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadmore.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28636,9 +26762,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 98:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/modal.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/modal.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28675,9 +26801,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 988:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-icon/icons.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-icon/icons.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28899,9 +27025,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 989:
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-icon/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-icon/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -28997,9 +27123,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ }),
 
 /***/ 99:
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/navbar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/navbar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
