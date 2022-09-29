@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "弹窗输入框",
-  "usingComponents": {
-    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
-    "public-module": "/components/public-module/public-module",
-    "z-prompt": "/uni_modules/z-prompt/components/z-prompt/z-prompt"
-  }
-}

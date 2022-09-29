@@ -1,1 +1,0 @@
-<view data-event-opts="{{[['tap',[['play',['$event']]]]]}}" class="{{['bg','data-v-70193150',audioPlay?'voicePlay':'']}}" bindtap="__e"></view>

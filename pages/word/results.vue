@@ -100,15 +100,19 @@
           style="padding: 30rpx 40rpx;"
         >
           <view style="display: flex;">
-            <u-button
-              style="width:auto"
-              class="custom-style"
-              type="primary"
-              text="英"
-              icon="static/word/word"
-              size="mini"
-              shape="circle"
-            ></u-button>
+            <view
+              class="padding-xs text-xs flex-start text-white"
+              style="background: #667efb; margin: 10rpx;border-radius:24rpx; "
+              @click="wordExampleIsPlay != wordExampleIsPlay"
+            >
+              <view class="margin-right-xs">英</view>
+              <play-words
+                ref="playExample"
+                play-id="wordExampleLink"
+                :audio-play.sync="wordExampleIsPlay"
+                :audio-link="wordExampleLink"
+              ></play-words>
+            </view>
 
             <view
               class="word-text-light-1"

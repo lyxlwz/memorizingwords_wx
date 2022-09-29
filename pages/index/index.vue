@@ -3,7 +3,7 @@
 	<view class="wordPageSty">
 		<view class="hpage">
 			<view class="search">
-				<view @click="search" 
+				<view @click="tosearch" 
 				style="background: white;border-radius: 20upx;padding: 20rpx;">
 					<u--input 
 					shape="square" 
@@ -18,7 +18,7 @@
 					@confirm="confirmInput">
 					
 							<template slot="suffix">
-								<view class="word-text-middle-1"  @click="close" style="font-size: 30rpx;">
+								<view class="word-text-middle-1" style="font-size: 30rpx;">
 									取消
 								</view> 
 							</template>
@@ -54,7 +54,8 @@
 						</view>
 					</view>
 				</view>
-				<view class="Proverbs margin-top-lg flex-row" :style="{'background':bgColor}">
+				
+					<view class="Proverbs margin-top-lg flex-row" :style="{'background':bgColor}">
 					<view>
 						<view class="big "
 							style="font-weight: 800;font-size: 130%;color: #4d5156; padding-bottom: 10px;">
@@ -64,8 +65,10 @@
 							{{text}}
 						</view>
 					</view>
-					<img :src="imgUrl" alt="" width="120rpx" height="120rpx" style="border-radius:50%">
+					<img :src="imgUrl" alt=""  style="border-radius:50%; height: 80%; width: 80%;">
 				</view>
+				
+				
 
 			</view>
 
@@ -153,9 +156,9 @@
 				});
 			},
 			getData() {},
-			search() {
+			tosearch() {
 				this.pop = true;
-			}
+			},
 		}
 	}
 </script>
@@ -220,7 +223,8 @@
 			.Proverbs {
 				box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 				border-radius: 20upx;
-				padding: 20px 20px;
+				padding: 40rpx 40rpx;
+				height: 400rpx;
 			}
 		}
 	}

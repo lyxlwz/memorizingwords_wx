@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "案例2",
-  "usingComponents": {
-    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar"
-  }
-}

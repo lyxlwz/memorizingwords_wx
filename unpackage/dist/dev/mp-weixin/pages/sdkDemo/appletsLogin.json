@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "小程序登录",
-  "usingComponents": {
-    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
-    "public-module": "/components/public-module/public-module"
-  }
-}

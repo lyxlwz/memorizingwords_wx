@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "u-line-progress": "/node-modules/uview-ui/components/u-line-progress/u-line-progress",
-    "random-box": "/pages/number/components/randomBox"
-  },
-  "component": true
-}

@@ -1,1 +1,0 @@
-<view class="circlePage data-v-ff36e7cc"><view class="wrap data-v-ff36e7cc"><canvas class="progress data-v-ff36e7cc" style="{{'height:'+(width+'rpx')+';'+('width:'+(width+'rpx')+';')}}" canvas-id="{{canvasId}}"></canvas><canvas style="{{'height:'+(width+'rpx')+';'+('width:'+(width+'rpx')+';')}}" canvas-id="{{canvasId+'_p'}}" class="data-v-ff36e7cc"></canvas></view></view>

@@ -11,12 +11,12 @@
         >
           <view
             class="image"
-            style="padding: 35rpx; 40rpx"
+            style="padding: 30rpx; 40rpx;"
           >
-            <img
+            <image
               :src="require(`static/image/image${index}.png`)"
-              width="70rpx"
-              height="70rpx"
+			  style="height: 130rpx;width: 130rpx;"
+              
             >
           </view>
           <view>
