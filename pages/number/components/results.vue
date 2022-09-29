@@ -101,7 +101,7 @@ export default {
 <style lang='scss' scoped>
 .num-results {
   background: #3d5cff;
-  height: 100vh;
+  height: 90vh;
   .accTraining {
     background: #fff;
     color: #000;

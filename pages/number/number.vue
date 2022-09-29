@@ -1,42 +1,56 @@
 <template>
   <view class="number">
-    <view
-      class="fbl "
-      style="padding: 300rpx 120rpx; "
+    <u-navbar
+      bgColor="#3d5cff"
+      color="#cbcdce"
+      leftIconColor="#cbcdce"
+      :autoBack="true"
     >
-      <view class="text flex_x_center word-text-border">
-        数字背诵训练
-      </view>
+    </u-navbar>
+    <view v-if="!isShowNumTrain">
       <view
-        class="input flex_x_center"
-        style="padding-top: 150rpx; "
+        class="fbl "
+        style="padding: 300rpx 120rpx; "
       >
-        <view
-          class=" word-Border-radius"
-          style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx"
-        >
-          <u--input
-            border="none"
-            fontSize="40rpx"
-            inputAlign="center"
-            color="#CBCDCE"
-          ></u--input>
+        <view class="text flex_x_center word-text-border">
+          数字背诵训练
         </view>
-      </view>
-      <view
-        class=" flex_x_center"
-        style="padding-top: 80rpx  ;"
-      >
-        <!--iconColor="#627bff" <button type="primary" iconColor="#3d5cff"  style="width: 55%;" @click="yes"  shape="circle">开始筛查</button> -->
         <view
-          class="word-text-border but"
-          style="font-size: 30rpx; padding: 10rpx 40rpx; border-radius: 50upx;"
-          @click="toTrain"
+          class="input flex_x_center"
+          style="padding-top: 150rpx; "
         >
-          开始训练
+          <view
+            class=" word-Border-radius"
+            style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx"
+          >
+            <u--input
+              border="none"
+              fontSize="40rpx"
+              inputAlign="center"
+              color="#CBCDCE"
+            ></u--input>
+          </view>
+        </view>
+        <view
+          class=" flex_x_center"
+          style="padding-top: 80rpx  ;"
+        >
+          <!--iconColor="#627bff" <button type="primary" iconColor="#3d5cff"  style="width: 55%;" @click="yes"  shape="circle">开始筛查</button> -->
+          <view
+            class="word-text-border but"
+            style="font-size: 30rpx; padding: 20rpx 40rpx; border-radius: 50upx;"
+            @click="isShowNumTrain = true"
+          >
+            开始训练
+          </view>
         </view>
       </view>
     </view>
+
+    <num-train
+      v-else
+      style="position: relative;top:88rpx;"
+    ></num-train>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
     <z-navigation></z-navigation>
@@ -44,18 +58,16 @@
 </template>
 
 <script>
+import numTrain from './components/numTrain.vue';
 export default {
+  components: { numTrain },
   data() {
     return {
       isShowNumTrain: false,
     }
   },
   methods: {
-    toTrain() {
-      uni.navigateTo({
-        url: '/pages/number/numTrain'
-      });
-    },
+
   }
 }
 </script>

@@ -90,7 +90,7 @@ export default {
 <style lang='scss' scoped>
 .number-train {
   background: #3d5cff;
-  height: 100vh;
+  height: 90vh;
   .num-btn {
     padding-top: 400rpx;
     .btn {

@@ -446,13 +446,6 @@
       }
     },
     {
-      "path": "pages/number/numTrain",
-      "style": {
-        "navigationBarTitleText": "",
-        "enablePullDownRefresh": false
-      }
-    },
-    {
       "path": "pages/search/search",
       "style": {
         "navigationBarTitleText": "",

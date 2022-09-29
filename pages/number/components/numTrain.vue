@@ -5,16 +5,12 @@
       v-else
       @submit="submit"
     />
-
-    <!-- 公共组件-每个页面必须引入 -->
-    <public-module></public-module>
-    <z-navigation></z-navigation>
   </view>
 </template>
 
 <script>
-import trainProcess from './components/process'
-import trainResults from './components/results.vue'
+import trainProcess from './process'
+import trainResults from './results'
 export default {
   name: 'numTrain',
   components: { trainProcess, trainResults },
