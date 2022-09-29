@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "模板",
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
+    "public-module": "/components/public-module/public-module",
+    "z-navigation": "/components/z-navigation/z-navigation"
+  }
+}

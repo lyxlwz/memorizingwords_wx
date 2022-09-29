@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "train-process": "/pages/number/components/process",
+    "train-results": "/pages/number/components/results"
+  }
+}

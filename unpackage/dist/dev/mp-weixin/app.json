@@ -66,7 +66,6 @@
     "pages/word/scre",
     "pages/account/account",
     "pages/number/number",
-    "pages/number/numTrain",
     "pages/search/search"
   ],
   "subPackages": [],

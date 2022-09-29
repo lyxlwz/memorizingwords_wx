@@ -17,7 +17,7 @@
       >
        <view 
        style="background: white;border-radius: 20upx;padding: 20rpx;">
-       	<u--input 
+       	<u-input 
        	shape="square" 
        	placeholder="请输入要查询的单词" 
        	placeholderStyle="font-size: 40rpx;"
@@ -36,7 +36,7 @@
        					取消
        				</view> 
        			</template>
-       	</u--input>
+       	</u-input>
        </view>
         <view style="padding: 30rpx; 20rpx">
           <view class="test-w-b word-text-border">

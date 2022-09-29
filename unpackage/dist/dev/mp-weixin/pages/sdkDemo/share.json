@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "分享（APP、小程序、公众号支持）",
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
+    "public-module": "/components/public-module/public-module"
+  }
+}

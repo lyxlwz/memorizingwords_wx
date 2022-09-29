@@ -20,7 +20,7 @@
     <view class="search">
       <view class="inp">
 
-        <u--input
+        <u-input
           shape="square"
           placeholder=""
           clearable
@@ -148,13 +148,14 @@
                 <view
                   class="butt"
                   style="display: flex;
-			  padding: 20rpx 80rpx;
+			  padding: 2rpx 50rpx;
 			  margin: auto;
 			  justify-content: space-between;"
                 >
                   <button
                     type="primary"
                     plain=true
+					iconColor="#3d5cff"
                     style="width: 40%;"
                     @click="no"
                   >取消</button>
@@ -162,7 +163,7 @@
                     type="primary"
                     iconColor="#3d5cff"
                     size="large"
-                    style="width: 55%;"
+                    style="width: 55%; background: #3d5cff;"
                     @click="yes"
                   >确定</button>
                 </view>
@@ -178,7 +179,7 @@
             ></u--image>
           </template>
 
-        </u--input>
+        </u-input>
       </view>
     </view>
 
@@ -453,30 +454,33 @@ export default {
   //   margin-right: 20px;
   //   padding: 20rpx;
   // }
-
+::v-deep.u-tag--square{margin:20rpx}
   .u-page__tag-item {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
-    justify-content: center;
+    // justify-content: center;
+	
     .tag-item {
       width: 25%;
       margin-right: 5%;
       margin-top: 2%;
       display: flex;
       align-items: center;
+	  
     }
   }
   .u-page__tag-item-i {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
-    margin-left: 4%;
+    
     .atag-item {
       width: 25%;
       margin-right: 5%;
 
       margin-top: 2%;
+	  
       // display: flex;
       align-items: center;
     }
@@ -485,12 +489,11 @@ export default {
     width: 100%;
     padding: 20rpx;
     flex-wrap: wrap;
-    margin-left: 4%;
+    
     .yatag-item {
       width: 25%;
       margin-right: 5%;
-
-      margin-top: 2%;
+      
       // display: flex;
       // align-items: center;
     }

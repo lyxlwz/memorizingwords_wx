@@ -15,8 +15,10 @@
       >
         Account
       </view>
-      <view class="img flex_x_center padding-top-sm">
-        <img src="static/word/img.png">
+      <view class="flex_x_center padding-top-sm">
+        <!-- <image src="static/word/img.png" >
+			</image> -->
+			<image src="../../static/word/img.png" style="height: 200rpx;width: 200rpx;"></image>
       </view>
       <view
         class="flex_bet test-w-b text-xl padding-top-lg  margin-top-lg"

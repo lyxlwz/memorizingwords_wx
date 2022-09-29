@@ -1,6 +1,7 @@
 <template>
   <view class="text-lg padding num-results">
-    <view class="word-Border-radius accTraining padding text-bold">
+	  <view style="padding-top: 50rpx;">
+	  	<view class="word-Border-radius accTraining padding text-bold">
       <view class="word-text-light text-sm">数字训练准确率<span>10%</span></view>
       <view class="text-xl margin-tb-xs">01:13''12</view>
       <u-line-progress
@@ -10,6 +11,8 @@
         activeColor="#f59b22"
       />
     </view>
+	  </view>
+    
 
     <view class="checkAnswers">
       <view class="flex justify-between text-sm  align-center">

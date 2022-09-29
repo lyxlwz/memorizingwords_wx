@@ -243,7 +243,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .screen {
-  height: 100vh;
+  height: 120vh;
   background: #3d5cff;
   .title {
     margin: auto;

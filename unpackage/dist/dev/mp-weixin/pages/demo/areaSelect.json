@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "地区选择",
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar",
+    "public-module": "/components/public-module/public-module",
+    "z-address": "/uni_modules/z-address/components/z-address/z-address",
+    "z-address-popup": "/uni_modules/z-address-popup/components/z-address-popup/z-address-popup"
+  }
+}

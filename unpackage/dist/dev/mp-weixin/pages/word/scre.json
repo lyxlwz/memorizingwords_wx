@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "u-navbar": "/node-modules/uview-ui/components/u-navbar/u-navbar",
+    "public-module": "/components/public-module/public-module",
+    "z-navigation": "/components/z-navigation/z-navigation",
+    "play-words": "/pages/word/components/playWords"
+  }
+}

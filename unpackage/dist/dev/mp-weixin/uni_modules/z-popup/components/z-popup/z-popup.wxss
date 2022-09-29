@@ -1,0 +1,67 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.popup_view.data-v-58ef7c25 {
+  position: fixed;
+  z-index: 500;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+}
+.popup_view_bottom.data-v-58ef7c25 {
+  align-items: flex-end;
+  justify-content: center;
+}
+.popup_view_top.data-v-58ef7c25 {
+  align-items: flex-start;
+  justify-content: center;
+}
+.popup_view_center.data-v-58ef7c25 {
+  align-items: center;
+  justify-content: center;
+}
+/*遮罩层*/
+.popup_mask.data-v-58ef7c25 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.popup_container.data-v-58ef7c25 {
+  max-width: 100vw;
+  max-height: 100vh;
+  min-height: 50rpx;
+  transition: all 0.4s;
+  z-index: 2;
+  z-index: 501;
+  opacity: 0;
+  font-size: 28rpx;
+  position: relative;
+}
+.popup_container_bottom.data-v-58ef7c25 {
+  -webkit-transform: translateY(100%);
+          transform: translateY(100%);
+  width: 750rpx;
+}
+.popup_container_top.data-v-58ef7c25 {
+  -webkit-transform: translateY(-100%);
+          transform: translateY(-100%);
+  width: 750rpx;
+}
+

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "头部导航示例",
+  "usingComponents": {
+    "z-nav-bar": "/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar"
+  }
+}

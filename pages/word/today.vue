@@ -277,7 +277,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .today {
-  height: 100vh;
+  height: 120vh;
   background: #3d5cff;
   .all {
     margin: auto;

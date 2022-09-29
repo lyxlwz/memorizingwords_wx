@@ -5,7 +5,7 @@
 			<view class="search">
 				<view @click="tosearch" 
 				style="background: white;border-radius: 20upx;padding: 20rpx;">
-					<u--input 
+					<u-input 
 					shape="square" 
 					placeholder="请输入要查询的单词" 
 					placeholderStyle="font-size: 40rpx;"
@@ -22,7 +22,7 @@
 									取消
 								</view> 
 							</template>
-					</u--input>
+					</u-input>
 				</view>
 
 				<view class="tobe" @click="tobe">
@@ -65,7 +65,7 @@
 							{{text}}
 						</view>
 					</view>
-					<img :src="imgUrl" alt=""  style="border-radius:50%; height: 80%; width: 80%;">
+					<img :src="imgUrl" alt=""  style="border-radius:50%; height: 90%; width: 60%;">
 				</view>
 				
 				
@@ -224,7 +224,7 @@
 				box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 				border-radius: 20upx;
 				padding: 40rpx 40rpx;
-				height: 400rpx;
+				height: 300rpx;
 			}
 		}
 	}
