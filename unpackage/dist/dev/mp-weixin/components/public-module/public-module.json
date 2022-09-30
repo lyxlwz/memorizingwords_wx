@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "z-loading": "/uni_modules/z-loading/components/z-loading/z-loading",
-    "applets-bind-user-info": "/components/applets-bind-userInfo/applets-bind-userInfo"
-  }
-}

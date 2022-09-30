@@ -10,7 +10,7 @@
       </u-navbar>
     </view>
     <view class="all">
-      <view class="title test-w-b">resort</view>
+      <view class="title test-w-b">{{wordObj.word}}</view>
       <view
         class="flex "
         style="padding-top: 10rpx;"
@@ -22,32 +22,19 @@
         <!--  -->
         <!-- <play-words></play-words> -->
         <!--  -->
-        <view class="word-text-light-1" style="padding-left: 5rpx;">/ rɪˈzɔːrt /</view>
       </view>
       <view
         class="translate padding-top-lg"
         style="display: flex;"
       >
-        <view class="noun word-text-light-1">
-          n.
-        </view>
         <view
           class="ntranslate word-text-border"
           style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
         >
-          度假胜地 采用的方法
+          {{wordObj.paraphrase}}
         </view>
       </view>
-      <view style="display: flex;padding-top: 10rpx;">
-        <view class="word-text-light-1">
-          vi.
-        </view>
-        <view
-          class="word-text-border"
-          style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
-        >
-          诉诸，采取
-        </view>
+    
       </view>
       <!-- 联想 -->
       <view style="padding-top: 80rpx;">
@@ -55,34 +42,22 @@
           class="association word-Border-radius"
           style="padding: 30rpx 40rpx"
         >
-          <!-- <view
-            class="word-text-light-1"
-            style="font-size: 30rpx;"
+          <view
+            class="word_content"
+            v-if="!isEditorMind"
           >
-            热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
-          </view> -->
+            <u-parse :content="wordObj.connect_in_the_mind"></u-parse>
+          </view>
           <cu-editor
-            ref="editor"
-            :content="content"
-            @save="onSave"
+            v-else
+            ref="wordEditor"
+            :content="wordObj.connect_in_the_mind"
           ></cu-editor>
-          <!-- <view class="word-text-light-1" style="height: 80rpx;font-size: 30rpx;">
-      		  		<u--input
-      		  		  shape="square"
-      		  		  height="60rpx"
-      		  		  border="none"
-      				  color="#CBCDCE"
-      		  		  @confirm="confirmInput"
-      						  		>
-      		  		  <template slot="prefix">
-      					  <text>
-      					  	<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>
-      		  		    </text>
-      		  		  </template>
-      				  </u--input>
-      		  	</view> -->
-      
-          <view class="bycorenr margin-top-sm flex_x_right">
+        
+          <view
+            class="bycorenr margin-top-sm flex_x_right"
+            @touchend="dbClickMind"
+          >
             <view
               class="word-text-border word-Border-radius Corner"
               style="font-size: 30rpx; padding: 10rpx 42rpx"
@@ -90,7 +65,7 @@
               联想
             </view>
           </view>
-      
+        
         </view>
       </view>
       <!-- 例句 -->
@@ -101,34 +76,13 @@
         >
           <view style="display: flex;">
             <view
-              class="padding-xs text-xs flex-start text-white"
-              style="background: #667efb; margin: 10rpx;border-radius:24rpx; "
-              @click="wordExampleIsPlay != wordExampleIsPlay"
-            >
-              <view class="margin-right-xs">英</view>
-              <play-words
-                ref="playExample"
-                play-id="wordExampleLink"
-                :audio-play.sync="wordExampleIsPlay"
-                :audio-link="wordExampleLink"
-              ></play-words>
-            </view>
-
-            <view
               class="word-text-light-1"
-              style="font-size: 30rpx; padding-left:20rpx"
+              style="font-size: 30rpx;"
             >
-              This place is just so charming, the perfect winter resort.
+              {{wordObj.example}}
             </view>
           </view>
-
-          <view
-            class="word-text-light-1"
-            style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx"
-          >
-            这个地方实在是太好啦，完美的冬季旅游胜地！
-          </view>
-
+        
           <view class=" margin-top-sm flex_x_right">
             <view
               class="word-text-border word-Border-radius expl"
@@ -137,10 +91,10 @@
               例句
             </view>
           </view>
-
+        
         </view>
 
-      </view>
+      
 
     </view>
 
@@ -155,12 +109,45 @@ import playWords from './components/playWords'
 export default {
   data() {
     return {
-		content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
+		// content: '<p>热（<span style="color: rgb(225, 60, 57);">re</span>）瘦（<span style="color: rgb(225, 60, 57);">s</span>）的鸡蛋（<span style="color: rgb(225, 60, 57);">o</span>）热（<span style="color: rgb(225, 60, 57);">r</span>）的头（<span style="color: rgb(225, 60, 57);">t</span>）疼</p><p></p>',
+		wordObj: {
+		  word: "",
+		  paraphrase: "",
+		  connect_in_the_mind: "",
+		  example: "",
+		  group_id: "",
+		  study_date: "",
+		  first_study_date: "",
+		  word_voice: ""
+		},
+		isEditorMind: false,
     }
+  },
+  onLoad(option){
+	  console.log(option.name)
   },
   components: { playWords },
   methods: {
-
+	  resapi(){
+		  this.$http.get('/WordSystem/wordData',
+		    {word_id:2},
+		    {
+		      header: { //默认 无 说明：请求头
+		        // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+		      }
+		    }).then(res => {
+		  				this.wordObj = res
+		  			})
+	  },
+	  dbClickMind() {
+	    this.touchNumMind++
+	    setTimeout(() => {
+	      if (this.touchNumMind >= 2) {
+	        this.isEditorMind = true
+	      }
+	      this.touchNumMind = 0
+	    }, 250)
+	  },
   }
 }
 </script>
@@ -189,6 +176,10 @@ export default {
         // height: 60rpx;
         background: #627bff;
         width: 150rpx;
+      }
+      ::v-deep.word_content {
+        color: #cbcdce;
+        font-size: 30rpx;
       }
     }
     .exp {

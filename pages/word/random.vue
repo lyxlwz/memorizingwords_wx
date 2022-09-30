@@ -19,7 +19,7 @@
 				    border="none"
 					fontSize="40rpx"
 					inputAlign="center"
-					placeholder="20"
+		
 					color="#CBCDCE"
 					v-model="keyword"
 				  ></u--input>
@@ -45,7 +45,7 @@
 	export default {
 		data() {
 			return {
-				keyword:'',
+				keyword:'20',
 			}
 		},
 		methods: {
@@ -57,14 +57,17 @@
 				      'Content-Type': 'multipart/form-data; charset=UTF-8'
 				    }
 				  }).then(data =>{
-					  console.log("请求成功")
+					  
+					  //这里返回的是一个数组，参考todaya.vue界面，我先暂时写个例子，具体逻辑有问题我到时候来写
+					  uni.navigateTo({
+					  	url: `/pages/word/scre?word_id=${data[0]}&type=2`
+						
+					  });
+					  // console.log("请求成功")
 				  
 				  })
 				  }
-			// yes(){
-			// 	uni.navigateTo({
-			// 		url: '/pages/word/scre'
-			// 	});
+			
 			
 		}
 	}

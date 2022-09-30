@@ -107,9 +107,9 @@ export default {
 		  });
 		      
 	},
-	word(){
+	word(word){
 		uni.navigateTo({
-		  url: '/pages/word/results'
+		  url: `/pages/word/results?name=${word}`
 		});
 	}
   }

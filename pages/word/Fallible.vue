@@ -19,8 +19,9 @@
 				    border="none"
 					fontSize="40rpx"
 					inputAlign="center"
-					placeholder="20"
+					
 					color="#CBCDCE"
+					v-model="keyword"
 				  ></u--input>
 				</view>
 			</view>
@@ -44,14 +45,36 @@
 	export default {
 		data() {
 			return {
-				
+				keyword:'20',
+				idlist:[],
 			}
 		},
 		methods: {
 			yes(){
-				uni.navigateTo({
-					url: '/pages/word/scre'
-				});
+				
+					this.$http.get('/WordLearn/errorProneWordScreening',
+					  { count: this.keyword },
+					  {
+					    header: { //默认 无 说明：请求头
+					      // 'Content-Type': 'multipart/form-data; charset=UTF-8'
+					    }
+					  }).then(data =>{
+						  // uni.navigateTo({
+						  // 	url: `/pages/word/scre?word_id=${data[0]}&type=3`
+						  						
+						  // });
+					  // this.$router.push({
+						 //  path:'/pages/word/scre',
+						 //  query:{
+							//   idlist: data.temp_word_list,
+							//   type:3
+						 //  }
+					  // })
+					  })
+					  
+				// uni.navigateTo({
+				// 	url: '/pages/word/scre'
+				// });
 			}
 		}
 	}

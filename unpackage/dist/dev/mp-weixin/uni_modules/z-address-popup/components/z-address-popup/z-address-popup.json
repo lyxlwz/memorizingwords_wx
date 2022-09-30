@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "z-popup": "/uni_modules/z-popup/components/z-popup/z-popup",
-    "z-address": "/uni_modules/z-address/components/z-address/z-address"
-  }
-}

@@ -10,7 +10,7 @@
       >
         <view slot="right">
           <view style="font-size: 30rpx; color:#cbcdce;">
-            学习日期：2022年9月5日
+            学习日期：{{wordObj.study_date}}
           </view>
         </view>
       </u-navbar>
@@ -30,7 +30,7 @@
       </view>
     </view>
 
-    <view class="title test-w-b">resort</view>
+    <view class="title test-w-b">{{wordObj.word}}</view>
     <view
       class="flex "
       style="padding-top: 10rpx; padding-left: 40rpx;"
@@ -53,27 +53,14 @@
           class="translate padding-top-lg"
           style="display: flex;"
         >
-          <view class="noun word-text-light-1">
-            n.
-          </view>
           <view
             class="ntranslate word-text-border"
             style="font-size: 30rpx; padding-left: 20rpx; "
           >
-            度假胜地 采用的方法
+            {{wordObj.paraphrase}}
           </view>
         </view>
-        <view style="display: flex;padding-top: 10rpx;">
-          <view class="word-text-light-1">
-            vi.
-          </view>
-          <view
-            class="word-text-border"
-            style="font-size: 30rpx; padding-left: 20rpx;"
-          >
-            诉诸，采取
-          </view>
-        </view>
+		
         <!-- 联想 -->
         <view style="padding-top: 80rpx;">
           <view
@@ -81,12 +68,21 @@
             style="padding: 30rpx 40rpx"
           >
             <view
-              class="word-text-light-1"
-              style="font-size: 30rpx;"
+              class="word_content"
+              v-if="!isEditorMind"
             >
-              热（re）瘦（s）的鸡蛋（o）热（r）的头（t）疼
+              <u-parse :content="wordObj.connect_in_the_mind"></u-parse>
             </view>
-            <view class="bycorenr margin-top-sm flex_x_right">
+            <cu-editor
+              v-else
+              ref="wordEditor"
+              :content="wordObj.connect_in_the_mind"
+            ></cu-editor>
+          
+            <view
+              class="bycorenr margin-top-sm flex_x_right"
+              @touchend="dbClickMind"
+            >
               <view
                 class="word-text-border word-Border-radius Corner"
                 style="font-size: 30rpx; padding: 10rpx 42rpx"
@@ -94,7 +90,7 @@
                 联想
               </view>
             </view>
-
+          
           </view>
         </view>
         <!-- 例句 -->
@@ -104,22 +100,14 @@
             style="padding: 30rpx 40rpx;"
           >
             <view style="display: flex;">
-
               <view
                 class="word-text-light-1"
-                style="font-size: 30rpx; padding-left:20rpx"
+                style="font-size: 30rpx;"
               >
-                This place is just so charming, the perfect winter resort.
+                {{wordObj.example}}
               </view>
             </view>
-
-            <view
-              class="word-text-light-1"
-              style="font-size: 30rpx; padding-left:110rpx;padding-top:20rpx"
-            >
-              这个地方实在是太好啦，完美的冬季旅游胜地！
-            </view>
-
+          
             <view class=" margin-top-sm flex_x_right">
               <view
                 class="word-text-border word-Border-radius expl"
@@ -128,7 +116,7 @@
                 例句
               </view>
             </view>
-
+          
           </view>
 
         </view>
@@ -139,18 +127,18 @@
         >
           <view
             class="tab-t word-text-border "
-            style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;"
-            @click="tabt"
+            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+            @click="lastWord"
           >
-            不记得
+            {{firstLoad ? '不记得' : '上一词'}}
           </view>
 
           <view
             class="tab-b word-text-border "
-            style="font-size: 40rpx; padding: 10rpx 42rpx; border-radius: 50upx;"
-            @click="tabb"
+            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+            @click="nextWord"
           >
-            下一词
+            {{lastLoad ? '开始筛查' :'下一词'}}
           </view>
         </view>
 
@@ -198,35 +186,153 @@
 
 <script>
 import playWords from './components/playWords'
+import cuEditor from '@/components/cu-editor/cu-editor'
+import { mapState, mapMutations } from 'vuex';
+import base from '@/config/baseUrl';
 export default {
   data() {
     return {
-      aaa: false,
-	  bbb: true,
-    }
+      day: new Date().format("yyyy-MM-dd"),
+      wordIsPlay: false,
+      wordObj: {
+        id: 201,
+        word: "",
+        paraphrase: "",
+        connect_in_the_mind: "",
+        example: "",
+        group_id: "",
+        study_date: "",
+        first_study_date: "",
+        word_voice: ""
+      },
+      touchNumWord: 0,
+      isEditorWord: false,
+      touchNumMind: 0,
+      isEditorMind: false,
+      firstLoad: false,
+      lastLoad: false,
+	  bbb : true,
+	  aaa : false,
+	  count: 0
+		  }
   },
-  components: { playWords },
+  onLoad() {
+    this.screapi()
+  },
+  onShow() {
+
+  },
+  onUnLoad() {
+    this.$refs.playWords.destroyAudio()
+    this.$refs.playExample.destroyAudio()
+  },
+  components: { playWords, cuEditor },
+  computed: {
+    ...mapState(['wordList', 'wordId'])
+  },
   methods: {
-	  screapi(){
-		  
-	  },
-    top() {
-      console.log("上一词")
-    },
-    down() {
-      console.log("下一词")
-    },
-    look() {
-      this.aaa = ! this.aaa,
-	  this.bbb = ! this.bbb
+    ...mapMutations(['setWordList', 'setWordId']),
+    blue() {
 
     },
-    tabt() {
-      console.log("不记得")
+	look(){
+		this.aaa =!this.aaa,
+		this.bbb =! this.bbb
+	},
+    // todayWordList() {
+    //   this.$http.get('/WordLearn/todayWordScreening',
+    //     {
+    //       date: '2022-10-23',
+    //     }).then(res => {
+    //       this.setWordList(res.temp_word_list)
+    //       this.setWordId(res.temp_word_list[0])
+    //       this.todayWord(this.wordId)
+    //       this.firstLoad = true
+    //     })
+    // },
+	screapi(){
+		this.$http.get('/WordLearn/wordScreening',
+		    {
+		      date: '2022-10-23',
+			  type: 2,
+			  word_id: 2,
+			  error_count:this.count
+		    }).then(res => {
+		      // this.setWordList(res.temp_word_list)
+		      // this.setWordId(res.temp_word_list[0])
+		      // this.todayWord(this.wordId)
+		      // this.firstLoad = true
+		    })
+	},
+    todayWord(word_id) {
+      this.firstLoad = this.wordList[0] == this.wordId
+      this.lastLoad = this.wordId == this.wordList[this.wordList.length - 1]
+      this.$http.get('/WordSystem/wordData',
+        { word_id }).then(res => {
+          this.wordObj = res
+          this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
+          this.$nextTick(() => {
+            this.$refs.playWords.creatAudio()
+          })
+        })
     },
-    tabb() {
-      console.log("下一词")
-    }
+    onSave() {
+      console.log('富文本编辑器保存');
+    },
+    dbClickWord() {
+      this.touchNumWord++
+      setTimeout(() => {
+        if (this.touchNumWord >= 2) {
+          this.isEditorWord = true
+        }
+        this.touchNumWord = 0
+      }, 250)
+    },
+    dbClickMind() {
+      this.touchNumMind++
+      setTimeout(() => {
+        if (this.touchNumMind >= 2) {
+          this.isEditorMind = true
+        }
+        this.touchNumMind = 0
+      }, 250)
+    },
+
+    lastWord() {
+      if (this.firstLoad) {
+        uni.navigateBack();
+      } else {
+        const wordId = (parseFloat(this.wordId) - 1).toString()
+        this.toNewWord(wordId)
+      }
+    },
+    nextWord() {
+      if (this.lastLoad) {
+        uni.navigateTo({
+          url: '/pages/word/scre'
+        })
+      } else {
+        const wordId = (parseFloat(this.wordId) + 1).toString()
+        this.toNewWord(wordId)
+      }
+    },
+    toNewWord(wordId) {
+      if (this.isEditorMind || this.isEditorWord) {
+        this.$http.post('/WordSystem/wordUpdate',
+          { ...this.wordObj, first_study_date: this.day, wordid: this.wordObj.id }).then(res => {
+            // todo
+            console.log(res, 55555555);
+            // this.wordObj = res
+            // this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
+            // this.$nextTick(() => {
+            //   this.$refs.playWords.creatAudio()
+            // })
+          })
+      } else {
+        this.setWordId(wordId)
+        this.todayWord(wordId)
+      }
+    },
   }
 }
 </script>
@@ -262,6 +368,10 @@ export default {
         background: #627bff;
         width: 150rpx;
       }
+	  ::v-deep.word_content {
+	    color: #cbcdce;
+	    font-size: 30rpx;
+	  }
     }
     .exp {
       // height: 320rpx;
