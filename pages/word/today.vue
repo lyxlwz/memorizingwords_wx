@@ -7,16 +7,17 @@
       leftIconColor="#cbcdce"
       :autoBack="true"
     >
-      <view slot="right">
-        <view style="font-size: 30rpx; color:#cbcdce;">
-          学习日期：{{wordObj.study_date}}
-        </view>
-      </view>
     </u-navbar>
-    <view style="position: relative;top: 20px;">
+    <view style="position: relative;top: 30rpx;">
       <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
         <view
           class="word-text-light-1 flex_x_right"
+          style="font-size: 30rpx;"
+        >
+          学习日期：{{wordObj.study_date}}
+        </view>
+        <view
+          class="word-text-light-1 flex_x_right padding-top-sm"
           style="font-size: 30rpx;"
         >
           分组序号
@@ -92,7 +93,6 @@
               v-else
               ref="wordEditor"
               :content="wordObj.connect_in_the_mind"
-              @save="onSave"
             ></cu-editor>
 
             <view
@@ -143,7 +143,7 @@
         >
           <view
             class="tab-t word-text-border "
-            style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
+            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
             @click="lastWord"
           >
             {{firstLoad ? '不记得' : '上一词'}}
@@ -151,10 +151,10 @@
 
           <view
             class="tab-b word-text-border "
-            style="font-size: 40rpx; padding: 20rpx 48rpx; border-radius: 50upx;"
+            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
             @click="nextWord"
           >
-            {{lastLoad ? '已学习完成' :'下一词'}}
+            {{lastLoad ? '开始筛查' :'下一词'}}
           </view>
         </view>
 
@@ -262,21 +262,38 @@ export default {
 
     lastWord() {
       if (this.firstLoad) {
-        uni.navigateBack({
-          delta: 1,//返回层数，2则上上页
-        })
+        uni.navigateBack();
       } else {
         const wordId = (parseFloat(this.wordId) - 1).toString()
         this.toNewWord(wordId)
       }
     },
     nextWord() {
-      const wordId = (parseFloat(this.wordId) + 1).toString()
-      this.toNewWord(wordId)
+      if (this.lastLoad) {
+        uni.navigateTo({
+          url: '/pages/word/scre'
+        })
+      } else {
+        const wordId = (parseFloat(this.wordId) + 1).toString()
+        this.toNewWord(wordId)
+      }
     },
     toNewWord(wordId) {
-      this.setWordId(wordId)
-      this.todayWord(wordId)
+      if (this.isEditorMind || this.isEditorWord) {
+        this.$http.post('/WordSystem/wordUpdate',
+          { ...this.wordObj, first_study_date: this.day, wordid: this.wordObj.id }).then(res => {
+            // todo
+            console.log(res, 55555555);
+            // this.wordObj = res
+            // this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
+            // this.$nextTick(() => {
+            //   this.$refs.playWords.creatAudio()
+            // })
+          })
+      } else {
+        this.setWordId(wordId)
+        this.todayWord(wordId)
+      }
     },
   }
 }
@@ -284,6 +301,7 @@ export default {
 <style lang="scss" scoped>
 .today {
   background: #3d5cff;
+  height: 100vh;
   .all {
     margin: auto;
     width: 90%;
