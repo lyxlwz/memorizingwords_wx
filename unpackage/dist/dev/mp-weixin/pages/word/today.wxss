@@ -1,0 +1,55 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.today.data-v-00fdd196 {
+  background: #3d5cff;
+  height: 100vh;
+}
+.today .all.data-v-00fdd196 {
+  margin: auto;
+  width: 90%;
+}
+.today .all .title.data-v-00fdd196 {
+  color: white;
+  font-size: 100rpx;
+  font-weight: 200%;
+}
+.today .all .title .custom-style.data-v-00fdd196 {
+  width: 50rpx;
+}
+.today .all .association.data-v-00fdd196 {
+  background: #506cff;
+}
+.today .all .association .Corner.data-v-00fdd196 {
+  background: #627bff;
+  width: 150rpx;
+}
+.today .all .association.data-v-00fdd196 .word_content {
+  color: #cbcdce;
+  font-size: 30rpx;
+}
+.today .all .exp.data-v-00fdd196 {
+  background: #506cff;
+}
+.today .all .exp .expl.data-v-00fdd196 {
+  background: #627bff;
+  width: 150rpx;
+}
+.today .all .tab-t.data-v-00fdd196 {
+  background: #627bff;
+}
+.today .all .tab-b.data-v-00fdd196 {
+  background: #627bff;
+}
+

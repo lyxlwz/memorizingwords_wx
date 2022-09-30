@@ -22,7 +22,7 @@
     <random-box
       ref="randomBox"
       :remember="remember"
-      :random-number="datas.random_number"
+      :random-number="number"
     />
 
     <div class="flex_x_center num-btn">
@@ -51,7 +51,11 @@ export default {
   name: 'numTrain',
   components: { randomBox },
   mixins: [],
-  props: {},
+  props: {
+	  number: Number,
+	  data: String,
+	  id: Number
+  },
   data() {
     return {
       datas: {},
@@ -69,19 +73,23 @@ export default {
     getData() {
       const data = {
         'id': 11,
-        'date': '16:45:42.000000',
-        'random_number': '31814410535809040085',
+        'date': this.data,
+        'random_number': this.number,
         'upload_number': null,
         'amount_error': null,
         'accuracy': null,
-        'digital_number': 20,
+        'digital_number': this.id,
         'time_spent': null
       }
       this.datas = data
     },
     submit() {
+		//这里是更新的数字就是第三个页面，他记住数字之后要提交的这个玩意
       this.datas.upload_number = this.$refs.randomBox.numList.join('')
       this.$emit('submit', true)
+	  this.$emit('update:number', false)
+	  this.$emit('update:data', false)
+	  this.$emit('update:id', false)
     }
   }
 }

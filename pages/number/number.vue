@@ -28,6 +28,7 @@
               fontSize="40rpx"
               inputAlign="center"
               color="#CBCDCE"
+			  v-model="keyword"
             ></u--input>
           </view>
         </view>
@@ -39,7 +40,7 @@
           <view
             class="word-text-border but"
             style="font-size: 30rpx; padding: 20rpx 40rpx; border-radius: 50upx;"
-            @click="isShowNumTrain = true"
+            @click="numberapi"
           >
             开始训练
           </view>
@@ -50,6 +51,9 @@
     <num-train
       v-else
       style="position: relative;top:88rpx;"
+	  :id.sync = "id"
+	  :data.sync = "data"
+	  :number.sync = "number"
     ></num-train>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
@@ -64,10 +68,33 @@ export default {
   data() {
     return {
       isShowNumTrain: false,
+	  keyword:'20',
+	  id:'',
+	  data:'',
+	  number:'',
     }
   },
+ //  onLoad() {
+ //  	this.numberapi()
+	
+ //  },
   methods: {
-
+	  numberapi(){
+		  this.isShowNumTrain = true
+		  this.$http.get('/MemoryTraining/numberMemoryTraining',
+		    { digital_number: this.keyword },
+		    {
+		      header: { //默认 无 说明：请求头
+		        // 'Content-Type': 'multipart/form-data; charset=UTF-8'
+		      }
+		    }).then(data =>{
+		  	  this.id = data.id,
+			  this.data = data.data,
+			  this.number = data.random_number
+			  // console.log(this.id,this.data,this.number)
+		    })
+			
+	  }
   }
 }
 </script>

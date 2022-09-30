@@ -1,0 +1,57 @@
+@charset "UTF-8";
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.screen.data-v-ae2fef82 {
+  height: 120vh;
+  background: #3d5cff;
+}
+.screen .title.data-v-ae2fef82 {
+  margin: auto;
+  width: 90%;
+  color: white;
+  font-size: 100rpx;
+  font-weight: 200%;
+}
+.screen .title .custom-style.data-v-ae2fef82 {
+  margin: auto;
+}
+.screen .all.data-v-ae2fef82 {
+  margin: auto;
+  width: 90%;
+}
+.screen .all .association.data-v-ae2fef82 {
+  background: #506cff;
+}
+.screen .all .association .Corner.data-v-ae2fef82 {
+  background: #627bff;
+  width: 150rpx;
+}
+.screen .all .association.data-v-ae2fef82 .word_content {
+  color: #cbcdce;
+  font-size: 30rpx;
+}
+.screen .all .exp.data-v-ae2fef82 {
+  background: #506cff;
+}
+.screen .all .exp .expl.data-v-ae2fef82 {
+  background: #627bff;
+  width: 150rpx;
+}
+.screen .all .tab-t.data-v-ae2fef82 {
+  background: #627bff;
+}
+.screen .all .tab-b.data-v-ae2fef82 {
+  background: #627bff;
+}
+

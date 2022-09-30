@@ -164,19 +164,19 @@
 </script>
 <style lang="scss" scoped>
 	.hpage {
-		height: 360rpx;
+		height: 450rpx;
 		background: #3d5cff;
 
 		.search {
 			margin: auto;
-			padding-top: 90rpx;
+			padding-top: 170rpx;
 			width: 90%;
-			height: 42px;
+			height: 500rpx;
 
 			.tobe {
 				margin-top: 80rpx;
 				// padding-top:30px;
-				padding: 18rpx;
+				padding: 20rpx;
 				background: #ffff;
 				border-radius: 20upx;
 				box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);

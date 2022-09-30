@@ -7,11 +7,11 @@
     <public-module></public-module>
     <view
       class="bg"
-      style="height: 90rpx;background: #3d5cff;"
+      style="height: 150rpx;background: #3d5cff;"
     >
       <view
         class="text"
-        style="color: white;font-weight: 200%;padding-top: 20rpx;"
+        style="color: white;font-weight: 200%;padding-top: 80rpx;"
       >
         单词管理
       </view>
@@ -24,6 +24,7 @@
           shape="square"
           placeholder=""
           clearable
+		  fontSize="32rpx"
           placeholderStyle="color:#3d5cff"
           height="90rpx"
           border="none"
@@ -34,11 +35,12 @@
           <template slot="prefix">
             <u--text
               prefixIcon="search"
-              iconStyle="font-size: 44rpx;color: #d7d7d7"
+              iconStyle="font-size: 50rpx;color: #d7d7d7"
               text="今日单词学习:"
               slot="prefix"
               margin="0 3px 0 0"
               bold
+			  size="32rpx"
               color="#3753E5"
             ></u--text>
           </template>
@@ -201,14 +203,14 @@
               slot="title"
               class="flex word-text-middle-1 margin-right-lg"
             >
-              <view class="margin-right-lg">{{item.first_study_date}}</view>
-              <view>{{item.word}}</view>
+              <view class="margin-right-lg " style="font-size: 30rpx;">{{item.first_study_date}}</view>
+              <view class="" style="font-size: 30rpx;">{{item.word}}</view>
             </view>
             <view
               slot="value"
               class="word-text-middle-1"
             >
-              <view class="text-right">{{item.paraphrase}}</view>
+              <view class="text-right " style="font-size: 30rpx;">{{item.paraphrase}}</view>
             </view>
           </u-cell>
         </u-list-item>

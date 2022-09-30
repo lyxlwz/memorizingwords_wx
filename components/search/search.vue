@@ -12,7 +12,7 @@
       <view
         class="search"
         style=" margin: auto;
-    padding-top: 90rpx;
+    padding-top: 170rpx;
     width: 90%;"
       >
        <view 

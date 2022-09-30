@@ -101,7 +101,10 @@ export default {
 
 <style lang="scss" scoped>
 .user {
-  //   height: 80rpx;
-  //   background: #3d5cff;
+    // height: 80rpx;
+    // background: #3d5cff;
+	// ::v-deep .header_content {
+ //     height: 10rpx;
+ //    } 
 }
 </style>
