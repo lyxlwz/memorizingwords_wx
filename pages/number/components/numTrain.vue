@@ -19,16 +19,19 @@ export default {
   components: { trainProcess, trainResults },
   mixins: [],
   props: {
-	  number: Number,
+	  number: {
+		 type: Number,
+		  default:0
+	  },
 	  data: String,
-	  id: Number
+	  id: String
   },
   data() {
     return {
       isResults: false,
 	  upload_number:'',
-	  upid:'',
-	  time_spent:''
+	  // upid:'',
+	  time_spent: '01:02:100'
     }
   },
 
@@ -40,16 +43,17 @@ export default {
 
   methods: {
     submit(val) {
-      this.isResults = val
+      this.isResults = val.isResults
 	  this.$emit('update:number', false)
 	  this.$emit('update:data', false)
 	  this.$emit('update:id', false)
+		console.log(this.upload_number,this.time_spent,val,'66666666666666666666')
 	  
-	  		  this.$http.get('/MemoryTraining/numberMemoryTraining',
+	  		  this.$http.post('/MemoryTraining/numberMemoryTraining',
 	  		    { 
-					upload_number:this.upload_number,
-					id:this.upid,
-					time_spent:this.time_spent
+					upload_number:val.upload_number,
+					id:this.id,
+					time_spent:'01:02:100'
 				},
 	  		    {
 	  		      header: { //默认 无 说明：请求头

@@ -86,7 +86,8 @@ export default {
     submit() {
 		//这里是更新的数字就是第三个页面，他记住数字之后要提交的这个玩意
       this.datas.upload_number = this.$refs.randomBox.numList.join('')
-      this.$emit('submit', true)
+	  this.$emit('submit',{isFinite:true, upload_number: this.datas.upload_number, time_spent:this.time_spent})
+      // this.$emit('submit', true)
 	  this.$emit('update:number', false)
 	  this.$emit('update:data', false)
 	  this.$emit('update:id', false)
