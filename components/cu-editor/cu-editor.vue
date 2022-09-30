@@ -626,7 +626,8 @@ export default {
       this.toolBarContentShow = false
       this.hideKeyboard()
     },
-    hideToolbar() {
+    hideToolbar(e) {
+      e.preventDefault();
       this.hideKeyboard()
       this.toolbarShow = false
     },
