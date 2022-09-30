@@ -81,6 +81,10 @@ export default {
       // show: true,
 	  indexList:[],
 	  boo:true,
+	  queryData: {
+	    count: 10,//单页数据条数
+	    page: 1,//页数
+	  },
       // indexList: [
       //   {
       //     name: "word",
@@ -94,8 +98,10 @@ export default {
       this.$emit('update:show', false)
     },
 	confirmInput(){
-		this.$http.post('/WordSystem/wordData',
-		  { word: this.keyword },
+		this.$http.get('/WordSystem/wordData',
+		  { word: this.keyword,
+		   ...this.queryData
+			},
 		  {
 		    header: { //默认 无 说明：请求头
 		      // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -103,7 +109,7 @@ export default {
 		  }).then(data =>{
 			 //   this.indexList.name = this.data.word,
 		  // this.indexList.key = this.data.paraphrase
-		  this.indexList = data
+		  this.indexList = data.data
 		  });
 		      
 	},
