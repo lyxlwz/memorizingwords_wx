@@ -21,6 +21,7 @@
 					inputAlign="center"
 					placeholder="20"
 					color="#CBCDCE"
+					v-model="keyword"
 				  ></u--input>
 				</view>
 			</view>
@@ -44,15 +45,27 @@
 	export default {
 		data() {
 			return {
-				
+				keyword:'',
 			}
 		},
 		methods: {
 			yes(){
-				uni.navigateTo({
-					url: '/pages/word/scre'
-				});
-			}
+				this.$http.get('/WordLearn/randomWordScreening',
+				  { count: this.keyword },
+				  {
+				    header: { //默认 无 说明：请求头
+				      'Content-Type': 'multipart/form-data; charset=UTF-8'
+				    }
+				  }).then(data =>{
+					  console.log("请求成功")
+				  
+				  })
+				  }
+			// yes(){
+			// 	uni.navigateTo({
+			// 		url: '/pages/word/scre'
+			// 	});
+			
 		}
 	}
 </script>

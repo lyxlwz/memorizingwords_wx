@@ -1,6 +1,5 @@
 <template>
   <view class="screen">
-	  
     <view>
       <u-navbar
         leftText="10/100"
@@ -43,7 +42,7 @@
       <!--  -->
       <!-- <play-words></play-words> -->
       <!--  -->
-      <view class="word-text-light-1" style="font-size: 30rpx;padding-left: 10rpx;">/ rɪˈzɔːrt /</view>
+      
     
 	
 		
@@ -59,7 +58,7 @@
           </view>
           <view
             class="ntranslate word-text-border"
-            style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+            style="font-size: 30rpx; padding-left: 20rpx; "
           >
             度假胜地 采用的方法
           </view>
@@ -70,7 +69,7 @@
           </view>
           <view
             class="word-text-border"
-            style="font-size: 30rpx; padding-left: 20rpx; border-bottom: 4rpx dashed #ddd;"
+            style="font-size: 30rpx; padding-left: 20rpx;"
           >
             诉诸，采取
           </view>
@@ -105,19 +104,6 @@
             style="padding: 30rpx 40rpx;"
           >
             <view style="display: flex;">
-              <view
-                class="padding-xs text-xs flex-start text-white"
-                style="background: #667efb; margin: 10rpx;border-radius:24rpx; "
-                @click="wordExampleIsPlay != wordExampleIsPlay"
-              >
-                <view class="margin-right-xs">英</view>
-                <play-words
-                  ref="playExample"
-                  play-id="wordExampleLink"
-                  :audio-play.sync="wordExampleIsPlay"
-                  :audio-link="wordExampleLink"
-                ></play-words>
-              </view>
 
               <view
                 class="word-text-light-1"
@@ -221,6 +207,9 @@ export default {
   },
   components: { playWords },
   methods: {
+	  screapi(){
+		  
+	  },
     top() {
       console.log("上一词")
     },
