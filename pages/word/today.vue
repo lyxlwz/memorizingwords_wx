@@ -208,13 +208,15 @@ export default {
   onUnLoad() {
     this.$refs.playWords.destroyAudio()
     this.$refs.playExample.destroyAudio()
+    this.emptyWordList()
+    this.emptyWorId()
   },
   components: { playWords, cuEditor },
   computed: {
     ...mapState(['wordList', 'wordId'])
   },
   methods: {
-    ...mapMutations(['setWordList', 'setWordId']),
+    ...mapMutations(['setWordList', 'setWordId', 'emptyWordList', 'emptyWorId']),
     blue() {
 
     },
@@ -253,9 +255,6 @@ export default {
         console.log(successMsg, 55555);
         // this.$successMsg(successMsg)
       })
-    },
-    onSave() {
-      console.log('富文本编辑器保存');
     },
     dbClickWord() {
       this.touchNumWord++

@@ -28,7 +28,7 @@ export const mutations = {
     }
   },
   // 清空单词list
-  emptyWordList(state) {
+  emptyWordList() {
     state.wordList = [];
     // #ifdef H5
     window.sessionStorage.removeItem("wordList");
@@ -38,7 +38,7 @@ export const mutations = {
     // #endif
   },
   // 清空单词id
-  emptyWorId(state) {
+  emptyWorId() {
     state.wordId = '';
     // #ifdef H5
     window.sessionStorage.removeItem("wordId");

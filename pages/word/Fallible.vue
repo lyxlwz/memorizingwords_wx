@@ -1,97 +1,98 @@
 <template>
-	<view class="Fallible">
-		<view>
-		  <u-navbar
-		    bgColor="#3d5cff"
-		    leftIconColor="#cbcdce"
-		    @rightClick="rightClick"
-		    :autoBack="true"
-		  >
-		  </u-navbar>
-		</view>
-		<view class="fbl " style="padding: 300rpx 120rpx; ">
-			<view class="text flex_x_center word-text-border"  >
-				易错单词筛查
-			</view>
-			<view class="input flex_x_center" style="padding-top: 150rpx; ">
-				<view class=" word-Border-radius" style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx">
-					<u--input
-				    border="none"
-					fontSize="40rpx"
-					inputAlign="center"
-					
-					color="#CBCDCE"
-					v-model="keyword"
-				  ></u--input>
-				</view>
-			</view>
-			<view class=" flex_x_center" style="padding-top: 80rpx  ;">
-				<!--iconColor="#627bff" <button type="primary" iconColor="#3d5cff"  style="width: 55%;" @click="yes"  shape="circle">开始筛查</button> -->
-				<view
-				  class="word-text-border but"
-				  style="font-size: 30rpx; padding: 20rpx 40rpx; border-radius: 50upx;"
-				 @click="yes">
-				  开始筛查
-				</view>
-			</view>
-		</view>
-		<!-- 公共组件-每个页面必须引入 -->
-		<public-module></public-module>
-		<z-navigation></z-navigation>
-	</view>
+  <view class="Fallible">
+    <view>
+      <u-navbar
+        bgColor="#3d5cff"
+        leftIconColor="#cbcdce"
+        @rightClick="rightClick"
+        :autoBack="true"
+      >
+      </u-navbar>
+    </view>
+    <view
+      class="fbl "
+      style="padding: 300rpx 120rpx; "
+    >
+      <view class="text flex_x_center word-text-border">
+        易错单词筛查
+      </view>
+      <view
+        class="input flex_x_center"
+        style="padding-top: 150rpx; "
+      >
+        <view
+          class=" word-Border-radius"
+          style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx"
+        >
+          <u--input
+            border="none"
+            fontSize="40rpx"
+            inputAlign="center"
+            color="#CBCDCE"
+            v-model="keyword"
+          ></u--input>
+        </view>
+      </view>
+      <view
+        class=" flex_x_center"
+        style="padding-top: 80rpx  ;"
+      >
+        <!--iconColor="#627bff" <button type="primary" iconColor="#3d5cff"  style="width: 55%;" @click="yes"  shape="circle">开始筛查</button> -->
+        <view
+          class="word-text-border but"
+          style="font-size: 30rpx; padding: 20rpx 40rpx; border-radius: 50upx;"
+          @click="yes"
+        >
+          开始筛查
+        </view>
+      </view>
+    </view>
+    <!-- 公共组件-每个页面必须引入 -->
+    <public-module></public-module>
+    <z-navigation></z-navigation>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				keyword:'20',
-				idlist:[],
-			}
-		},
-		methods: {
-			yes(){
-				
-					this.$http.get('/WordLearn/errorProneWordScreening',
-					  { count: this.keyword },
-					  {
-					    header: { //默认 无 说明：请求头
-					      // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-					    }
-					  }).then(data =>{
-						  // uni.navigateTo({
-						  // 	url: `/pages/word/scre?word_id=${data[0]}&type=3`
-						  						
-						  // });
-					  // this.$router.push({
-						 //  path:'/pages/word/scre',
-						 //  query:{
-							//   idlist: data.temp_word_list,
-							//   type:3
-						 //  }
-					  // })
-					  })
-					  
-				// uni.navigateTo({
-				// 	url: '/pages/word/scre'
-				// });
-			}
-		}
-	}
+import { mapState, mapMutations } from 'vuex';
+export default {
+  data() {
+    return {
+      keyword: '20',
+      idlist: [],
+    }
+  },
+  computed: {
+    ...mapState(['wordList', 'wordId'])
+  },
+  methods: {
+    ...mapMutations(['setWordList', 'setWordId', 'emptyWordList', 'emptyWorId']),
+    yes() {
+      this.$http.get('/WordLearn/errorProneWordScreening',
+        { count: this.keyword }).then(res => {
+          this.setWordList(res.temp_word_list)
+          this.setWordId(res.temp_word_list[0])
+          uni.navigateTo({
+            url: `/pages/word/scre?word_id=${res.temp_word_list[0]}&type=3`
+          });
+        })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-	.Fallible{
-		background: #3d5cff;
-		height: 100vh;
-		.text{
-			font-size: 40rpx; 
-			font-weight: 1000;
-		}
-		.but{
-			background: #627bff;
-			width: 200rpx;
-			// height: 20%;
-		}
-	}
+.Fallible {
+  background: #3d5cff;
+  height: 100vh;
+  .text {
+    font-size: 40rpx;
+    font-weight: 1000;
+  }
+  .but {
+    background: #627bff;
+    width: 200rpx;
+    // height: 20%;
+  }
+}
 </style>

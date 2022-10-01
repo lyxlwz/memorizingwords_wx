@@ -1,186 +1,203 @@
 <template>
   <view class="screen">
-    <view>
-      <u-navbar
-        leftText="10/100"
-        bgColor="#3d5cff"
-        color="#cbcdce"
-        leftIconColor="#cbcdce"
-        :autoBack="true"
-      >
-        <view slot="right">
-          <view style="font-size: 30rpx; color:#cbcdce;">
-            学习日期：{{wordObj.study_date}}
-          </view>
-        </view>
-      </u-navbar>
-    </view>
-    <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
-      <view
-        class="word-text-light-1 flex_x_right"
-        style="font-size: 30rpx;"
-      >
-        分组序号
-      </view>
-      <view
-        class="word-text-light-1 flex_x_right"
-        style="padding-top: 20rpx;font-size: 30rpx;"
-      >
-        单词学习
-      </view>
-    </view>
-
-    <view class="title test-w-b">{{wordObj.word}}</view>
-    <view
-      class="flex "
-      style="padding-top: 10rpx; padding-left: 40rpx;"
+    <u-navbar
+      :leftText="`${wordIndex}/${wordList.length}`"
+      bgColor="#3d5cff"
+      color="#cbcdce"
+      leftIconColor="#cbcdce"
+      :autoBack="true"
     >
-      <view class="word-Border-radius padding-xs association text-xs flex-start text-white" style="background: #5670fb;">
-        <view class="margin-right-xs">英</view>
-        <play-words ref="playWords"></play-words>
-      </view>
-      <!--  -->
-      <!-- <play-words></play-words> -->
-      <!--  -->
-      
-    
-	
-		
-	</view>
-    <view v-if="aaa">
-      <view class="all">
+    </u-navbar>
+    <view style="position: relative;top: 30rpx;">
+      <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
         <view
-          class="translate padding-top-lg"
-          style="display: flex;"
+          class="word-text-light-1 flex_x_right"
+          style="font-size: 30rpx;"
         >
-          <view
-            class="ntranslate word-text-border"
-            style="font-size: 30rpx; padding-left: 20rpx; "
-          >
-            {{wordObj.paraphrase}}
-          </view>
+          学习日期：{{wordObj.study_date}}
         </view>
-		
-        <!-- 联想 -->
-        <view style="padding-top: 80rpx;">
-          <view
-            class="association word-Border-radius"
-            style="padding: 30rpx 40rpx"
-          >
-            <view
-              class="word_content"
-              v-if="!isEditorMind"
-            >
-              <u-parse :content="wordObj.connect_in_the_mind"></u-parse>
-            </view>
-            <cu-editor
-              v-else
-              ref="wordEditor"
-              :content="wordObj.connect_in_the_mind"
-            ></cu-editor>
-          
-            <view
-              class="bycorenr margin-top-sm flex_x_right"
-              @touchend="dbClickMind"
-            >
-              <view
-                class="word-text-border word-Border-radius Corner"
-                style="font-size: 30rpx; padding: 10rpx 42rpx"
-              >
-                联想
-              </view>
-            </view>
-          
-          </view>
-        </view>
-        <!-- 例句 -->
-        <view style="padding-top: 50rpx;">
-          <view
-            class="exp word-Border-radius"
-            style="padding: 30rpx 40rpx;"
-          >
-            <view style="display: flex;">
-              <view
-                class="word-text-light-1"
-                style="font-size: 30rpx;"
-              >
-                {{wordObj.example}}
-              </view>
-            </view>
-          
-            <view class=" margin-top-sm flex_x_right">
-              <view
-                class="word-text-border word-Border-radius expl"
-                style="font-size: 30rpx; padding: 10rpx 42rpx"
-              >
-                例句
-              </view>
-            </view>
-          
-          </view>
-
-        </view>
-
         <view
-          class="flex_bet"
-          style="padding: 80rpx 80rpx; display: flex; "
+          class="word-text-light-1 flex_x_right padding-top-sm"
+          style="font-size: 30rpx;"
         >
-          <view
-            class="tab-t word-text-border "
-            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
-            @click="lastWord"
-          >
-            {{firstLoad ? '不记得' : '上一词'}}
-          </view>
-
-          <view
-            class="tab-b word-text-border "
-            style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
-            @click="nextWord"
-          >
-            {{lastLoad ? '开始筛查' :'下一词'}}
-          </view>
+          分组序号
         </view>
-
-      </view>
-    </view>
-	<view v-if="bbb">
-    <view style="padding: 100rpx 130rpx;">
-      <view class="flex_xy_center">
         <view
-          class="look word-text-border flex_xy_center"
-          style="font-size: 40rpx; width: 250rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
-          @click="look"
+          class="word-text-light-1 flex_x_right"
+          style="padding-top: 20rpx;font-size: 30rpx;"
         >
-          查看释义
+          单词学习
         </view>
       </view>
 
       <view
-        class="flex_bet"
-        style="padding-top: 100rpx; display: flex; "
+        class="title test-w-b"
+        @touchend="dbClickWord"
       >
-        <view
-          class="top word-text-border "
-          style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
-          @click="top"
-        >
-          上一词
-        </view>
+        <text v-if="!isEditorWord">{{wordObj.word}}</text>
+        <input
+          v-else
+          class="input_item"
+          v-model="wordObj.word"
+          style="height:80px !important;border:1px solid #fff;border-radius:20rpx;"
+          placeholder="请输入单词"
+        />
+      </view>
 
+      <view
+        class="padding-xs association text-sm flex-start text-white playWords"
+        style="border-radius:24rpx;justify-content: space-around;width: 100rpx;"
+        @click="wordIsPlay = !wordIsPlay"
+      >
+        <view class="margin-right-xs">英</view>
+        <play-words
+          :first-load="firstLoad"
+          ref="playWords"
+          play-id="wordLink"
+          :audio-play.sync="wordIsPlay"
+          :audio-link="wordObj.word_voice"
+        ></play-words>
+      </view>
+
+      <view style="padding-top: 10rpx;">
         <view
-          class="down word-text-border "
-          style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx;background: #627bff;"
-          @click="down"
+          class="all"
+          v-if="aaa"
         >
-          下一词
+          <view
+            class="translate padding-top-lg"
+            style="display: flex;"
+          >
+            <view
+              class="ntranslate word-text-border"
+              style="font-size: 30rpx; padding-left: 20rpx; "
+            >
+              {{wordObj.paraphrase}}
+            </view>
+          </view>
+
+          <!-- 联想 -->
+          <view style="padding-top: 80rpx;">
+            <view
+              class="association word-Border-radius"
+              style="padding: 30rpx 40rpx"
+            >
+              <view
+                class="word_content"
+                v-if="!isEditorMind"
+              >
+                <u-parse :content="wordObj.connect_in_the_mind"></u-parse>
+              </view>
+              <cu-editor
+                v-else
+                ref="wordEditor"
+                :content="wordObj.connect_in_the_mind"
+              ></cu-editor>
+
+              <view
+                class="bycorenr margin-top-sm flex_x_right"
+                @touchend="dbClickMind"
+              >
+                <view
+                  class="word-text-border word-Border-radius Corner"
+                  style="font-size: 30rpx; padding: 10rpx 42rpx"
+                >
+                  联想
+                </view>
+              </view>
+
+            </view>
+          </view>
+          <!-- 例句 -->
+          <view style="padding-top: 50rpx;">
+            <view
+              class="exp word-Border-radius"
+              style="padding: 30rpx 40rpx;"
+            >
+              <view style="display: flex;">
+                <view
+                  class="word-text-light-1"
+                  style="font-size: 30rpx;"
+                >
+                  {{wordObj.example}}
+                </view>
+              </view>
+
+              <view class=" margin-top-sm flex_x_right">
+                <view
+                  class="word-text-border word-Border-radius expl"
+                  style="font-size: 30rpx; padding: 10rpx 42rpx"
+                >
+                  例句
+                </view>
+              </view>
+
+            </view>
+
+          </view>
+
+          <view
+            class="flex_bet"
+            style="padding: 80rpx 80rpx; display: flex; "
+          >
+            <view
+              class="tab-t word-text-border "
+              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+              @click="lastWord"
+            >
+              {{firstLoad ? '不记得' : '上一词'}}
+            </view>
+
+            <view
+              class="tab-b word-text-border "
+              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+              @click="nextWord"
+            >
+              {{lastLoad ? '开始筛查' :'下一词'}}
+            </view>
+          </view>
+
+        </view>
+        <view
+          style="padding: 100rpx 130rpx;"
+          v-if="bbb"
+        >
+          <view class="flex_xy_center">
+            <view
+              class="look word-text-border flex_xy_center"
+              style="font-size: 40rpx; width: 250rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
+              @click="look"
+            >
+              查看释义
+            </view>
+          </view>
+
+          <view
+            class="flex_bet"
+            style="padding-top: 100rpx; display: flex; "
+          >
+            <view
+              class="top word-text-border "
+              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
+              @click="lastWord"
+            >
+              {{firstLoad ? '不记得' : '上一词'}}
+            </view>
+
+            <view
+              class="down word-text-border "
+              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx;background: #627bff;"
+              @click="nextWord"
+            >
+              {{lastLoad ? '开始筛查' :'下一词'}}
+            </view>
+          </view>
         </view>
       </view>
+      <!-- 公共组件-每个页面必须引入 -->
+      <public-module></public-module>
+      <z-navigation></z-navigation>
     </view>
-</view>
-    <!-- 公共组件-每个页面必须引入 -->
-    <public-module></public-module>
-    <z-navigation></z-navigation>
   </view>
 </template>
 
@@ -211,15 +228,14 @@ export default {
       isEditorMind: false,
       firstLoad: false,
       lastLoad: false,
-	  bbb : true,
-	  aaa : false,
-	  count: 0
-		  }
+      wordIndex: 0,
+      bbb: true,
+      aaa: false,
+    }
   },
-  onLoad() {
-	  
-    this.screapi()
-	this.todayWord(word_id)
+  onLoad(options) {
+    console.log(options, 55555555555);
+    this.todayWord(options.word_id)
   },
   onShow() {
 
@@ -227,45 +243,22 @@ export default {
   onUnLoad() {
     this.$refs.playWords.destroyAudio()
     this.$refs.playExample.destroyAudio()
+    this.emptyWordList()
+    this.emptyWorId()
   },
   components: { playWords, cuEditor },
   computed: {
     ...mapState(['wordList', 'wordId'])
   },
   methods: {
-    ...mapMutations(['setWordList', 'setWordId']),
+    ...mapMutations(['setWordId', 'emptyWordList', 'emptyWorId']),
     blue() {
 
     },
-	look(){
-		this.aaa =!this.aaa,
-		this.bbb =! this.bbb
-	},
-    // todayWordList() {
-    //   this.$http.get('/WordLearn/todayWordScreening',
-    //     {
-    //       date: '2022-10-23',
-    //     }).then(res => {
-    //       this.setWordList(res.temp_word_list)
-    //       this.setWordId(res.temp_word_list[0])
-    //       this.todayWord(this.wordId)
-    //       this.firstLoad = true
-    //     })
-    // },
-	screapi(){
-		this.$http.get('/WordLearn/wordScreening',
-		    {
-		      date: '2022-10-23',
-			  type: 2,
-			  word_id: 2,
-			  error_count:this.count
-		    }).then(res => {
-		      // this.setWordList(res.temp_word_list)
-		      // this.setWordId(res.temp_word_list[0])
-		      // this.todayWord(this.wordId)
-		      // this.firstLoad = true
-		    })
-	},
+    look() {
+      this.aaa = !this.aaa
+      this.bbb = !this.bbb
+    },
     todayWord(word_id) {
       this.firstLoad = this.wordList[0] == this.wordId
       this.lastLoad = this.wordId == this.wordList[this.wordList.length - 1]
@@ -277,9 +270,6 @@ export default {
             this.$refs.playWords.creatAudio()
           })
         })
-    },
-    onSave() {
-      console.log('富文本编辑器保存');
     },
     dbClickWord() {
       this.touchNumWord++
@@ -303,32 +293,71 @@ export default {
     lastWord() {
       if (this.firstLoad) {
         uni.navigateBack();
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 1,
+          date: this.day
+        })
       } else {
-        const wordId = (parseFloat(this.wordId) - 1).toString()
+        const length = this.wordList.length
+        const index = this.wordList.findIndex(v => v === this.wordId)
+        this.wordIndex = index
+        const wordId = index === 0 ? this.wordList[length - 1] : this.wordList[index - 1]
         this.toNewWord(wordId)
       }
     },
     nextWord() {
       if (this.lastLoad) {
-        uni.navigateTo({
-          url: '/pages/word/scre'
+        uni.navigateBack();
+        // uni.navigateTo({
+        //   url: '/pages/word/scre'
+        // })
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 0,
+          date: this.day
         })
       } else {
-        const wordId = (parseFloat(this.wordId) + 1).toString()
+        const length = this.wordList.length
+        const index = this.wordList.findIndex(v => v === this.wordId)
+        this.wordIndex = index
+        const wordId = index === length - 1 ? this.wordList[0] : this.wordList[index + 1]
         this.toNewWord(wordId)
       }
+    },
+    getScreenWords(data) {
+      this.$http.get('/WordLearn/wordScreening', { ...data }).then((res) => {
+        console.log(res, 55555555);
+        let successMsg = '单词不记得，临时表及筛查表更新成功'
+        if (data.error_count === 1) {
+          successMsg = '单词不记得，临时表及筛查表更新成功'
+        } else if (data.error_count === 0) {
+          successMsg = '单词记得，临时表及筛查表更新成功'
+        }
+        console.log(successMsg, 55555);
+        // this.$successMsg(successMsg)
+      })
     },
     toNewWord(wordId) {
       if (this.isEditorMind || this.isEditorWord) {
         this.$http.post('/WordSystem/wordUpdate',
-          { ...this.wordObj, first_study_date: this.day, wordid: this.wordObj.id }).then(res => {
+          {
+            word_id: this.wordObj.id,
+            word: this.wordObj.word,
+            connect_in_the_mind: this.wordObj.connect_in_the_mind
+          }).then(res => {
             // todo
             console.log(res, 55555555);
+            this.isEditorMind = false
+            this.isEditorWord = false
+            this.wordObj = res[0]
             // this.wordObj = res
-            // this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
-            // this.$nextTick(() => {
-            //   this.$refs.playWords.creatAudio()
-            // })
+            this.wordObj.word_voice = `${base.wordVoiceUrl}${res[0].word_voice}`
+            this.$nextTick(() => {
+              this.$refs.playWords.creatAudio()
+            })
           })
       } else {
         this.setWordId(wordId)
@@ -357,6 +386,9 @@ export default {
       // width: 50rpx;
     }
   }
+  .playWords {
+    // padding: 0 5%;
+  }
   .all {
     margin: auto;
     width: 90%;
@@ -370,10 +402,10 @@ export default {
         background: #627bff;
         width: 150rpx;
       }
-	  ::v-deep.word_content {
-	    color: #cbcdce;
-	    font-size: 30rpx;
-	  }
+      ::v-deep.word_content {
+        color: #cbcdce;
+        font-size: 30rpx;
+      }
     }
     .exp {
       // height: 320rpx;
