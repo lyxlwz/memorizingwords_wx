@@ -79,7 +79,7 @@ export default {
     drawCircleBg(prefix, data) {
       var that = this;
       //创建并返回绘图上下文context对象。
-      let cxt_arc = uni.createCanvasContext(prefix);
+      let cxt_arc = uni.createCanvasContext(prefix, this);
       cxt_arc.setLineWidth(this.lineBgWidth); //线条的宽度
       cxt_arc.setStrokeStyle(this.bgColor);//边框颜色
       cxt_arc.setLineCap('round');
@@ -93,7 +93,7 @@ export default {
     //绘制橙色进度条
     drawCirclePg(prefix, data) {
       //创建并返回绘图上下文context对象。
-      let cxt_arc = uni.createCanvasContext(prefix + '_p');
+      let cxt_arc = uni.createCanvasContext(prefix + '_p', this);
       let value
       if (parseFloat(data.total) == 0) {
         value = 0.01

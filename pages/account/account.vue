@@ -18,7 +18,10 @@
       <view class="flex_x_center padding-top-sm">
         <!-- <image src="static/word/img.png" >
 			</image> -->
-			<image src="../../static/word/img.png" style="height: 200rpx;width: 200rpx;"></image>
+        <image
+          src="../../static/word/img.png"
+          style="height: 200rpx;width: 200rpx;"
+        ></image>
       </view>
       <view
         class="flex_bet test-w-b text-xl padding-top-lg  margin-top-lg"
@@ -76,23 +79,9 @@ export default {
   },
   methods: {
     api() {
-      this.item[0].number = this.userInfo.today_number_target
-      this.item[1].number = this.userInfo.screening_number
-      this.item[2].number = this.userInfo.screening_words
-
-      // this.$http.get('/LearnPlan/learn_plan_search',
-      // { date: this.day},
-      // {
-      //   header: { //默认 无 说明：请求头
-      //     // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-      //   }
-      // }).then(data =>{
-      // 	console.log(data,'成功返回参数')
-      // this.item[0].number = data.today_number_target
-      // this.item[1].number = data.screening_number
-      // this.item[2].number = data.screening_words
-
-      // })
+      this.item[0].number = this.userInfo.cumulative_learn_words || 0
+      this.item[1].number = this.userInfo.word_target || 0
+      this.item[2].number = this.userInfo.best_training_time || 0
     }
 
   }
@@ -101,10 +90,10 @@ export default {
 
 <style lang="scss" scoped>
 .user {
-    // height: 80rpx;
-    // background: #3d5cff;
-	// ::v-deep .header_content {
- //     height: 10rpx;
- //    } 
+  // height: 80rpx;
+  // background: #3d5cff;
+  // ::v-deep .header_content {
+  //     height: 10rpx;
+  //    }
 }
 </style>
