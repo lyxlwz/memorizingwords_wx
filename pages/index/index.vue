@@ -30,7 +30,7 @@
 					<view class="number margin-tb-xs">
 						{{toword}}
 					</view>
-					<u-line-progress :percentage="30" :showText="false" height="10" activeColor="#f59b22">
+					<u-line-progress :percentage="per" :showText="false" height="10" activeColor="#f59b22">
 					</u-line-progress>
 				</view>
 
@@ -90,6 +90,7 @@
 				text: '',
 				bgColor: '',
 				imgUrl: '',
+				per:'',
 				day:'2022-9-21',
 				pop: false,
 				toword:'',
@@ -117,7 +118,11 @@
 			};
 		},
 		computed: {
-		  ...mapState(['userInfo'])
+		  ...mapState(['userInfo']),
+		  per(){
+			  return ((this.planList[1].planNum / this.planList[1].planTotalNum)*100)
+			  
+		  }
 		},
 		components: {
 			circleProgress,
@@ -152,6 +157,7 @@
 				this.planList[0].planTotalNum = this.userInfo.today_number_target || 0
 				this.planList[1].planTotalNum = this.userInfo.today_word_target || 0
 				this.toword = this.userInfo.today_word_target || 0
+				
 				
 				
 
