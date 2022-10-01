@@ -54,6 +54,7 @@
           >
             <view class="margin-right-xs">英</view>
             <play-words
+              :first-load="firstLoad"
               ref="playWords"
               play-id="wordLink"
               :audio-play.sync="wordIsPlay"

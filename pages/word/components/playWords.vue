@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       innerAudioContext: null,
+      timeID: null
     }
   },
   props: {
@@ -29,10 +30,15 @@ export default {
     audioPlay: {
       type: Boolean,
       default: false
-    }
+    },
+    firstLoad: {
+      type: Boolean,
+      default: false
+    },
   },
   created() {
     this.creatAudio()
+    this.autoLoopPlay()
   },
 
   mounted() {
@@ -79,6 +85,18 @@ export default {
     },
     destroy() {
       this.innerAudioContext.destroy()
+      clearTimeout(this.timeID)
+    },
+    autoLoopPlay() {
+      if (this.timeID) {
+        clearTimeout(this.timeID); //   清除定时器
+      }
+      this.timeID = setInterval(() => {
+        //   定时器
+        if (this.firstLoad) {
+          this.creatAudio()
+        }
+      }, 1000);
     },
   }
 }

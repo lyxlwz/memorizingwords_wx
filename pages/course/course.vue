@@ -15,8 +15,7 @@
           >
             <image
               :src="require(`static/image/image${index}.png`)"
-			  style="height: 130rpx;width: 130rpx;"
-              
+              style="height: 130rpx;width: 130rpx;"
             >
           </view>
           <view>
@@ -41,11 +40,11 @@ export default {
           chinese: "今日单词学习",
           english: "Robertson Connie"
         },
-        {
-          chinese: "今日单词筛查",
+        // {
+        //   chinese: "今日单词筛查",
 
-          english: "Nguyen Shane"
-        },
+        //   english: "Nguyen Shane"
+        // },
         {
           chinese: "易错单词筛查",
           english: "Bert Pullman"
@@ -101,11 +100,13 @@ export default {
         uni.navigateTo({
           url: '/pages/word/today'
         });
-      } else if (name === '今日单词筛查') {
-        uni.navigateTo({
-          url: '/pages/word/scre'
-        });
-      } else if (name === '数字记忆训练') {
+      }
+      // else if (name === '今日单词筛查') {
+      //   uni.navigateTo({
+      //     url: '/pages/word/scre'
+      //   });
+      // }
+      else if (name === '数字记忆训练') {
         uni.navigateTo({
           url: '/pages/number/number'
         });

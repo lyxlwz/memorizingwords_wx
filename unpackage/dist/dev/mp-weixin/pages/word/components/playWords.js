@@ -130,7 +130,8 @@ var _default =
   mixins: [],
   data: function data() {
     return {
-      innerAudioContext: null };
+      innerAudioContext: null,
+      timeID: null };
 
   },
   props: {
@@ -144,11 +145,16 @@ var _default =
 
     audioPlay: {
       type: Boolean,
+      default: false },
+
+    firstLoad: {
+      type: Boolean,
       default: false } },
 
 
   created: function created() {
     this.creatAudio();
+    this.autoLoopPlay();
   },
 
   mounted: function mounted() {
@@ -195,6 +201,18 @@ var _default =
     },
     destroy: function destroy() {
       this.innerAudioContext.destroy();
+      clearTimeout(this.timeID);
+    },
+    autoLoopPlay: function autoLoopPlay() {var _this2 = this;
+      if (this.timeID) {
+        clearTimeout(this.timeID); //   清除定时器
+      }
+      this.timeID = setInterval(function () {
+        //   定时器
+        if (_this2.firstLoad) {
+          _this2.creatAudio();
+        }
+      }, 1000);
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

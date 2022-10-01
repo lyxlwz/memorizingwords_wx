@@ -208,7 +208,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 var _default =
 {
   data: function data() {
@@ -218,11 +217,11 @@ var _default =
         chinese: "今日单词学习",
         english: "Robertson Connie" },
 
-      {
-        chinese: "今日单词筛查",
+      // {
+      //   chinese: "今日单词筛查",
 
-        english: "Nguyen Shane" },
-
+      //   english: "Nguyen Shane"
+      // },
       {
         chinese: "易错单词筛查",
         english: "Bert Pullman" },
@@ -278,15 +277,17 @@ var _default =
         uni.navigateTo({
           url: '/pages/word/today' });
 
-      } else if (name === '今日单词筛查') {
-        uni.navigateTo({
-          url: '/pages/word/scre' });
-
-      } else if (name === '数字记忆训练') {
-        uni.navigateTo({
-          url: '/pages/number/number' });
-
       }
+      // else if (name === '今日单词筛查') {
+      //   uni.navigateTo({
+      //     url: '/pages/word/scre'
+      //   });
+      // }
+      else if (name === '数字记忆训练') {
+          uni.navigateTo({
+            url: '/pages/number/number' });
+
+        }
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
