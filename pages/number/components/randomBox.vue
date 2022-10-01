@@ -7,7 +7,8 @@
     >
       <view
         class="word-Border-radius text-center num-training-num"
-        style="margin:10%"
+        style="margin:10%,"
+		:style="{'border':`1px solid${colorList[numIndex]}`}"
       >
         <u--input
           v-if="remember"
@@ -54,17 +55,16 @@ export default {
   },
   data() {
     return {
-      numList: []
+      numList: [],
+	  colorList: []
     }
   },
 watch: {
     answerResult(val) {
       val.split(',').forEach(answer => {
         if (answer === this.answerRules[0].state) {
-          console.log('5555', this.answerRules[0].color)
           this.colorList.push(this.answerRules[0].color)
         } else if (answer === this.answerRules[1].state) {
-          console.log('666666', this.answerRules[0].color)
           this.colorList.push(this.answerRules[1].color)
         }
       })
