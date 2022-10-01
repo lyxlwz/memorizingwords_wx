@@ -19,6 +19,8 @@
 .today .all.data-v-00fdd196 {
   margin: auto;
   width: 90%;
+  height: calc(90vh - 300rpx);
+  overflow: scroll;
 }
 .today .all .title.data-v-00fdd196 {
   color: white;

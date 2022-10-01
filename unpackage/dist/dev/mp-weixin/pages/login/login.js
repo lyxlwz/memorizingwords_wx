@@ -267,10 +267,12 @@ var _vuex = __webpack_require__(/*! vuex */ 10);function ownKeys(object, enumera
       then(function (res) {
         _this.setUserInfo({ token: res });
         _this.getUserInfo();
+        console.log(55555555555);
         uni.showToast({
           title: '登录成功',
           duration: 2000,
           success: function success() {
+            console.log(55555555555);
             uni.switchTab({
               url: '/pages/index/index' });
 

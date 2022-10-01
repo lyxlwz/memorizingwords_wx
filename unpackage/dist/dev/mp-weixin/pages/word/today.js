@@ -98,9 +98,6 @@ try {
     uNavbar: function() {
       return Promise.all(/*! import() | node-modules/uview-ui/components/u-navbar/u-navbar */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-navbar/u-navbar")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-navbar/u-navbar.vue */ 375))
     },
-    uInput: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-input/u-input */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-input/u-input")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-input/u-input.vue */ 281))
-    },
     uParse: function() {
       return Promise.all(/*! import() | node-modules/uview-ui/components/u-parse/u-parse */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-parse/u-parse")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-parse/u-parse.vue */ 383))
     },
@@ -345,6 +342,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 var _vuex = __webpack_require__(/*! vuex */ 10);
 var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl */ 146));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var playWords = function playWords() {__webpack_require__.e(/*! require.ensure | pages/word/components/playWords */ "pages/word/components/playWords").then((function () {return resolve(__webpack_require__(/*! ./components/playWords */ 400));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var cuEditor = function cuEditor() {Promise.all(/*! require.ensure | components/cu-editor/cu-editor */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/cu-editor/cu-editor")]).then((function () {return resolve(__webpack_require__(/*! @/components/cu-editor/cu-editor */ 392));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 {
@@ -368,7 +366,8 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
       touchNumMind: 0,
       isEditorMind: false,
       firstLoad: false,
-      lastLoad: false };
+      lastLoad: false,
+      wordIndex: 0 };
 
   },
   onLoad: function onLoad() {
@@ -393,7 +392,7 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
     todayWordList: function todayWordList() {var _this = this;
       this.$http.get('/WordLearn/todayWordScreening',
       {
-        date: '2022-10-23' }).
+        date: this.day }).
       then(function (res) {
         _this.setWordList(res.temp_word_list);
         _this.setWordId(res.temp_word_list[0]);
@@ -411,6 +410,19 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
         _this2.$nextTick(function () {
           _this2.$refs.playWords.creatAudio();
         });
+      });
+    },
+    getScreenWords: function getScreenWords(data) {
+      this.$http.get('/WordLearn/wordScreening', _objectSpread({}, data)).then(function (res) {
+        console.log(res, 55555555);
+        var successMsg = '单词不记得，临时表及筛查表更新成功';
+        if (data.error_count === 1) {
+          successMsg = '单词不记得，临时表及筛查表更新成功';
+        } else if (data.error_count === 0) {
+          successMsg = '单词记得，临时表及筛查表更新成功';
+        }
+        console.log(successMsg, 55555);
+        // this.$successMsg(successMsg)
       });
     },
     onSave: function onSave() {
@@ -435,35 +447,61 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
       }, 250);
     },
 
-    lastWord: function lastWord() {
+    lastWord: function lastWord() {var _this5 = this;
       if (this.firstLoad) {
         uni.navigateBack();
-      } else {
-        var wordId = (parseFloat(this.wordId) - 1).toString();
-        this.toNewWord(wordId);
-      }
-    },
-    nextWord: function nextWord() {
-      if (this.lastLoad) {
-        uni.navigateTo({
-          url: '/pages/word/scre' });
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 1,
+          date: this.day });
 
       } else {
-        var wordId = (parseFloat(this.wordId) + 1).toString();
+        var length = this.wordList.length;
+        var index = this.wordList.findIndex(function (v) {return v === _this5.wordId;});
+        this.wordIndex = index;
+        var wordId = index === 0 ? this.wordList[length - 1] : this.wordList[index - 1];
         this.toNewWord(wordId);
       }
     },
-    toNewWord: function toNewWord(wordId) {
+    nextWord: function nextWord() {var _this6 = this;
+      if (this.lastLoad) {
+        uni.navigateBack();
+        // uni.navigateTo({
+        //   url: '/pages/word/scre'
+        // })
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 0,
+          date: this.day });
+
+      } else {
+        var length = this.wordList.length;
+        var index = this.wordList.findIndex(function (v) {return v === _this6.wordId;});
+        this.wordIndex = index;
+        var wordId = index === length - 1 ? this.wordList[0] : this.wordList[index + 1];
+        this.toNewWord(wordId);
+      }
+    },
+    toNewWord: function toNewWord(wordId) {var _this7 = this;
       if (this.isEditorMind || this.isEditorWord) {
-        this.$http.post('/WordSystem/wordUpdate', _objectSpread(_objectSpread({},
-        this.wordObj), {}, { first_study_date: this.day, wordid: this.wordObj.id })).then(function (res) {
+        this.$http.post('/WordSystem/wordUpdate',
+        {
+          word_id: this.wordObj.id,
+          word: this.wordObj.word,
+          connect_in_the_mind: this.wordObj.connect_in_the_mind }).
+        then(function (res) {
           // todo
           console.log(res, 55555555);
+          _this7.isEditorMind = false;
+          _this7.isEditorWord = false;
+          _this7.wordObj = res[0];
           // this.wordObj = res
-          // this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
-          // this.$nextTick(() => {
-          //   this.$refs.playWords.creatAudio()
-          // })
+          _this7.wordObj.word_voice = "".concat(_baseUrl.default.wordVoiceUrl).concat(res[0].word_voice);
+          _this7.$nextTick(function () {
+            _this7.$refs.playWords.creatAudio();
+          });
         });
       } else {
         this.setWordId(wordId);

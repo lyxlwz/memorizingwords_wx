@@ -82,6 +82,9 @@ try {
     },
     appletsBindUserInfo: function() {
       return Promise.all(/*! import() | components/applets-bind-userInfo/applets-bind-userInfo */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/applets-bind-userInfo/applets-bind-userInfo")]).then(__webpack_require__.bind(null, /*! @/components/applets-bind-userInfo/applets-bind-userInfo.vue */ 457))
+    },
+    uToast: function() {
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-toast/u-toast */ "node-modules/uview-ui/components/u-toast/u-toast").then(__webpack_require__.bind(null, /*! uview-ui/components/u-toast/u-toast.vue */ 610))
     }
   }
 } catch (e) {
@@ -152,8 +155,25 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 //
 //
 //
+//
+//
+//
+//
 var _default =
-{};exports.default = _default;
+{
+  watch: {
+    flushInfoMsg: function flushInfoMsg(nval) {
+      this.$refs.uToast.show({
+        message: this.infoMsg,
+        type: 'success' });
+
+    },
+    flushErrorMsg: function flushErrorMsg(nval) {
+      this.$refs.uToast.show({
+        message: this.errorMsg,
+        type: 'error' });
+
+    } } };exports.default = _default;
 
 /***/ })
 

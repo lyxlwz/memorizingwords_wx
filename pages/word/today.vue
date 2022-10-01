@@ -1,7 +1,7 @@
 <template>
   <view class="today wordPageSty">
     <u-navbar
-      leftText="10/100"
+      :leftText="`${wordIndex}/${wordList.length}`"
       bgColor="#3d5cff"
       color="#cbcdce"
       leftIconColor="#cbcdce"
@@ -35,20 +35,21 @@
           @touchend="dbClickWord"
         >
           <text v-if="!isEditorWord">{{wordObj.word}}</text>
-          <u-input
+          <input
             v-else
+            class="input_item"
             v-model="wordObj.word"
-            color="#fff"
-            fontSize="50"
-          ></u-input>
+            style="height:80px !important;border:1px solid #fff;border-radius:20rpx;"
+            placeholder="请输入单词"
+          />
         </view>
         <view
           class="flex-start"
           style="padding-top: 10rpx;"
         >
           <view
-            class="padding-xs association text-xs flex-start text-white"
-            style="background: #5670fb;border-radius:24rpx;"
+            class="padding-xs association text-sm flex-start text-white"
+            style="border-radius:24rpx;justify-content: space-around;width: 100rpx;"
             @click="wordIsPlay = !wordIsPlay"
           >
             <view class="margin-right-xs">英</view>
@@ -194,6 +195,7 @@ export default {
       isEditorMind: false,
       firstLoad: false,
       lastLoad: false,
+      wordIndex: 0,
     }
   },
   onLoad() {
@@ -218,7 +220,7 @@ export default {
     todayWordList() {
       this.$http.get('/WordLearn/todayWordScreening',
         {
-          date: '2022-10-23',
+          date: this.day,
         }).then(res => {
           this.setWordList(res.temp_word_list)
           this.setWordId(res.temp_word_list[0])
@@ -237,6 +239,19 @@ export default {
             this.$refs.playWords.creatAudio()
           })
         })
+    },
+    getScreenWords(data) {
+      this.$http.get('/WordLearn/wordScreening', { ...data }).then((res) => {
+        console.log(res, 55555555);
+        let successMsg = '单词不记得，临时表及筛查表更新成功'
+        if (data.error_count === 1) {
+          successMsg = '单词不记得，临时表及筛查表更新成功'
+        } else if (data.error_count === 0) {
+          successMsg = '单词记得，临时表及筛查表更新成功'
+        }
+        console.log(successMsg, 55555);
+        // this.$successMsg(successMsg)
+      })
     },
     onSave() {
       console.log('富文本编辑器保存');
@@ -263,32 +278,58 @@ export default {
     lastWord() {
       if (this.firstLoad) {
         uni.navigateBack();
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 1,
+          date: this.day
+        })
       } else {
-        const wordId = (parseFloat(this.wordId) - 1).toString()
+        const length = this.wordList.length
+        const index = this.wordList.findIndex(v => v === this.wordId)
+        this.wordIndex = index
+        const wordId = index === 0 ? this.wordList[length - 1] : this.wordList[index - 1]
         this.toNewWord(wordId)
       }
     },
     nextWord() {
       if (this.lastLoad) {
-        uni.navigateTo({
-          url: '/pages/word/scre'
+        uni.navigateBack();
+        // uni.navigateTo({
+        //   url: '/pages/word/scre'
+        // })
+        this.getScreenWords({
+          type: 1,
+          word_id: this.wordId,
+          error_count: 0,
+          date: this.day
         })
       } else {
-        const wordId = (parseFloat(this.wordId) + 1).toString()
+        const length = this.wordList.length
+        const index = this.wordList.findIndex(v => v === this.wordId)
+        this.wordIndex = index
+        const wordId = index === length - 1 ? this.wordList[0] : this.wordList[index + 1]
         this.toNewWord(wordId)
       }
     },
     toNewWord(wordId) {
       if (this.isEditorMind || this.isEditorWord) {
         this.$http.post('/WordSystem/wordUpdate',
-          { ...this.wordObj, first_study_date: this.day, wordid: this.wordObj.id }).then(res => {
+          {
+            word_id: this.wordObj.id,
+            word: this.wordObj.word,
+            connect_in_the_mind: this.wordObj.connect_in_the_mind
+          }).then(res => {
             // todo
             console.log(res, 55555555);
+            this.isEditorMind = false
+            this.isEditorWord = false
+            this.wordObj = res[0]
             // this.wordObj = res
-            // this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
-            // this.$nextTick(() => {
-            //   this.$refs.playWords.creatAudio()
-            // })
+            this.wordObj.word_voice = `${base.wordVoiceUrl}${res[0].word_voice}`
+            this.$nextTick(() => {
+              this.$refs.playWords.creatAudio()
+            })
           })
       } else {
         this.setWordId(wordId)
@@ -305,6 +346,8 @@ export default {
   .all {
     margin: auto;
     width: 90%;
+    height: calc(90vh - 300rpx);
+    overflow: scroll;
     // padding-left: 20rpx;
     .title {
       // padding-top: 150rpx;

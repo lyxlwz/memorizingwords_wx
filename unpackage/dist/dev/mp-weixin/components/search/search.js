@@ -269,6 +269,10 @@ var _default =
     close: function close() {
       this.$emit('update:show', false);
     },
+    scrolltolower: function scrolltolower() {
+      this.queryData.page += 1,
+      this.confirmInput();
+    },
     confirmInput: function confirmInput() {var _this = this;
       this.$http.get('/WordSystem/wordData', _objectSpread({
         word: this.keyword },

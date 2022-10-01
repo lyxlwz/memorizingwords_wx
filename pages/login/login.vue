@@ -107,10 +107,12 @@ export default {
         }).then(res => {
           this.setUserInfo({ token: res });
           this.getUserInfo()
+          console.log(55555555555);
           uni.showToast({
             title: '登录成功',
             duration: 2000,
             success: () => {
+              console.log(55555555555);
               uni.switchTab({
                 url: '/pages/index/index'
               });
