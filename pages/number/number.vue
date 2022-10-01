@@ -52,7 +52,7 @@
       v-else
       style="position: relative;top:88rpx;"
 	  :id.sync = "id"
-	  :data.sync = "data"
+	  :date.sync = "date"
 	  :number.sync = "number"
     ></num-train>
     <!-- 公共组件-每个页面必须引入 -->
@@ -70,7 +70,7 @@ export default {
       isShowNumTrain: false,
 	  keyword:'20',
 	  id:'',
-	  data:'',
+	  date:'',
 	  number:'',
     }
   },
@@ -89,7 +89,7 @@ export default {
 		      }
 		    }).then(data =>{
 		  	  this.id = data.id,
-			  this.data = data.data,
+			  this.date = data.date,
 			  this.number = data.random_number
 			  // console.log(this.id,this.data,this.number)
 		    })

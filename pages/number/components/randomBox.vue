@@ -37,10 +37,20 @@ export default {
       type: String,
       default: ''
     },
+	answerRules: {
+	      type: Array,
+	      default: () => {
+	        return []
+	      }
+	    },
     remember: {
       type: Boolean,
       default: false
-    }
+    },
+	answerResult: {
+	      type: String,
+	      default: ''
+	    }
   },
   data() {
     return {

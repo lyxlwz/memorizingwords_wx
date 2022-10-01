@@ -2,7 +2,7 @@
   <view class="text-lg padding num-results">
 	  <view style="padding-top: 50rpx;">
 	  	<view class="word-Border-radius accTraining padding text-bold">
-      <view class="word-text-light text-sm">数字训练准确率<span>10%</span></view>
+      <view class="word-text-light text-sm">数字训练准确率<span>{{numObj.accuracy}}%</span></view>
       <view class="text-xl margin-tb-xs">01:13''12</view>
       <u-line-progress
         :show-text="false"
@@ -34,7 +34,9 @@
 
       <random-box
         ref="randomBox"
-        random-number="31814410535809040085"
+        :random-number="numObj.upload_number"
+		 :answer-result="numObj.res"
+		:answer-rules="answerRules"
       />
     </view>
 
@@ -45,7 +47,7 @@
 
       <random-box
         ref="randomBox"
-        random-number="31814410535809040085"
+        :random-number="numObj.random_number"
       />
     </view>
 
@@ -73,7 +75,18 @@ export default {
   name: 'Results',
   components: { randomBox },
   mixins: [],
-  props: {},
+  props: {
+	  numObj:{
+		  type:Object,
+	  default:function(){
+		  return{
+			  
+		  }
+	  }
+	  }
+	  
+	  
+  },
   data() {
     return {
       answerRules: [
@@ -84,11 +97,11 @@ export default {
         {
           color: '#D8001B',
           title: '错误'
-        },
-        {
-          color: '#fff',
-          title: '未做'
         }
+        // {
+        //   color: '#fff',
+        //   title: '未做'
+        // }
       ]
     }
   },

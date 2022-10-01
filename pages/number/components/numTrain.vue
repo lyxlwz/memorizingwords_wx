@@ -1,11 +1,14 @@
 <template>
   <view class="number-train text-lg text-white">
-    <train-results v-if="isResults" />
+    <train-results v-if="isResults"
+	 
+	 :numObj = "numObj"
+	 />
     <train-process
       v-else
       @submit="submit"
 	  :id.sync = "id"
-	  :data.sync = "data"
+	  :date.sync = "date"
 	  :number.sync = "number"
     />
   </view>
@@ -20,18 +23,17 @@ export default {
   mixins: [],
   props: {
 	  number: {
-		 type: Number,
+		 type: String,
 		  default:0
 	  },
-	  data: String,
-	  id: String
+	  date: String,
+	  id: [String,Number]
   },
   data() {
     return {
       isResults: false,
-	  upload_number:'',
 	  // upid:'',
-	  time_spent: '01:02:100'
+	 numObj:{},
     }
   },
 
@@ -43,11 +45,8 @@ export default {
 
   methods: {
     submit(val) {
-      this.isResults = val.isResults
-	  this.$emit('update:number', false)
-	  this.$emit('update:data', false)
-	  this.$emit('update:id', false)
-		console.log(this.upload_number,this.time_spent,val,'66666666666666666666')
+      this.isResults = val.isFinite
+		// console.log(this.upload_number,this.time_spent,val,'66666666666666666666')
 	  
 	  		  this.$http.post('/MemoryTraining/numberMemoryTraining',
 	  		    { 
@@ -60,10 +59,14 @@ export default {
 	  		        // 'Content-Type': 'multipart/form-data; charset=UTF-8'
 	  		      }
 	  		    }).then(data =>{
-	  		  	//   this.id = data.id,
-	  			  // this.data = data.data,
-	  			  // this.number = data.random_number
-	  			  // console.log(this.id,this.data,this.number)
+					// this.accuracy = data.accuracy
+					// this.random_number= data.random_number
+					// this.time_spent= data.time_spent
+					// this.upload_number= data.upload_number
+					
+					this.numObj = data
+	  			  // console.log(this.random_number)
+				  
 	  		    })
 	  			
 	  

@@ -52,13 +52,15 @@ export default {
   components: { randomBox },
   mixins: [],
   props: {
-	  number: Number,
+	  number: {
+	  		 type: String,
+	  		  default:0
+	  },
 	  data: String,
-	  id: Number
+	  id: [String,Number]
   },
   data() {
     return {
-      datas: {},
       remember: false
     }
   },
@@ -66,31 +68,14 @@ export default {
   computed: {},
 
   created() {
-    this.getData()
+	  
   },
 
   methods: {
-    getData() {
-      const data = {
-        'id': 11,
-        'date': this.data,
-        'random_number': this.number,
-        'upload_number': null,
-        'amount_error': null,
-        'accuracy': null,
-        'digital_number': this.id,
-        'time_spent': null
-      }
-      this.datas = data
-    },
     submit() {
 		//这里是更新的数字就是第三个页面，他记住数字之后要提交的这个玩意
-      this.datas.upload_number = this.$refs.randomBox.numList.join('')
-	  this.$emit('submit',{isFinite:true, upload_number: this.datas.upload_number, time_spent:this.time_spent})
-      // this.$emit('submit', true)
-	  this.$emit('update:number', false)
-	  this.$emit('update:data', false)
-	  this.$emit('update:id', false)
+      const upload_number = this.$refs.randomBox.numList.join('')
+	  this.$emit('submit',{isFinite:true, upload_number, time_spent:this.time_spent})
     }
   }
 }
