@@ -217,7 +217,9 @@ export default {
 		  }
   },
   onLoad() {
+	  
     this.screapi()
+	this.todayWord(word_id)
   },
   onShow() {
 
