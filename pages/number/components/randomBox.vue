@@ -7,8 +7,8 @@
     >
       <view
         class="word-Border-radius text-center num-training-num"
-        style="margin:10%,"
-		:style="{'border':`1px solid${colorList[numIndex]}`}"
+        style="margin:10%"
+        :style="{'border':`1px solid${colorList[numIndex]}`}"
       >
         <u--input
           v-if="remember"
@@ -38,28 +38,28 @@ export default {
       type: String,
       default: ''
     },
-	answerRules: {
-	      type: Array,
-	      default: () => {
-	        return []
-	      }
-	    },
+    answerRules: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    },
     remember: {
       type: Boolean,
       default: false
     },
-	answerResult: {
-	      type: String,
-	      default: ''
-	    }
+    answerResult: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
       numList: [],
-	  colorList: []
+      colorList: []
     }
   },
-watch: {
+  watch: {
     answerResult(val) {
       val.split(',').forEach(answer => {
         if (answer === this.answerRules[0].state) {

@@ -15,7 +15,7 @@
           name="clock"
           class="margin-right-xs"
         ></u-icon>
-        <span>00:13:11''26</span>
+        <span>{{ time_spent }}</span>
       </span>
     </view>
 
@@ -47,35 +47,44 @@
 
 <script>
 import randomBox from './randomBox'
+import { handleTime } from '@/plugins/utils'
 export default {
   name: 'numTrain',
   components: { randomBox },
   mixins: [],
   props: {
-	  number: {
-	  		 type: String,
-	  		  default:0
-	  },
-	  data: String,
-	  id: [String,Number]
+    number: {
+      type: String,
+      default: 0
+    },
   },
   data() {
     return {
-      remember: false
+      remember: false,
+      timer: null,
+      time_spent: ''
     }
   },
 
   computed: {},
 
   created() {
-	  
+    const before = new Date().getTime()
+    this.timer = setInterval(() => {
+      const now = new Date().getTime()
+      const time = now - before
+      this.time_spent = handleTime(time, false)
+    }, 1000 / 60)
+  },
+  beforeDestroy() {
+    clearTimeout(this.timer)
   },
 
   methods: {
     submit() {
-		//这里是更新的数字就是第三个页面，他记住数字之后要提交的这个玩意
+      //这里是更新的数字就是第三个页面，他记住数字之后要提交的这个玩意
       const upload_number = this.$refs.randomBox.numList.join('')
-	  this.$emit('submit',{isFinite:true, upload_number, time_spent:this.time_spent})
+      this.$emit('submit', { isFinite: true, upload_number, time_spent: this.time_spent })
     }
   }
 }

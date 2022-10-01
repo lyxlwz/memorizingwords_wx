@@ -7,11 +7,11 @@
     <public-module></public-module>
     <view
       class="bg"
-      style="height: 150rpx;background: #3d5cff;"
+      style="height: 200rpx;background: #3d5cff;"
     >
       <view
         class="text"
-        style="color: white;font-weight: 200%;padding-top: 80rpx;"
+        style="color: white;font-weight: 200%;padding-top: 120rpx;font-size: 36rpx;"
       >
         单词管理
       </view>
@@ -24,7 +24,7 @@
           shape="square"
           placeholder=""
           clearable
-		  fontSize="32rpx"
+          fontSize="32rpx"
           placeholderStyle="color:#3d5cff"
           height="90rpx"
           border="none"
@@ -36,11 +36,11 @@
             <u--text
               prefixIcon="search"
               iconStyle="font-size: 50rpx;color: #d7d7d7"
-              text="今日单词学习:"
+              :text="`${searchCondition}:`"
               slot="prefix"
               margin="0 3px 0 0"
               bold
-			  size="32rpx"
+              size="32rpx"
               color="#3753E5"
             ></u--text>
           </template>
@@ -52,7 +52,6 @@
               :closeable="true"
               closeIconPos="top-left"
               :closeOnClickOverlay="false"
-              @open="open"
               @close="close"
             >
               <view
@@ -66,29 +65,31 @@
                 >设置</view>
                 <view
                   class="lg "
-                  style=" height: calc(800rpx - 50rpx);
-    overflow: scroll;"
+                  style=" height: calc(800rpx - 50rpx);overflow: scroll;"
                 >
-                  <view
-                    class="test-w-b"
-                    style="font-size: 100%;padding-left: 20rpx;"
-                  >搜索条件</view>
-                  <view class="u-page__tag-item flex text-center">
-                    <u-tag
-                      v-for="(item, index) in radios"
-                      class="tag-item"
-                      :key="index"
-                      :text="item.name"
-                      size="large"
-                      :name="index"
-                      :bgColor="item.bgColor"
-                      :borderColor="item.borderColor"
-                      :color="item.color"
-                      @click="radioClick"
-                    >
-                    </u-tag>
+                  <view v-if="firstLoad">
+                    <view
+                      class="test-w-b"
+                      style="font-size: 100%;padding-left: 20rpx;"
+                    >搜索条件</view>
+                    <view class="u-page__tag-item flex text-center">
+                      <u-tag
+                        v-for="(item, index) in radios"
+                        class="tag-item"
+                        :key="index"
+                        :text="item.name"
+                        size="large"
+                        :name="index"
+                        :bgColor="item.bgColor"
+                        :borderColor="item.borderColor"
+                        :color="item.color"
+                        @click="radioClick"
+                      >
+                      </u-tag>
+                    </view>
                   </view>
-                  <view class="padding-top-lg">
+                  <view v-else>
+                    <!-- <view class="padding-top-lg">
                     <view
                       class="test-w-b"
                       style="font-size: 100%;padding-left: 20rpx;"
@@ -108,51 +109,49 @@
                       @click="aradioClick"
                     >
                     </u-tag>
-                  </view>
-                  <view class="padding-top-lg">
-                    <view
-                      class="test-w-b"
-                      style="font-size: 100%;padding-left: 20rpx;"
-                    >表头选择</view>
-                  </view>
-                  <view class="u-page__tag-item-ii flex text-center">
-                    <u-tag
-                      v-for="(aitem, index) in yaradios"
-                      class="yatag-item"
-                      :key="index"
-                      :text="aitem.aname"
-                      size="large"
-                      :name="index"
-                      :bgColor="aitem.bgColor"
-                      :borderColor="aitem.borderColor"
-                      :color="aitem.color"
-                      @click="yaradioClick"
-                    >
-                    </u-tag>
-                  </view>
-                  <view class="padding-top-lg">
-                    <view
-                      class="test-w-b"
-                      style="font-size: 100%;padding-left: 20rpx;"
-                    >批量修改为</view>
-                  </view>
-                  <view style="padding: 20rpx 50rpx;">
-                    <view class="input">
-                      <u--input
-                        border="none"
-                        @change="change"
-                        height="500"
-                      ></u--input>
+                  </view> -->
+                    <view class="padding-top-lg">
+                      <view
+                        class="test-w-b"
+                        style="font-size: 100%;padding-left: 20rpx;"
+                      >表头选择</view>
+                    </view>
+                    <view class="u-page__tag-item-ii flex text-center">
+                      <u-tag
+                        v-for="(aitem, index) in yaradios"
+                        class="yatag-item"
+                        :key="index"
+                        :text="aitem.aname"
+                        size="large"
+                        :name="index"
+                        :bgColor="aitem.bgColor"
+                        :borderColor="aitem.borderColor"
+                        :color="aitem.color"
+                        @click="yaradioClick"
+                      >
+                      </u-tag>
+                      <view class="padding-top-lg">
+                        <view
+                          class="test-w-b"
+                          style="font-size: 100%;padding-left: 20rpx;"
+                        >批量修改为</view>
+                      </view>
+                      <view style="padding: 20rpx 50rpx;">
+                        <view class="input">
+                          <u--input
+                            v-model="modVal"
+                            border="none"
+                            height="500"
+                          ></u--input>
+                        </view>
+                      </view>
                     </view>
                   </view>
 
                 </view>
                 <view
                   class="butt"
-                  style="display: flex;
-			  padding: 2rpx 50rpx;
-			  margin: auto;
-			  justify-content: space-between;"
+                  style="display: flex;padding: 2rpx 50rpx;margin: auto;justify-content: space-between;"
                 >
                   <button
                     type="primary"
@@ -195,22 +194,32 @@
         <u-list-item
           v-for="(item, index) in indexList"
           :key="index"
-          @click="click(index)"
           class="test-w-b"
         >
-          <u-cell>
+          <u-cell @click="cellClick(item)">
             <view
               slot="title"
               class="flex word-text-middle-1 margin-right-lg"
+              :class="cellClass(item,index)"
             >
-              <view class="margin-right-lg " style="font-size: 30rpx;">{{item.first_study_date}}</view>
-              <view class="" style="font-size: 30rpx;">{{item.word}}</view>
+              <view
+                class="margin-right-lg "
+                style="font-size: 30rpx;"
+              >{{item.first_study_date}}</view>
+              <view
+                class=""
+                style="font-size: 30rpx;"
+              >{{item.word}}</view>
             </view>
             <view
               slot="value"
               class="word-text-middle-1"
+              :class="cellClass(item,index)"
             >
-              <view class="text-right " style="font-size: 30rpx;">{{item.paraphrase}}</view>
+              <view
+                class="text-right "
+                style="font-size: 30rpx;"
+              >{{item.paraphrase}}</view>
             </view>
           </u-cell>
         </u-list-item>
@@ -228,6 +237,7 @@ export default {
       all: '',
       src: '/static/word/sear.png',
       indexList: [],
+      searchCondition: '单词',
       searchVal: 'Product Design',
       urls: [],
       show: false,
@@ -237,6 +247,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'first_study_date'
       },
       {
         checked: false,
@@ -244,6 +255,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'group_id'
       },
       {
         checked: false,
@@ -251,7 +263,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-
+        // val:'group_id'
       }],
       aradios: [{
         checked: false,
@@ -274,6 +286,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'word',
       },
       {
         checked: false,
@@ -281,6 +294,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'paraphrase',
       },
       {
         checked: false,
@@ -288,6 +302,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'first_study_date',
       },
       {
         checked: false,
@@ -295,6 +310,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'word',
       },
       {
         checked: false,
@@ -302,6 +318,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'group_id',
       },
       {
         checked: false,
@@ -309,18 +326,30 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
+        val: 'word',
       }
       ],
       queryData: {
         count: 20,//单页数据条数
         page: 1,//页数
       },
-
+      selDataIds: [],
+      firstLoad: true,
+      selConditions: {
+        name: '单词',
+        val: 'word'
+      },
+      modVal: '',
+      modConditions: {
+        name: '单词',
+        val: 'word'
+      },
+      isSerach: false,
+      serachList: [],
     }
   },
   //第一次加载
   onLoad(e) {
-    // this.loadmore()
     this.manageapi()
     // 隐藏原生的tabbar
     uni.hideTabBar();
@@ -334,11 +363,36 @@ export default {
     manageapi() {
       this.$http.get('/WordSystem/wordData',
         { wordList: 'all', ...this.queryData }).then(res => {
-          this.indexList.push(...res.data)
+          let indexList = res.data.map((item, index) => {
+            return {
+              rowIndex: index,
+              checked: false,
+              ...item
+            }
+          })
+          this.indexList.push(...indexList)
         });
     },
     yes() {
-      this.close()
+      if (this.firstLoad) {
+        this.firstLoad = false;
+        this.searchCondition = this.selConditions.name
+        this.close()
+      } else {
+        this.updateWord()
+      }
+    },
+    updateWord() {
+      if (this.selDataIds.length == 0) {
+        console.log('请选择单词');
+        return
+      }
+      this.$http.get('/WordSystem/wordUpdate',
+        { [this.modConditions.val]: this.modVal, word_id: this.selDataIds.join(',') }).then(res => {
+          this.confirmInput()
+          this.close()
+          // this.$successMsg('更新成功！')
+        });
     },
     no() {
       this.close()
@@ -353,6 +407,10 @@ export default {
         }
 
         if (item.checked) {
+          this.selConditions = {
+            name: item.name,
+            val: item.val
+          }
           item.bgColor = "#3d5cff"
           item.borderColor = "#3d5cff"
           item.color = "#FFFF"
@@ -395,6 +453,10 @@ export default {
         }
 
         if (aitem.checked) {
+          this.modConditions = {
+            name: aitem.name,
+            val: aitem.val
+          }
           aitem.bgColor = "#3d5cff"
           aitem.borderColor = "#3d5cff"
           aitem.color = "#FFFF"
@@ -406,29 +468,54 @@ export default {
       })
 
     },
-    click(index) {
-      console.log(index)
-    },
     scrolltolower() {
       this.queryData.page += 1
-      this.manageapi()
-    },
-    // loadmore() {
-    //   for (let i = 0; i <= 15; i++) {
-    //     this.indexList.push({
-    //       url: this.urls[uni.$u.random(0, 1)]
-    //     })
-    //   }
-    // },
-    open() {
-      // console.log('open');
+      if (this.isSerach) {
+        this.confirmInput()
+      } else {
+        this.manageapi()
+      }
     },
     close() {
       this.show = false
-      // console.log('close');
     },
     confirmInput() {
-      console.log('进行搜索')
+      this.$http.post('/WordSystem/wordData',
+        { [this.selConditions.val]: this.searchVal, ...this.queryData }).then(res => {
+          this.isSerach = true
+          console.log(res, 5555555);
+          if (res.data.length == 0) {
+
+          } else {
+            let serachList = res.data.map((item, index) => {
+              return {
+                rowIndex: index,
+                checked: false,
+                ...item
+              }
+            })
+            this.serachList.push(...serachList)
+            this.indexList = this.serachList
+          }
+
+        });
+    },
+    cellClick(row) {
+      this.$set(row, 'checked', !row.checked)
+      if (row.checked) {
+        this.selDataIds.push(row.id)
+      } else {
+        this.selDataIds.forEach((data, index) => {
+          if (data === row.id) {
+            this.selDataIds.splice(index, 1)
+          }
+        })
+      }
+    },
+    cellClass(row, rowIndex) {
+      if (row.checked && rowIndex === row.rowIndex) {
+        return 'highlight-row'
+      }
     },
 
   }
@@ -521,5 +608,10 @@ export default {
   ::v-deep.u-line {
     border-bottom: 4rpx solid #b6b8b9 !important;
   }
+}
+
+.highlight-row {
+  color: #3d5cff !important;
+  font-weight: bold !important;
 }
 </style>

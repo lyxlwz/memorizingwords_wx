@@ -112,9 +112,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var trainProcess = function trainProcess() {__webpack_require__.e(/*! require.ensure | pages/number/components/process */ "pages/number/components/process").then((function () {return resolve(__webpack_require__(/*! ./process */ 533));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var trainResults = function trainResults() {__webpack_require__.e(/*! require.ensure | pages/number/components/results */ "pages/number/components/results").then((function () {return resolve(__webpack_require__(/*! ./results */ 540));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
-
-
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var trainProcess = function trainProcess() {Promise.all(/*! require.ensure | pages/number/components/process */[__webpack_require__.e("common/vendor"), __webpack_require__.e("pages/number/components/process")]).then((function () {return resolve(__webpack_require__(/*! ./process */ 533));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var trainResults = function trainResults() {__webpack_require__.e(/*! require.ensure | pages/number/components/results */ "pages/number/components/results").then((function () {return resolve(__webpack_require__(/*! ./results */ 540));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
 
@@ -141,7 +139,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
       default: 0 },
 
     date: String,
-    id: [String, Number] },
+    word_id: [String, Number] },
 
   data: function data() {
     return {
@@ -160,27 +158,13 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
   methods: {
     submit: function submit(val) {var _this = this;
       this.isResults = val.isFinite;
-      // console.log(this.upload_number,this.time_spent,val,'66666666666666666666')
-
       this.$http.post('/MemoryTraining/numberMemoryTraining',
       {
         upload_number: val.upload_number,
-        id: this.id,
-        time_spent: '01:02:100' },
-
-      {
-        header: {//默认 无 说明：请求头
-          // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-        } }).
+        id: this.word_id,
+        time_spent: val.time_spent }).
       then(function (data) {
-        // this.accuracy = data.accuracy
-        // this.random_number= data.random_number
-        // this.time_spent= data.time_spent
-        // this.upload_number= data.upload_number
-
         _this.numObj = data;
-        // console.log(this.random_number)
-
       });
 
 

@@ -137,7 +137,8 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var randomBox = function randomBox() {__webpack_require__.e(/*! require.ensure | pages/number/components/randomBox */ "pages/number/components/randomBox").then((function () {return resolve(__webpack_require__(/*! ./randomBox */ 555));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default2 =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var randomBox = function randomBox() {__webpack_require__.e(/*! require.ensure | pages/number/components/randomBox */ "pages/number/components/randomBox").then((function () {return resolve(__webpack_require__(/*! ./randomBox */ 555));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default2 =
+
 
 
 
@@ -231,14 +232,17 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
       answerRules: [
       {
         color: '#00FF49',
+        state: 'correct',
         title: '正确' },
 
       {
         color: '#D8001B',
+        state: 'error',
         title: '错误' }
 
       // {
       //   color: '#fff',
+      //   state:'',
       //   title: '未做'
       // }
       ] };
@@ -249,7 +253,20 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
   mounted: function mounted() {},
 
-  methods: {} };exports.default = _default2;
+  methods: {
+    finishTrain: function finishTrain() {
+      uni.navigateBack();
+    },
+    practiceAgain: function practiceAgain() {
+      var pages = getCurrentPages();
+      var curPage = pages[pages.length - 1];
+      console.log(curPage);
+      var url = curPage.$page.fullPath;
+      uni.reLaunch({
+        url: url });
+
+    } } };exports.default = _default2;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 
