@@ -92,73 +92,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "recyclableRender", function() { return recyclableRender; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "components", function() { return components; });
-var components
-try {
-  components = {
-    publicModule: function() {
-      return __webpack_require__.e(/*! import() | components/public-module/public-module */ "components/public-module/public-module").then(__webpack_require__.bind(null, /*! @/components/public-module/public-module.vue */ 276))
-    },
-    uInput: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-input/u-input */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-input/u-input")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-input/u-input.vue */ 281))
-    },
-    "u-Text": function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u--text/u--text */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u--text/u--text")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u--text/u--text.vue */ 318))
-    },
-    uPopup: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-popup/u-popup */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-popup/u-popup")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-popup/u-popup.vue */ 324))
-    },
-    uTag: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-tag/u-tag */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-tag/u-tag")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-tag/u-tag.vue */ 332))
-    },
-    "u-Input": function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u--input/u--input */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u--input/u--input")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u--input/u--input.vue */ 340))
-    },
-    "u-Image": function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u--image/u--image */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u--image/u--image")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u--image/u--image.vue */ 345))
-    },
-    uList: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-list/u-list */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-list/u-list")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-list/u-list.vue */ 351))
-    },
-    uListItem: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-list-item/u-list-item */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-list-item/u-list-item")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-list-item/u-list-item.vue */ 359))
-    },
-    uCell: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-cell/u-cell */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-cell/u-cell")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-cell/u-cell.vue */ 367))
-    },
-    zNavigation: function() {
-      return __webpack_require__.e(/*! import() | components/z-navigation/z-navigation */ "components/z-navigation/z-navigation").then(__webpack_require__.bind(null, /*! @/components/z-navigation/z-navigation.vue */ 311))
-    }
-  }
-} catch (e) {
-  if (
-    e.message.indexOf("Cannot find module") !== -1 &&
-    e.message.indexOf(".vue") !== -1
-  ) {
-    console.error(e.message)
-    console.error("1. 排查组件名称拼写是否正确")
-    console.error(
-      "2. 排查组件是否符合 easycom 规范，文档：https://uniapp.dcloud.net.cn/collocation/pages?id=easycom"
-    )
-    console.error(
-      "3. 若组件不符合 easycom 规范，需手动引入，并在 components 中注册该组件"
-    )
-  } else {
-    throw e
-  }
-}
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  if (!_vm._isMounted) {
-    _vm.e0 = function($event) {
-      _vm.show = true
-    }
-  }
-}
-var recyclableRender = false
+var render = function () {}
 var staticRenderFns = []
-render._withStripped = true
+var recyclableRender
+var components
 
 
 
@@ -411,6 +348,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   data: function data() {
@@ -418,6 +364,7 @@ var _default =
       all: '',
       src: '/static/word/sear.png',
       indexList: [],
+      searchCondition: '单词',
       searchVal: 'Product Design',
       urls: [],
       show: false,
@@ -426,23 +373,25 @@ var _default =
         aname: "首次学习日期",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'first_study_date' },
 
       {
         checked: false,
         aname: "分组序号",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'group_id' },
 
       {
         checked: false,
         aname: "最后筛查日期",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" }],
-
-
+        color: "#a6a6a6"
+        // val:'group_id'
+      }],
       aradios: [{
         checked: false,
         aname: "全选",
@@ -463,54 +412,71 @@ var _default =
         name: "单词",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'word' },
 
       {
         checked: false,
         name: "释义",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'paraphrase' },
 
       {
         checked: false,
         name: "首次学习日期",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'first_study_date' },
 
       {
         checked: false,
         name: "学习日期",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'word' },
 
       {
         checked: false,
         name: "分组序号",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" },
+        color: "#a6a6a6",
+        val: 'group_id' },
 
       {
         checked: false,
         name: "今日学习单词",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6" }],
+        color: "#a6a6a6",
+        val: 'word' }],
 
 
       queryData: {
         count: 20, //单页数据条数
         page: 1 //页数
-      } };
+      },
+      selDataIds: [],
+      firstLoad: true,
+      selConditions: {
+        name: '单词',
+        val: 'word' },
 
+      modVal: '',
+      modConditions: {
+        name: '单词',
+        val: 'word' },
+
+      isSerach: false,
+      serachList: [] };
 
   },
   //第一次加载
   onLoad: function onLoad(e) {
-    // this.loadmore()
     this.manageapi();
     // 隐藏原生的tabbar
     uni.hideTabBar();
@@ -524,16 +490,41 @@ var _default =
     manageapi: function manageapi() {var _this = this;
       this.$http.get('/WordSystem/wordData', _objectSpread({
         wordList: 'all' }, this.queryData)).then(function (res) {var _this$indexList;
-        (_this$indexList = _this.indexList).push.apply(_this$indexList, _toConsumableArray(res.data));
+        var indexList = res.data.map(function (item, index) {
+          return _objectSpread({
+            rowIndex: index,
+            checked: false },
+          item);
+
+        });
+        (_this$indexList = _this.indexList).push.apply(_this$indexList, _toConsumableArray(indexList));
       });
     },
     yes: function yes() {
-      this.close();
+      if (this.firstLoad) {
+        this.firstLoad = false;
+        this.searchCondition = this.selConditions.name;
+        this.close();
+      } else {
+        this.updateWord();
+      }
+    },
+    updateWord: function updateWord() {var _this$$http$get,_this2 = this;
+      if (this.selDataIds.length == 0) {
+        console.log('请选择单词');
+        return;
+      }
+      this.$http.get('/WordSystem/wordUpdate', (_this$$http$get = {}, _defineProperty(_this$$http$get,
+      this.modConditions.val, this.modVal), _defineProperty(_this$$http$get, "word_id", this.selDataIds.join(',')), _this$$http$get)).then(function (res) {
+        _this2.confirmInput();
+        _this2.close();
+        // this.$successMsg('更新成功！')
+      });
     },
     no: function no() {
       this.close();
     },
-    radioClick: function radioClick(name) {
+    radioClick: function radioClick(name) {var _this3 = this;
       this.radios.forEach(function (item, index) {
         if (index === name) {
           // 如果被选中再点一次就被取消了
@@ -543,6 +534,10 @@ var _default =
         }
 
         if (item.checked) {
+          _this3.selConditions = {
+            name: item.name,
+            val: item.val };
+
           item.bgColor = "#3d5cff";
           item.borderColor = "#3d5cff";
           item.color = "#FFFF";
@@ -575,7 +570,7 @@ var _default =
       });
 
     },
-    yaradioClick: function yaradioClick(aname) {
+    yaradioClick: function yaradioClick(aname) {var _this4 = this;
       this.yaradios.forEach(function (aitem, index) {
         if (index === aname) {
           // 如果被选中再点一次就被取消了
@@ -585,6 +580,10 @@ var _default =
         }
 
         if (aitem.checked) {
+          _this4.modConditions = {
+            name: aitem.name,
+            val: aitem.val };
+
           aitem.bgColor = "#3d5cff";
           aitem.borderColor = "#3d5cff";
           aitem.color = "#FFFF";
@@ -596,29 +595,54 @@ var _default =
       });
 
     },
-    click: function click(index) {
-      console.log(index);
-    },
     scrolltolower: function scrolltolower() {
       this.queryData.page += 1;
-      this.manageapi();
-    },
-    // loadmore() {
-    //   for (let i = 0; i <= 15; i++) {
-    //     this.indexList.push({
-    //       url: this.urls[uni.$u.random(0, 1)]
-    //     })
-    //   }
-    // },
-    open: function open() {
-      // console.log('open');
+      if (this.isSerach) {
+        this.confirmInput();
+      } else {
+        this.manageapi();
+      }
     },
     close: function close() {
       this.show = false;
-      // console.log('close');
     },
-    confirmInput: function confirmInput() {
-      console.log('进行搜索');
+    confirmInput: function confirmInput() {var _this5 = this;
+      this.$http.post('/WordSystem/wordData', _objectSpread(_defineProperty({},
+      this.selConditions.val, this.searchVal), this.queryData)).then(function (res) {
+        _this5.isSerach = true;
+        console.log(res, 5555555);
+        if (res.data.length == 0) {
+
+        } else {var _this5$serachList;
+          var serachList = res.data.map(function (item, index) {
+            return _objectSpread({
+              rowIndex: index,
+              checked: false },
+            item);
+
+          });
+          (_this5$serachList = _this5.serachList).push.apply(_this5$serachList, _toConsumableArray(serachList));
+          _this5.indexList = _this5.serachList;
+        }
+
+      });
+    },
+    cellClick: function cellClick(row) {var _this6 = this;
+      this.$set(row, 'checked', !row.checked);
+      if (row.checked) {
+        this.selDataIds.push(row.id);
+      } else {
+        this.selDataIds.forEach(function (data, index) {
+          if (data === row.id) {
+            _this6.selDataIds.splice(index, 1);
+          }
+        });
+      }
+    },
+    cellClass: function cellClass(row, rowIndex) {
+      if (row.checked && rowIndex === row.rowIndex) {
+        return 'highlight-row';
+      }
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

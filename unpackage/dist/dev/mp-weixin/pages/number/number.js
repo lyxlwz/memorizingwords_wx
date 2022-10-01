@@ -233,7 +233,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
     return {
       isShowNumTrain: false,
       keyword: '20',
-      id: '',
+      word_id: '',
       date: '',
       number: '' };
 
@@ -252,10 +252,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
           // 'Content-Type': 'multipart/form-data; charset=UTF-8'
         } }).
       then(function (data) {
-        _this.id = data.id,
-        _this.date = data.date,
+        _this.word_id = data.id;
+        _this.date = data.date;
         _this.number = data.random_number;
-        // console.log(this.id,this.data,this.number)
       });
 
     } } };exports.default = _default;

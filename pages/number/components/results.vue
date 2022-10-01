@@ -1,27 +1,26 @@
 <template>
   <view class="text-lg padding num-results">
-	  <view style="padding-top: 50rpx;">
-	  	<view class="word-Border-radius accTraining padding text-bold">
-      <view class="word-text-light text-sm">数字训练准确率<span>{{numObj.accuracy}}%</span></view>
-      <view class="text-xl margin-tb-xs">01:13''12</view>
-      <u-line-progress
-        :show-text="false"
-        :percentage="70"
-        :stroke-width="10"
-        activeColor="#f59b22"
-      />
+    <view style="padding-top: 50rpx;">
+      <view class="word-Border-radius accTraining padding text-bold">
+        <view class="word-text-light text-sm">数字训练准确率<span>{{numObj.accuracy}}%</span></view>
+        <view class="text-xl margin-tb-xs">{{numObj.time_spent}}</view>
+        <u-line-progress
+          :show-text="false"
+          :percentage="numObj.accuracy"
+          :stroke-width="10"
+          activeColor="#f59b22"
+        />
+      </view>
     </view>
-	  </view>
-    
 
     <view class="checkAnswers">
-      <view class="flex justify-between text-sm  align-center">
+      <view class="flex-row text-sm">
         <view>你的答案</view>
         <view class="flex">
           <view
             v-for="(rule,ruleIndex) in answerRules"
             :key="ruleIndex"
-            class="flex align-center margin-left-xs"
+            class="flex_y_center margin-left-xs"
           >
             <view
               class="answer-box word-info-bgcolor margin-right-xs"
@@ -35,8 +34,8 @@
       <random-box
         ref="randomBox"
         :random-number="numObj.upload_number"
-		 :answer-result="numObj.res"
-		:answer-rules="answerRules"
+        :answer-result="numObj.res"
+        :answer-rules="answerRules"
       />
     </view>
 
@@ -55,6 +54,7 @@
       <view
         class="btn"
         style="padding: 20rpx 100rpx; border-radius: 50upx;"
+        @click="finishTrain"
       >
         结束训练
       </view>
@@ -62,6 +62,7 @@
       <view
         class="btn"
         style="padding: 20rpx 100rpx; border-radius: 50upx;"
+        @click="practiceAgain"
       >
         再次练习
       </view>
@@ -76,30 +77,33 @@ export default {
   components: { randomBox },
   mixins: [],
   props: {
-	  numObj:{
-		  type:Object,
-	  default:function(){
-		  return{
-			  
-		  }
-	  }
-	  }
-	  
-	  
+    numObj: {
+      type: Object,
+      default: function () {
+        return {
+
+        }
+      }
+    }
+
+
   },
   data() {
     return {
       answerRules: [
         {
           color: '#00FF49',
+          state: 'correct',
           title: '正确'
         },
         {
           color: '#D8001B',
+          state: 'error',
           title: '错误'
         }
         // {
         //   color: '#fff',
+        //   state:'',
         //   title: '未做'
         // }
       ]
@@ -110,7 +114,20 @@ export default {
 
   mounted() { },
 
-  methods: {}
+  methods: {
+    finishTrain() {
+      uni.navigateBack();
+    },
+    practiceAgain() {
+      const pages = getCurrentPages()
+      const curPage = pages[pages.length - 1]
+      console.log(curPage);
+      const url = curPage.$page.fullPath
+      uni.reLaunch({
+        url
+      })
+    },
+  }
 }
 
 </script>

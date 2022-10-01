@@ -21,14 +21,14 @@
         >
           <view
             class=" word-Border-radius"
-            style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx"
+            style="width: 60%;height: 100rpx; background: #516dff; padding-top:28rpx"
           >
             <u--input
               border="none"
               fontSize="40rpx"
               inputAlign="center"
               color="#CBCDCE"
-			  v-model="keyword"
+              v-model="keyword"
             ></u--input>
           </view>
         </view>
@@ -51,9 +51,9 @@
     <num-train
       v-else
       style="position: relative;top:88rpx;"
-	  :id.sync = "id"
-	  :date.sync = "date"
-	  :number.sync = "number"
+      :word_id="word_id"
+      :date="date"
+      :number="number"
     ></num-train>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
@@ -68,33 +68,32 @@ export default {
   data() {
     return {
       isShowNumTrain: false,
-	  keyword:'20',
-	  id:'',
-	  date:'',
-	  number:'',
+      keyword: '20',
+      word_id: '',
+      date: '',
+      number: '',
     }
   },
- //  onLoad() {
- //  	this.numberapi()
-	
- //  },
+  //  onLoad() {
+  //  	this.numberapi()
+
+  //  },
   methods: {
-	  numberapi(){
-		  this.isShowNumTrain = true
-		  this.$http.get('/MemoryTraining/numberMemoryTraining',
-		    { digital_number: this.keyword },
-		    {
-		      header: { //默认 无 说明：请求头
-		        // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-		      }
-		    }).then(data =>{
-		  	  this.id = data.id,
-			  this.date = data.date,
-			  this.number = data.random_number
-			  // console.log(this.id,this.data,this.number)
-		    })
-			
-	  }
+    numberapi() {
+      this.isShowNumTrain = true
+      this.$http.get('/MemoryTraining/numberMemoryTraining',
+        { digital_number: this.keyword },
+        {
+          header: { //默认 无 说明：请求头
+            // 'Content-Type': 'multipart/form-data; charset=UTF-8'
+          }
+        }).then(data => {
+          this.word_id = data.id
+          this.date = data.date
+          this.number = data.random_number
+        })
+
+    }
   }
 }
 </script>

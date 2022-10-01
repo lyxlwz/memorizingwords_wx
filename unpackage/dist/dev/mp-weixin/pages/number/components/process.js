@@ -142,7 +142,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var randomBox = function randomBox() {__webpack_require__.e(/*! require.ensure | pages/number/components/randomBox */ "pages/number/components/randomBox").then((function () {return resolve(__webpack_require__(/*! ./randomBox */ 555));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
 
 
 
@@ -191,6 +191,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 
 
+var _utils = __webpack_require__(/*! @/plugins/utils */ 145);var randomBox = function randomBox() {__webpack_require__.e(/*! require.ensure | pages/number/components/randomBox */ "pages/number/components/randomBox").then((function () {return resolve(__webpack_require__(/*! ./randomBox */ 555));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 {
   name: 'numTrain',
   components: { randomBox: randomBox },
@@ -198,21 +199,29 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
   props: {
     number: {
       type: String,
-      default: 0 },
+      default: 0 } },
 
-    data: String,
-    id: [String, Number] },
 
   data: function data() {
     return {
-      remember: false };
+      remember: false,
+      timer: null,
+      time_spent: '' };
 
   },
 
   computed: {},
 
-  created: function created() {
-
+  created: function created() {var _this = this;
+    var before = new Date().getTime();
+    this.timer = setInterval(function () {
+      var now = new Date().getTime();
+      var time = now - before;
+      _this.time_spent = (0, _utils.handleTime)(time, false);
+    }, 1000 / 60);
+  },
+  beforeDestroy: function beforeDestroy() {
+    clearTimeout(this.timer);
   },
 
   methods: {
