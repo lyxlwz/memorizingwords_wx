@@ -28,7 +28,7 @@
 				<view class="tobe" @click="tobe">
 					<view class="title">今日待学习单词</view>
 					<view class="number margin-tb-xs">
-						201
+						{{toword}}
 					</view>
 					<u-line-progress :percentage="30" :showText="false" height="10" activeColor="#f59b22">
 					</u-line-progress>
@@ -82,6 +82,7 @@
 
 <script>
 	import circleProgress from '@/components/circle-progress/circle-progress'
+	import { mapState } from 'vuex';
 	export default {
 		data() {
 			return {
@@ -89,7 +90,9 @@
 				text: '',
 				bgColor: '',
 				imgUrl: '',
+				day:'2022-9-21',
 				pop: false,
+				toword:'',
 				planList: [{
 						planName: '记忆训练',
 						planNum: 7,
@@ -113,6 +116,9 @@
 				],
 			};
 		},
+		computed: {
+		  ...mapState(['userInfo'])
+		},
 		components: {
 			circleProgress,
 		},
@@ -122,6 +128,7 @@
 			uni.hideTabBar();
 			this.getData()
 			this.api()
+			this.toapi()
 		},
 		//页面显示
 		onShow() {
@@ -138,6 +145,16 @@
 					// this.imgUrl = ''
 					this.imgUrl = data.picture
 				})
+			},
+			toapi(){
+				this.planList[0].planNum = this.userInfo.screening_number || 0
+				this.planList[1].planNum = this.userInfo.screening_words || 0
+				this.planList[0].planTotalNum = this.userInfo.today_number_target || 0
+				this.planList[1].planTotalNum = this.userInfo.today_word_target || 0
+				this.toword = this.userInfo.today_word_target || 0
+				
+				
+
 			},
 			planItem(plan, index) {
 				if (index === 0) {

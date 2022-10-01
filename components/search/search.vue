@@ -97,6 +97,10 @@ export default {
     close() {
       this.$emit('update:show', false)
     },
+	scrolltolower(){
+		this.queryData.page += 1,
+		this.confirmInput()
+	},
 	confirmInput(){
 		this.$http.get('/WordSystem/wordData',
 		  { word: this.keyword,
