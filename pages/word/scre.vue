@@ -292,7 +292,9 @@ export default {
 
     lastWord() {
       if (this.firstLoad) {
-        uni.navigateBack();
+        uni.navigateBack({
+          delta: 2
+        })
         this.getScreenWords({
           type: 1,
           word_id: this.wordId,
@@ -309,10 +311,9 @@ export default {
     },
     nextWord() {
       if (this.lastLoad) {
-        uni.navigateBack();
-        // uni.navigateTo({
-        //   url: '/pages/word/scre'
-        // })
+        uni.navigateBack({
+          delta: 2
+        })
         this.getScreenWords({
           type: 1,
           word_id: this.wordId,

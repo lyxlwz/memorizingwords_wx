@@ -464,7 +464,9 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
 
     lastWord: function lastWord() {var _this4 = this;
       if (this.firstLoad) {
-        uni.navigateBack();
+        uni.navigateBack({
+          delta: 2 });
+
         this.getScreenWords({
           type: 1,
           word_id: this.wordId,
@@ -481,10 +483,9 @@ var _baseUrl = _interopRequireDefault(__webpack_require__(/*! @/config/baseUrl *
     },
     nextWord: function nextWord() {var _this5 = this;
       if (this.lastLoad) {
-        uni.navigateBack();
-        // uni.navigateTo({
-        //   url: '/pages/word/scre'
-        // })
+        uni.navigateBack({
+          delta: 2 });
+
         this.getScreenWords({
           type: 1,
           word_id: this.wordId,
