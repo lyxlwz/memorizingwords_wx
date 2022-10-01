@@ -260,6 +260,7 @@ var _vuex = __webpack_require__(/*! vuex */ 10);function ownKeys(object, enumera
       text: '',
       bgColor: '',
       imgUrl: '',
+      per: '',
       day: '2022-9-21',
       pop: false,
       toword: '',
@@ -286,8 +287,12 @@ var _vuex = __webpack_require__(/*! vuex */ 10);function ownKeys(object, enumera
 
 
   },
-  computed: _objectSpread({},
-  (0, _vuex.mapState)(['userInfo'])),
+  computed: _objectSpread(_objectSpread({},
+  (0, _vuex.mapState)(['userInfo'])), {}, {
+    per: function per() {
+      return this.planList[1].planNum / this.planList[1].planTotalNum * 100;
+
+    } }),
 
   components: {
     circleProgress: circleProgress },
@@ -322,6 +327,7 @@ var _vuex = __webpack_require__(/*! vuex */ 10);function ownKeys(object, enumera
       this.planList[0].planTotalNum = this.userInfo.today_number_target || 0;
       this.planList[1].planTotalNum = this.userInfo.today_word_target || 0;
       this.toword = this.userInfo.today_word_target || 0;
+
 
 
 

@@ -78,13 +78,13 @@ var components
 try {
   components = {
     zLoading: function() {
-      return Promise.all(/*! import() | uni_modules/z-loading/components/z-loading/z-loading */[__webpack_require__.e("common/vendor"), __webpack_require__.e("uni_modules/z-loading/components/z-loading/z-loading")]).then(__webpack_require__.bind(null, /*! @/uni_modules/z-loading/components/z-loading/z-loading.vue */ 450))
+      return Promise.all(/*! import() | uni_modules/z-loading/components/z-loading/z-loading */[__webpack_require__.e("common/vendor"), __webpack_require__.e("uni_modules/z-loading/components/z-loading/z-loading")]).then(__webpack_require__.bind(null, /*! @/uni_modules/z-loading/components/z-loading/z-loading.vue */ 422))
     },
     appletsBindUserInfo: function() {
-      return Promise.all(/*! import() | components/applets-bind-userInfo/applets-bind-userInfo */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/applets-bind-userInfo/applets-bind-userInfo")]).then(__webpack_require__.bind(null, /*! @/components/applets-bind-userInfo/applets-bind-userInfo.vue */ 457))
+      return Promise.all(/*! import() | components/applets-bind-userInfo/applets-bind-userInfo */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/applets-bind-userInfo/applets-bind-userInfo")]).then(__webpack_require__.bind(null, /*! @/components/applets-bind-userInfo/applets-bind-userInfo.vue */ 429))
     },
     uToast: function() {
-      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-toast/u-toast */ "node-modules/uview-ui/components/u-toast/u-toast").then(__webpack_require__.bind(null, /*! uview-ui/components/u-toast/u-toast.vue */ 610))
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-toast/u-toast */ "node-modules/uview-ui/components/u-toast/u-toast").then(__webpack_require__.bind(null, /*! uview-ui/components/u-toast/u-toast.vue */ 436))
     }
   }
 } catch (e) {

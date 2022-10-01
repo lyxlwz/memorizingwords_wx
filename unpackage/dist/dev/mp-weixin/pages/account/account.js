@@ -96,7 +96,7 @@ var components
 try {
   components = {
     zNavBar: function() {
-      return Promise.all(/*! import() | uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar */[__webpack_require__.e("common/vendor"), __webpack_require__.e("uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar")]).then(__webpack_require__.bind(null, /*! @/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar.vue */ 407))
+      return Promise.all(/*! import() | uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar */[__webpack_require__.e("common/vendor"), __webpack_require__.e("uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar")]).then(__webpack_require__.bind(null, /*! @/uni_modules/z-nav-bar/components/z-nav-bar/z-nav-bar.vue */ 355))
     },
     publicModule: function() {
       return __webpack_require__.e(/*! import() | components/public-module/public-module */ "components/public-module/public-module").then(__webpack_require__.bind(null, /*! @/components/public-module/public-module.vue */ 276))

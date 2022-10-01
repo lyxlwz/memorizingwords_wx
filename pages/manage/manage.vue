@@ -56,8 +56,7 @@
             >
               <view
                 class="sys"
-                style="height: 1000rpx;width: 100%;
-			  "
+                style="height: 1000rpx;width: 100%;"
               >
                 <view
                   class="test-w-b"
@@ -130,20 +129,20 @@
                         @click="yaradioClick"
                       >
                       </u-tag>
-                      <view class="padding-top-lg">
-                        <view
-                          class="test-w-b"
-                          style="font-size: 100%;padding-left: 20rpx;"
-                        >批量修改为</view>
-                      </view>
-                      <view style="padding: 20rpx 50rpx;">
-                        <view class="input">
-                          <u--input
-                            v-model="modVal"
-                            border="none"
-                            height="500"
-                          ></u--input>
-                        </view>
+                    </view>
+                    <view class="padding-top-lg">
+                      <view
+                        class="test-w-b"
+                        style="font-size: 100%;padding-left: 20rpx;"
+                      >批量修改为</view>
+                    </view>
+                    <view style="padding: 20rpx 50rpx;">
+                      <view class="input">
+                        <u--input
+                          v-model="modVal"
+                          border="none"
+                          height="500"
+                        ></u--input>
                       </view>
                     </view>
                   </view>
@@ -200,7 +199,7 @@
             <view
               slot="title"
               class="flex word-text-middle-1 margin-right-lg"
-              :class="cellClass(item,index)"
+              :class="[cellClass(item,index)]"
             >
               <view
                 class="margin-right-lg "
@@ -214,7 +213,7 @@
             <view
               slot="value"
               class="word-text-middle-1"
-              :class="cellClass(item,index)"
+              :class="[cellClass(item,index)]"
             >
               <view
                 class="text-right "

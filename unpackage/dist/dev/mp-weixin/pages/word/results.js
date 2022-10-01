@@ -96,13 +96,13 @@ var components
 try {
   components = {
     uNavbar: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-navbar/u-navbar */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-navbar/u-navbar")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-navbar/u-navbar.vue */ 375))
+      return Promise.all(/*! import() | node-modules/uview-ui/components/u-navbar/u-navbar */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-navbar/u-navbar")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-navbar/u-navbar.vue */ 318))
     },
     uParse: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-parse/u-parse */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-parse/u-parse")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-parse/u-parse.vue */ 383))
+      return Promise.all(/*! import() | node-modules/uview-ui/components/u-parse/u-parse */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-parse/u-parse")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-parse/u-parse.vue */ 326))
     },
     cuEditor: function() {
-      return Promise.all(/*! import() | components/cu-editor/cu-editor */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/cu-editor/cu-editor")]).then(__webpack_require__.bind(null, /*! @/components/cu-editor/cu-editor.vue */ 392))
+      return Promise.all(/*! import() | components/cu-editor/cu-editor */[__webpack_require__.e("common/vendor"), __webpack_require__.e("components/cu-editor/cu-editor")]).then(__webpack_require__.bind(null, /*! @/components/cu-editor/cu-editor.vue */ 335))
     },
     publicModule: function() {
       return __webpack_require__.e(/*! import() | components/public-module/public-module */ "components/public-module/public-module").then(__webpack_require__.bind(null, /*! @/components/public-module/public-module.vue */ 276))
@@ -165,7 +165,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var playWords = function playWords() {__webpack_require__.e(/*! require.ensure | pages/word/components/playWords */ "pages/word/components/playWords").then((function () {return resolve(__webpack_require__(/*! ./components/playWords */ 400));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var playWords = function playWords() {__webpack_require__.e(/*! require.ensure | pages/word/components/playWords */ "pages/word/components/playWords").then((function () {return resolve(__webpack_require__(/*! ./components/playWords */ 343));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
 
