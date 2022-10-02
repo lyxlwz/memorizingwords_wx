@@ -9,7 +9,7 @@
     >
     </u-navbar>
     <view style="position: relative;top: 30rpx;">
-      <view style="padding-top: 90rpx; padding-left: 20rpx; padding-right:20rpx;">
+      <view style="padding-top: 120rpx; padding-left: 20rpx; padding-right:20rpx;">
         <view
           class="word-text-light-1 flex_x_right"
           style="font-size: 30rpx;"

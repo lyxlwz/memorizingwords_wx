@@ -7,6 +7,7 @@
     <view
       v-else
       class="flex_bet text-white"
+	  
     >
       <span>请记住以下数字</span>
       <span class="flex">
@@ -95,7 +96,7 @@ export default {
   background: #3d5cff;
   height: 90vh;
   .num-btn {
-    padding-top: 400rpx;
+    padding-top: 500rpx;
     .btn {
       background: #627bff;
       color: #ddd;

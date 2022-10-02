@@ -7,11 +7,11 @@
     <public-module></public-module>
     <view
       class="bg"
-      style="height: 120rpx;background: #3d5cff;"
+      style="height: 130rpx;background: #3d5cff;"
     >
       <view
         class="text"
-        style="color: white;font-weight: 200%;padding-top: 56rpx;font-size: 36rpx;"
+        style="color: white;font-weight: 200%;padding-top: 60rpx;font-size: 36rpx;"
       >
         单词管理
       </view>
