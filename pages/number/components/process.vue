@@ -1,5 +1,5 @@
 <template>
-  <view class="number-train text-lg padding">
+  <view class="number-train text-lg">
     <span
       v-if="remember"
       class="text-white "
@@ -95,8 +95,9 @@ export default {
 .number-train {
   background: #3d5cff;
   height: 90vh;
+  padding: 60rpx 32rpx;
   .num-btn {
-    padding-top: 500rpx;
+    padding-top: 600rpx;
     .btn {
       background: #627bff;
       color: #ddd;
