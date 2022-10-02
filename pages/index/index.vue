@@ -11,6 +11,7 @@
 					placeholderStyle="font-size: 40rpx;"
 					clearable
 					height="90rpx"
+					:disabled = "dis"
 					border="none" 
 					confirmType="search" 
 					prefixIcon="search"
@@ -89,8 +90,9 @@
 				keyword: '',
 				text: '',
 				bgColor: '',
+				dis: true,
 				imgUrl: '',
-				per:'',
+				//  per:'',
 				day:'2022-9-21',
 				pop: false,
 				toword:'',

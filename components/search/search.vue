@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view style="">
    <!-- <u-overlay
       :show="show"
       @click="close"
@@ -97,10 +97,7 @@ export default {
     close() {
       this.$emit('update:show', false)
     },
-	scrolltolower(){
-		this.queryData.page += 1,
-		this.confirmInput()
-	},
+	
 	confirmInput(){
 		this.$http.get('/WordSystem/wordData',
 		  { word: this.keyword,
@@ -113,9 +110,14 @@ export default {
 		  }).then(data =>{
 			 //   this.indexList.name = this.data.word,
 		  // this.indexList.key = this.data.paraphrase
-		  this.indexList = data.data
+		  this.indexList.push(...data.data)
+		  // this.indexList.push(...this.indexList)
 		  });
 		      
+	},
+	scrolltolower(){
+		this.queryData.page  =  this.queryData.page + 1
+		this.confirmInput()
 	},
 	word(word){
 		uni.navigateTo({
