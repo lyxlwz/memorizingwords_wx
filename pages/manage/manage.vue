@@ -388,7 +388,11 @@ export default {
       }
       this.$http.get('/WordSystem/wordUpdate',
         { [this.modConditions.val]: this.modVal, word_id: this.selDataIds.join(',') }).then(res => {
-          this.confirmInput()
+          if (this.isSerach) {
+            this.confirmInput()
+          } else {
+            this.manageapi()
+          }
           this.close()
           // this.$successMsg('更新成功！')
         });
@@ -482,9 +486,8 @@ export default {
       this.$http.post('/WordSystem/wordData',
         { [this.selConditions.val]: this.searchVal, ...this.queryData }).then(res => {
           this.isSerach = true
-          console.log(res, 5555555);
           if (res.data.length == 0) {
-
+            this.indexList = this.serachList
           } else {
             let serachList = res.data.map((item, index) => {
               return {
