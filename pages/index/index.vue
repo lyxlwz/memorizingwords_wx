@@ -131,7 +131,6 @@ export default {
       dis: true,
       imgUrl: '',
       //  per:'',
-      day: '2022-9-21',
       pop: false,
       toword: '',
       planList: [{

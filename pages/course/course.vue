@@ -123,7 +123,7 @@ export default {
   background: #3d5cff;
   .text {
     color: white;
-    font-weight: 900;
+    font-weight: bold;
     font-size: 50rpx;
     padding-top: 100rpx;
     padding-left: 40rpx;
