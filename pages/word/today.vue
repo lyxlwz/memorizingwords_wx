@@ -287,8 +287,8 @@ export default {
       } else {
         const length = this.wordList.length
         const index = this.wordList.findIndex(v => v === this.wordId)
-        this.wordIndex = index
         const wordId = index === 0 ? this.wordList[length - 1] : this.wordList[index - 1]
+        this.wordIndex = index === 0 ? this.wordList.length : index - 1
         this.toNewWord(wordId)
       }
     },
@@ -307,8 +307,8 @@ export default {
       } else {
         const length = this.wordList.length
         const index = this.wordList.findIndex(v => v === this.wordId)
-        this.wordIndex = index
         const wordId = index === length - 1 ? this.wordList[0] : this.wordList[index + 1]
+        this.wordIndex = index === length - 1 ? 0 : index + 1
         this.toNewWord(wordId)
       }
     },

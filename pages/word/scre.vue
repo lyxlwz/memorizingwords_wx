@@ -45,8 +45,8 @@
       </view>
 
       <view
-        class="padding-xs association text-sm flex-start text-white playWords"
-        style="border-radius:24rpx;justify-content: space-around;width: 100rpx;"
+        class="padding-xs association text-sm flex-start text-white"
+        style="border-radius:24rpx;justify-content: space-around;width: 100rpx;margin: 0 5%;"
         @click="wordIsPlay = !wordIsPlay"
       >
         <view class="margin-right-xs">英</view>
@@ -65,7 +65,7 @@
           v-if="aaa"
         >
           <view
-            class="translate padding-top-lg"
+            class="translate padding-top-sm"
             style="display: flex;"
           >
             <view
@@ -304,8 +304,8 @@ export default {
       } else {
         const length = this.wordList.length
         const index = this.wordList.findIndex(v => v === this.wordId)
-        this.wordIndex = index
         const wordId = index === 0 ? this.wordList[length - 1] : this.wordList[index - 1]
+        this.wordIndex = index === 0 ? this.wordList.length : index - 1
         this.toNewWord(wordId)
       }
     },
@@ -323,8 +323,8 @@ export default {
       } else {
         const length = this.wordList.length
         const index = this.wordList.findIndex(v => v === this.wordId)
-        this.wordIndex = index
         const wordId = index === length - 1 ? this.wordList[0] : this.wordList[index + 1]
+        this.wordIndex = index === length - 1 ? 0 : index + 1
         this.toNewWord(wordId)
       }
     },
@@ -370,7 +370,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .screen {
-  height: 120vh;
+  height: 100vh;
   background: #3d5cff;
   .title {
     margin: auto;
@@ -387,27 +387,26 @@ export default {
       // width: 50rpx;
     }
   }
-  .playWords {
-    // padding: 0 5%;
+  .association {
+    // height: 200rpx;
+    background: #506cff;
+    .Corner {
+      // height: 60rpx;
+      background: #627bff;
+      width: 150rpx;
+    }
+    ::v-deep.word_content {
+      color: #cbcdce;
+      font-size: 30rpx;
+    }
   }
+
   .all {
     margin: auto;
     width: 90%;
+    height: calc(90vh - 300rpx);
+    overflow: scroll;
     // padding-left: 20rpx;
-
-    .association {
-      // height: 200rpx;
-      background: #506cff;
-      .Corner {
-        // height: 60rpx;
-        background: #627bff;
-        width: 150rpx;
-      }
-      ::v-deep.word_content {
-        color: #cbcdce;
-        font-size: 30rpx;
-      }
-    }
     .exp {
       // height: 320rpx;
       background: #506cff;

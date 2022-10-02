@@ -613,6 +613,26 @@ Vue.filter('timeFormat', function (val, fmt = 'yyyy-MM-dd hh:mm:ss') {
     return "";
   }
 });
+
+
+/**
+ * 获取当前的字体大小 当前的皮肤主题
+ * @param curfontSize
+ * @param curthemeClass
+ * @returns {*[]}
+ * @private
+ */
+export function _getTempClass(curfontSize, curthemeClass) {
+  const themeCLass = curthemeClass || uni.getStorageSync('themeCLass') || "system";
+  let themeSizeClass = curfontSize || uni.getStorageSync('themeSizeClass') || "";
+  //如果不存在默认值 则设置相应的默认值，并缓存起来
+  if (themeSizeClass === '') {
+    themeSizeClass = "font-size-common";
+    uni.setStorageSync('themeSizeClass', "font-size-common");
+  }
+  return [themeCLass, themeSizeClass];
+}
+
 // #ifdef APP-PLUS
 // 文字换行
 function drawtext(text, maxWidth) {

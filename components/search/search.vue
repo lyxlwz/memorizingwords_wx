@@ -1,67 +1,71 @@
 <template>
-  <view style="">
-   <!-- <u-overlay
-      :show="show"
-      @click="close"
-      opacity="0.9"
-    > -->
- <u-overlay
-      :show="show"
-      opacity="0.9"
+  <u-overlay
+    :show="show"
+    opacity="0.9"
+    zIndex="999999999999999999"
+  >
+    <view
+      class="search"
+      style="padding-top: 170rpx;margin: 0 5%;"
     >
-      <view
-        class="search"
-        style=" margin: auto;
-    padding-top: 170rpx;
-    width: 90%;"
-      >
-       <view 
-       style="background: white;border-radius: 20upx;padding: 20rpx;">
-       	<u-input 
-       	shape="square" 
-       	placeholder="请输入要查询的单词" 
-       	placeholderStyle="font-size: 40rpx;"
-       	clearable
-       	height="90rpx"
-       	border="none" 
-		:focus="boo"
-       	confirmType="search" 
-		v-model="keyword"
-       	prefixIcon="search"
-       	prefixIconStyle="font-size: 60rpx;color: #909399"
-       	@confirm="confirmInput">
-       	
-       			<template slot="suffix">
-       				<view class="word-text-middle-1"  @click="close" style="font-size: 30rpx;">
-       					取消
-       				</view> 
-       			</template>
-       	</u-input>
-       </view>
-        <view style="padding: 30rpx; 20rpx">
-          <view class="test-w-b word-text-border">
-            查询结果
-          </view>
-          <u-list @scrolltolower="scrolltolower">
-            <u-list-item
-              v-for="(item, index) in indexList"
-              :key="index"
+      <view style="background: white;border-radius: 20upx;padding: 20rpx;">
+        <u-input
+          shape="square"
+          placeholder="请输入要查询的单词"
+          placeholderStyle="font-size: 40rpx;"
+          clearable
+          height="90rpx"
+          border="none"
+          :focus="boo"
+          confirmType="search"
+          v-model="keyword"
+          prefixIcon="search"
+          prefixIconStyle="font-size: 60rpx;color: #909399"
+          @confirm="confirmInput"
+        >
+
+          <template slot="suffix">
+            <view
+              class="word-text-middle-1"
+              @click="close"
+              style="font-size: 30rpx;"
             >
-              <u-cell
-			  @click = "word(index)"
-                :title="item.word"
-                :label="item.paraphrase"
-                :titleStyle="{'font-size':'32rpx','color':'#FFFFFFCC'}"
-              >
-              </u-cell>
-            </u-list-item>
-          </u-list>
-        </view>
-
+              取消
+            </view>
+          </template>
+        </u-input>
       </view>
-    </u-overlay>
+      <view
+        style="padding: 30rpx 0"
+        v-if="indexList.length > 0"
+      >
+        <view class="test-w-b word-text-border">
+          查询结果
+        </view>
+        <u-list
+          @scrolltolower="scrolltolower"
+          enableBackToTop
+          height="calc(80vh - 180rpx)"
+          style="overflow: scroll"
+          pagingEnabled
+        >
+          <u-list-item
+            v-for="(item, index) in indexList"
+            :key="index"
+          >
+            <u-cell
+              @click="word(item)"
+              :title="item.word"
+              :label="item.paraphrase"
+              :titleStyle="{'font-size':'32rpx','color':'#FFFFFFCC'}"
+            >
+            </u-cell>
+          </u-list-item>
+        </u-list>
+      </view>
 
-  </view>
+    </view>
+  </u-overlay>
 </template>
 
 <script>
@@ -79,12 +83,12 @@ export default {
       keyword: '',
       // show: vshow,
       // show: true,
-	  indexList:[],
-	  boo:true,
-	  queryData: {
-	    count: 10,//单页数据条数
-	    page: 1,//页数
-	  },
+      indexList: [],
+      boo: true,
+      queryData: {
+        count: 10,//单页数据条数
+        page: 1,//页数
+      },
       // indexList: [
       //   {
       //     name: "word",
@@ -97,33 +101,31 @@ export default {
     close() {
       this.$emit('update:show', false)
     },
-	
-	confirmInput(){
-		this.$http.get('/WordSystem/wordData',
-		  { word: this.keyword,
-		   ...this.queryData
-			},
-		  {
-		    header: { //默认 无 说明：请求头
-		      // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-		    }
-		  }).then(data =>{
-			 //   this.indexList.name = this.data.word,
-		  // this.indexList.key = this.data.paraphrase
-		  this.indexList.push(...data.data)
-		  // this.indexList.push(...this.indexList)
-		  });
-		      
-	},
-	scrolltolower(){
-		this.queryData.page  =  this.queryData.page + 1
-		this.confirmInput()
-	},
-	word(word){
-		uni.navigateTo({
-		  url: `/pages/word/results?name=${word}`
-		});
-	}
+
+    confirmInput() {
+      this.$http.get('/WordSystem/wordData',
+        {
+          word: this.keyword,
+          ...this.queryData
+        },
+        {
+          header: { //默认 无 说明：请求头
+            // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+          }
+        }).then(data => {
+          this.indexList.push(...data.data)
+        });
+
+    },
+    scrolltolower() {
+      this.queryData.page = this.queryData.page + 1
+      this.confirmInput()
+    },
+    word(word) {
+      uni.navigateTo({
+        url: `/pages/word/results?id=${word.id}`
+      });
+    }
   }
 }
 </script>
@@ -131,5 +133,9 @@ export default {
 <style>
 ::v-deep .u-search__content {
   border-radius: 10px !important;
+}
+
+::v-deep .u-cell__body {
+  padding: 10px 0 !important;
 }
 </style>
