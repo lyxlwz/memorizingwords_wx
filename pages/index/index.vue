@@ -10,9 +10,10 @@
           <u-input
             shape="square"
             placeholder="请输入要查询的单词"
-            placeholderStyle="font-size: 40rpx;"
+            placeholderStyle="font-size: 30rpx;"
             clearable
             height="90rpx"
+			disabledColor = "white"
             :disabled="dis"
             border="none"
             confirmType="search"
