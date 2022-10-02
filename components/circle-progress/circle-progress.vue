@@ -20,6 +20,8 @@ export default {
     return {
       wid: 200,
       r: 33,
+      lineBgWid: 6,
+      lineWid: 6,
     }
   },
   props: {
@@ -69,6 +71,8 @@ export default {
   mounted() {
     this.wid = uni.getSystemInfoSync().windowWidth / 375 * this.width
     this.r = uni.getSystemInfoSync().windowWidth / 375 * this.radius
+    this.lineBgWid = uni.getSystemInfoSync().windowWidth / 375 * this.lineBgWidth
+    this.lineWid = uni.getSystemInfoSync().windowWidth / 375 * this.lineWidth
     const data = {
       total: this.total,
       num: this.num,
@@ -80,7 +84,7 @@ export default {
       var that = this;
       //创建并返回绘图上下文context对象。
       let cxt_arc = uni.createCanvasContext(prefix, this);
-      cxt_arc.setLineWidth(this.lineBgWidth); //线条的宽度
+      cxt_arc.setLineWidth(this.lineBgWid); //线条的宽度
       cxt_arc.setStrokeStyle(this.bgColor);//边框颜色
       cxt_arc.setLineCap('round');
       cxt_arc.beginPath();
@@ -100,7 +104,7 @@ export default {
       } else {
         value = (data.num / data.total) * 2;
       }
-      cxt_arc.setLineWidth(this.lineWidth);
+      cxt_arc.setLineWidth(this.lineWid);
       cxt_arc.setStrokeStyle(this.activeColor);
       cxt_arc.setLineCap('round');
       cxt_arc.beginPath();
