@@ -22,7 +22,6 @@
 
         <u-input
           shape="square"
-          placeholder=""
           clearable
           fontSize="32rpx"
           placeholderStyle="color:#3d5cff"
