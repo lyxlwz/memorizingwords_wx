@@ -189,7 +189,7 @@
       <u-list
         v-if="indexList.length > 0"
         @scrolltolower="scrolltolower"
-        height="calc(80vh - 180rpx)"
+        height="calc(70vh - 180rpx)"
         pagingEnabled
         :preLoadScreen="queryData.page * 4"
       >

@@ -1,5 +1,4 @@
 <template>
-  <!-- 这里直接引用即可 wordPageSty -->
   <view class="wordPageSty">
     <view class="hpage">
       <view class="search">
@@ -13,7 +12,7 @@
             placeholderStyle="font-size: 30rpx;"
             clearable
             height="90rpx"
-			disabledColor = "white"
+            disabledColor="white"
             :disabled="dis"
             border="none"
             confirmType="search"
@@ -102,10 +101,11 @@
               {{text}}
             </view>
           </view>
-          <img
+          <image
             :src="imgUrl"
             alt=""
-            style="border-radius:50%; height: 90%; width: 50%;"
+            mode="widthFix"
+            style="border-radius:50%; height: 50%; width: 50%;"
           >
         </view>
 

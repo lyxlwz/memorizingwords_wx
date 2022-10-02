@@ -186,10 +186,7 @@ $http.requestError = function (e) {
   if (e.statusCode === 0) {
     throw e;
   } else {
-    getApp().globalData.toast.show({
-      message: "网络错误，请检查一下网络",
-      type: 'error',
-    })
+    Vue.prototype.$errorMsg('网络错误，请检查一下网络')
   }
 }
 export default $http;

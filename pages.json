@@ -84,10 +84,13 @@
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    // "navigationBarTitleText": "uni-app",
+    "navigationBarTitleText": "个人学习应用",
     "navigationBarBackgroundColor": "#3d5cff",
     "backgroundColor": "#3d5cff",
-    "navigationStyle": "custom"
+    "navigationStyle": "custom",
+    "rpxCalcMaxDeviceWidth": 1860,
+    "rpxCalcBaseDeviceWidth": 375,
+    "rpxCalcIncludeWidth": 750
   },
   "tabBar": {
     "color": "#444444",
