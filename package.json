@@ -1,9 +1,18 @@
 {
-    "id": "cu-editor",
-    "name": "微信小程序富文本编辑器（仿腾讯文档）",
-    "version": "1.0.4",
-    "description": "照着腾讯文档小程序开发了微信小程序富文本编辑器组件，这几天做个整理，如果有这个需求可以前往腾讯文档小程序操作看看实际效果。腾讯文档小程序用的不是原生的组件，当前项目按现有开放api尽可能实现。",
-    "keywords": [
-        "editor"
-    ]
+  "name": "memorizingwords_wx",
+  "version": "1.0.0",
+  "description": "{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/north-south-detachment_1/memorizingwords_wx.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "uview-ui": "^2.0.31"
+  }
 }
