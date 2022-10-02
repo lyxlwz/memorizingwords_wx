@@ -464,20 +464,20 @@ var _default =
 
       {
         checked: false,
-        aname: "分组序号",
+        aname: "单词",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-        val: 'group_id' },
+        val: 'word' },
 
       {
         checked: false,
-        aname: "最后筛查日期",
+        aname: "释义",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
-        color: "#a6a6a6"
-        // val:'group_id'
-      }],
+        color: "#a6a6a6",
+        val: 'paraphrase' }],
+
       aradios: [{
         checked: false,
         aname: "全选",
@@ -539,7 +539,7 @@ var _default =
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-        val: 'word' }],
+        val: 'study_date' }],
 
 
       queryData: {

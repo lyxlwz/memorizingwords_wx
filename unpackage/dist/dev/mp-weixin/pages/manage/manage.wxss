@@ -76,6 +76,8 @@
 }
 .u-page.data-v-55df5bb4 .u-line {
   border-bottom: 4rpx solid #b6b8b9 !important;
+  width: auto !important;
+  margin: 0 32rpx !important;
 }
 .highlight-row.data-v-55df5bb4 {
   color: #3d5cff !important;
