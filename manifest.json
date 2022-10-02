@@ -10,7 +10,7 @@
         }
     ],
     "versionName" : "0.0.1",
-    "versionCode" : 110,
+    "versionCode" : 1,
     "app-plus" : {
         "compatible" : {
             "ignoreVersion" : true

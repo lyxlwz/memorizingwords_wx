@@ -2,7 +2,6 @@
   <u-overlay
     :show="show"
     opacity="0.9"
-    zIndex="999999999999999999"
   >
     <view
       class="search"
@@ -44,10 +43,10 @@
         </view>
         <u-list
           @scrolltolower="scrolltolower"
-          enableBackToTop
           height="calc(80vh - 180rpx)"
           style="overflow: scroll"
           pagingEnabled
+          :preLoadScreen="queryData.page * 4"
         >
           <u-list-item
             v-for="(item, index) in indexList"
@@ -86,7 +85,7 @@ export default {
       indexList: [],
       boo: true,
       queryData: {
-        count: 10,//单页数据条数
+        count: 20,//单页数据条数
         page: 1,//页数
       },
       // indexList: [

@@ -189,6 +189,7 @@
         @scrolltolower="scrolltolower"
         height="calc(80vh - 180rpx)"
         pagingEnabled
+        :preLoadScreen="queryData.page * 4"
       >
         <u-list-item
           v-for="(item, index) in indexList"

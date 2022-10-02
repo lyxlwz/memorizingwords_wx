@@ -10,7 +10,7 @@
           <u-input
             shape="square"
             placeholder="请输入要查询的单词"
-            placeholderStyle="font-size: 30rpx;"
+            placeholderStyle="font-size: 40rpx;"
             clearable
             height="90rpx"
             :disabled="dis"
@@ -60,6 +60,7 @@
               >
                 <view class="title flex">
                   <circle-progress
+                    v-if="!pop"
                     :canvasId="`canvas${index}`"
                     active-color="#009DFF"
                     :total="plan.planTotalNum"
