@@ -7,11 +7,11 @@
     <public-module></public-module>
     <view
       class="bg"
-      style="height: 200rpx;background: #3d5cff;"
+      style="height: 120rpx;background: #3d5cff;"
     >
       <view
         class="text"
-        style="color: white;font-weight: 200%;padding-top: 120rpx;font-size: 36rpx;"
+        style="color: white;font-weight: 200%;padding-top: 56rpx;font-size: 36rpx;"
       >
         单词管理
       </view>
@@ -156,7 +156,7 @@
                     type="info"
                     plain=true
                     iconColor="#3d5cff"
-					color="#3d5cff"
+                    color="#3d5cff"
                     style="width: 40%;border-color:#3d5cff;color: #3d5cff;"
                     @click="no"
                   >取消</button>
@@ -251,19 +251,19 @@ export default {
       },
       {
         checked: false,
-        aname: "分组序号",
+        aname: "单词",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-        val: 'group_id'
+        val: 'word'
       },
       {
         checked: false,
-        aname: "最后筛查日期",
+        aname: "释义",
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-        // val:'group_id'
+        val: 'paraphrase'
       }],
       aradios: [{
         checked: false,
@@ -326,7 +326,7 @@ export default {
         bgColor: "#d7d7d7",
         borderColor: "#d7d7d7",
         color: "#a6a6a6",
-        val: 'word',
+        val: 'study_date',
       }
       ],
       queryData: {
@@ -607,6 +607,8 @@ export default {
 
   ::v-deep.u-line {
     border-bottom: 4rpx solid #b6b8b9 !important;
+    width: auto !important;
+    margin: 0 32rpx !important;
   }
 }
 
