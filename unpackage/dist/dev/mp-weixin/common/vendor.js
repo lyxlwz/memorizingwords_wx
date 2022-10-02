@@ -334,7 +334,7 @@ var promiseInterceptor = {
 
 
 var SYNC_API_RE =
-/^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo|getSystemSetting|getAppAuthorizeSetting/;
+/^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo/;
 
 var CONTEXT_API_RE = /^create|Manager$/;
 
@@ -342,7 +342,7 @@ var CONTEXT_API_RE = /^create|Manager$/;
 var CONTEXT_API_RE_EXC = ['createBLEConnection'];
 
 // 同步例外情况
-var ASYNC_API = ['createBLEConnection', 'createPushMessage'];
+var ASYNC_API = ['createBLEConnection'];
 
 var CALLBACK_API_RE = /^on|^off/;
 
@@ -766,8 +766,8 @@ function populateParameters(result) {var _result$brand =
     appVersion: "0.0.1",
     appVersionCode: "110",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "3.6.3",
-    uniRuntimeVersion: "3.6.3",
+    uniCompileVersion: "3.4.15",
+    uniRuntimeVersion: "3.4.15",
     uniPlatform: undefined || "mp-weixin",
     deviceBrand: deviceBrand,
     deviceModel: model,
@@ -910,19 +910,6 @@ var getWindowInfo = {
   } };
 
 
-var getAppAuthorizeSetting = {
-  returnValue: function returnValue(result) {var
-    locationReducedAccuracy = result.locationReducedAccuracy;
-
-    result.locationAccuracy = 'unsupported';
-    if (locationReducedAccuracy === true) {
-      result.locationAccuracy = 'reduced';
-    } else if (locationReducedAccuracy === false) {
-      result.locationAccuracy = 'full';
-    }
-  } };
-
-
 // import navigateTo from 'uni-helpers/navigate-to'
 
 var protocols = {
@@ -934,8 +921,7 @@ var protocols = {
   showActionSheet: showActionSheet,
   getAppBaseInfo: getAppBaseInfo,
   getDeviceInfo: getDeviceInfo,
-  getWindowInfo: getWindowInfo,
-  getAppAuthorizeSetting: getAppAuthorizeSetting };
+  getWindowInfo: getWindowInfo };
 
 var todos = [
 'vibrate',
@@ -1160,7 +1146,6 @@ function getApiCallbacks(params) {
 
 var cid;
 var cidErrMsg;
-var enabled;
 
 function normalizePushMessage(message) {
   try {
@@ -1172,25 +1157,17 @@ function normalizePushMessage(message) {
 function invokePushCallback(
 args)
 {
-  if (args.type === 'enabled') {
-    enabled = true;
-  } else if (args.type === 'clientId') {
+  if (args.type === 'clientId') {
     cid = args.cid;
     cidErrMsg = args.errMsg;
     invokeGetPushCidCallbacks(cid, args.errMsg);
   } else if (args.type === 'pushMsg') {
-    var message = {
-      type: 'receive',
-      data: normalizePushMessage(args.message) };
+    onPushMessageCallbacks.forEach(function (callback) {
+      callback({
+        type: 'receive',
+        data: normalizePushMessage(args.message) });
 
-    for (var i = 0; i < onPushMessageCallbacks.length; i++) {
-      var callback = onPushMessageCallbacks[i];
-      callback(message);
-      // 该消息已被阻止
-      if (message.stopped) {
-        break;
-      }
-    }
+    });
   } else if (args.type === 'click') {
     onPushMessageCallbacks.forEach(function (callback) {
       callback({
@@ -1210,7 +1187,7 @@ function invokeGetPushCidCallbacks(cid, errMsg) {
   getPushCidCallbacks.length = 0;
 }
 
-function getPushClientId(args) {
+function getPushClientid(args) {
   if (!isPlainObject(args)) {
     args = {};
   }var _getApiCallbacks =
@@ -1222,33 +1199,25 @@ function getPushClientId(args) {
   var hasSuccess = isFn(success);
   var hasFail = isFn(fail);
   var hasComplete = isFn(complete);
+  getPushCidCallbacks.push(function (cid, errMsg) {
+    var res;
+    if (cid) {
+      res = {
+        errMsg: 'getPushClientid:ok',
+        cid: cid };
 
-  Promise.resolve().then(function () {
-    if (typeof enabled === 'undefined') {
-      enabled = false;
-      cid = '';
-      cidErrMsg = 'uniPush is not enabled';
+      hasSuccess && success(res);
+    } else {
+      res = {
+        errMsg: 'getPushClientid:fail' + (errMsg ? ' ' + errMsg : '') };
+
+      hasFail && fail(res);
     }
-    getPushCidCallbacks.push(function (cid, errMsg) {
-      var res;
-      if (cid) {
-        res = {
-          errMsg: 'getPushClientId:ok',
-          cid: cid };
-
-        hasSuccess && success(res);
-      } else {
-        res = {
-          errMsg: 'getPushClientId:fail' + (errMsg ? ' ' + errMsg : '') };
-
-        hasFail && fail(res);
-      }
-      hasComplete && complete(res);
-    });
-    if (typeof cid !== 'undefined') {
-      invokeGetPushCidCallbacks(cid, cidErrMsg);
-    }
+    hasComplete && complete(res);
   });
+  if (typeof cid !== 'undefined') {
+    Promise.resolve().then(function () {return invokeGetPushCidCallbacks(cid, cidErrMsg);});
+  }
 }
 
 var onPushMessageCallbacks = [];
@@ -1272,7 +1241,7 @@ var offPushMessage = function offPushMessage(fn) {
 
 var api = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  getPushClientId: getPushClientId,
+  getPushClientid: getPushClientid,
   onPushMessage: onPushMessage,
   offPushMessage: offPushMessage,
   invokePushCallback: invokePushCallback });
@@ -1290,17 +1259,7 @@ var customize = cached(function (str) {
 function initTriggerEvent(mpInstance) {
   var oldTriggerEvent = mpInstance.triggerEvent;
   var newTriggerEvent = function newTriggerEvent(event) {for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {args[_key3 - 1] = arguments[_key3];}
-    // 事件名统一转驼峰格式，仅处理：当前组件为 vue 组件、当前组件为 vue 组件子组件
-    if (this.$vm || this.dataset && this.dataset.comType) {
-      event = customize(event);
-    } else {
-      // 针对微信/QQ小程序单独补充驼峰格式事件，以兼容历史项目
-      var newEvent = customize(event);
-      if (newEvent !== event) {
-        oldTriggerEvent.apply(this, [newEvent].concat(args));
-      }
-    }
-    return oldTriggerEvent.apply(this, [event].concat(args));
+    return oldTriggerEvent.apply(mpInstance, [customize(event)].concat(args));
   };
   try {
     // 京东小程序 triggerEvent 为只读
@@ -1399,29 +1358,6 @@ function initHooks(mpOptions, hooks, vueOptions) {
   });
 }
 
-function initUnknownHooks(mpOptions, vueOptions) {var excludes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-  findHooks(vueOptions).forEach(function (hook) {return initHook$1(mpOptions, hook, excludes);});
-}
-
-function findHooks(vueOptions) {var hooks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  if (vueOptions) {
-    Object.keys(vueOptions).forEach(function (name) {
-      if (name.indexOf('on') === 0 && isFn(vueOptions[name])) {
-        hooks.push(name);
-      }
-    });
-  }
-  return hooks;
-}
-
-function initHook$1(mpOptions, hook, excludes) {
-  if (excludes.indexOf(hook) === -1 && !hasOwn(mpOptions, hook)) {
-    mpOptions[hook] = function (args) {
-      return this.$vm && this.$vm.__call_hook(hook, args);
-    };
-  }
-}
-
 function initVueComponent(Vue, vueOptions) {
   vueOptions = vueOptions.default || vueOptions;
   var VueComponent;
@@ -1464,7 +1400,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -1559,25 +1495,18 @@ function parsePropType(key, type, defaultValue, file) {
   return type;
 }
 
-function initProperties(props) {var isBehavior = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;var file = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';var options = arguments.length > 3 ? arguments[3] : undefined;
+function initProperties(props) {var isBehavior = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;var file = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   var properties = {};
   if (!isBehavior) {
     properties.vueId = {
       type: String,
       value: '' };
 
-    {
-      if (options.virtualHost) {
-        properties.virtualHostStyle = {
-          type: null,
-          value: '' };
+    // 用于字节跳动小程序模拟抽象节点
+    properties.generic = {
+      type: Object,
+      value: null };
 
-        properties.virtualHostClass = {
-          type: null,
-          value: '' };
-
-      }
-    }
     // scopedSlotsCompiler auto
     properties.scopedSlotsCompiler = {
       type: String,
@@ -1707,7 +1636,7 @@ function getExtraValue(vm, dataPathsArray) {
   return context;
 }
 
-function processEventExtra(vm, extra, event, __args__) {
+function processEventExtra(vm, extra, event) {
   var extraObj = {};
 
   if (Array.isArray(extra) && extra.length) {
@@ -1730,7 +1659,11 @@ function processEventExtra(vm, extra, event, __args__) {
           if (dataPath === '$event') {// $event
             extraObj['$' + index] = event;
           } else if (dataPath === 'arguments') {
-            extraObj['$' + index] = event.detail ? event.detail.__args__ || __args__ : __args__;
+            if (event.detail && event.detail.__args__) {
+              extraObj['$' + index] = event.detail.__args__;
+            } else {
+              extraObj['$' + index] = [event];
+            }
           } else if (dataPath.indexOf('$event.') === 0) {// $event.target.value
             extraObj['$' + index] = vm.__get_value(dataPath.replace('$event.', ''), event);
           } else {
@@ -1757,12 +1690,6 @@ function getObjByArray(arr) {
 
 function processEventArgs(vm, event) {var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];var extra = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];var isCustom = arguments.length > 4 ? arguments[4] : undefined;var methodName = arguments.length > 5 ? arguments[5] : undefined;
   var isCustomMPEvent = false; // wxcomponent 组件，传递原始 event 对象
-
-  // fixed 用户直接触发 mpInstance.triggerEvent
-  var __args__ = isPlainObject(event.detail) ?
-  event.detail.__args__ || [event.detail] :
-  [event.detail];
-
   if (isCustom) {// 自定义事件
     isCustomMPEvent = event.currentTarget &&
     event.currentTarget.dataset &&
@@ -1771,11 +1698,11 @@ function processEventArgs(vm, event) {var args = arguments.length > 2 && argumen
       if (isCustomMPEvent) {
         return [event];
       }
-      return __args__;
+      return event.detail.__args__ || event.detail;
     }
   }
 
-  var extraObj = processEventExtra(vm, extra, event, __args__);
+  var extraObj = processEventExtra(vm, extra, event);
 
   var ret = [];
   args.forEach(function (arg) {
@@ -1784,7 +1711,7 @@ function processEventArgs(vm, event) {var args = arguments.length > 2 && argumen
         ret.push(event.target.value);
       } else {
         if (isCustom && !isCustomMPEvent) {
-          ret.push(__args__[0]);
+          ret.push(event.detail.__args__[0]);
         } else {// wxcomponent 组件或内置组件
           ret.push(event);
         }
@@ -1875,9 +1802,7 @@ function handleEvent(event) {var _this2 = this;
           }
           var handler = handlerCtx[methodName];
           if (!isFn(handler)) {
-            var _type = _this2.$vm.mpType === 'page' ? 'Page' : 'Component';
-            var path = _this2.route || _this2.is;
-            throw new Error("".concat(_type, " \"").concat(path, "\" does not have a method \"").concat(methodName, "\""));
+            throw new Error(" _vm.".concat(methodName, " is not a function"));
           }
           if (isOnce) {
             if (handler.once) {
@@ -2091,7 +2016,6 @@ function parseBaseApp(vm, _ref3)
   initAppLocale(_vue.default, vm, normalizeLocale(wx.getSystemInfoSync().language) || LOCALE_EN);
 
   initHooks(appOptions, hooks);
-  initUnknownHooks(appOptions, vm.$options);
 
   return appOptions;
 }
@@ -2261,7 +2185,7 @@ function parseBaseComponent(vueComponentOptions)
     options: options,
     data: initData(vueOptions, _vue.default.prototype),
     behaviors: initBehaviors(vueOptions, initBehavior),
-    properties: initProperties(vueOptions.props, false, vueOptions.__file, options),
+    properties: initProperties(vueOptions.props, false, vueOptions.__file),
     lifetimes: {
       attached: function attached() {
         var properties = this.properties;
@@ -2370,7 +2294,6 @@ function parseBasePage(vuePageOptions, _ref6)
     this.$vm.$mp.query = query; // 兼容 mpvue
     this.$vm.__call_hook('onLoad', query);
   };
-  initUnknownHooks(pageOptions.methods, vuePageOptions, ['onReady']);
 
   return pageOptions;
 }
@@ -8556,7 +8479,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -8577,14 +8500,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -8670,7 +8593,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"memorizingwords_wx","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -8856,12 +8779,9 @@ function internalMixin(Vue) {
 
   Vue.prototype.$emit = function(event) {
     if (this.$scope && event) {
-      var triggerEvent = this.$scope['_triggerEvent'] || this.$scope['triggerEvent'];
-      if (triggerEvent) {
-        triggerEvent.call(this.$scope, event, {
-          __args__: toArray(arguments, 1)
-        });
-      }
+      (this.$scope['_triggerEvent'] || this.$scope['triggerEvent']).call(this.$scope, event, {
+        __args__: toArray(arguments, 1)
+      });
     }
     return oldEmit.apply(this, arguments)
   };
@@ -9028,8 +8948,7 @@ var LIFECYCLE_HOOKS$1 = [
     // 'onReady', // 兼容旧版本，应该移除该事件
     'onPageShow',
     'onPageHide',
-    'onPageResize',
-    'onUploadDouyinVideo'
+    'onPageResize'
 ];
 function lifecycleMixin$1(Vue) {
 
@@ -9084,9 +9003,9 @@ internalMixin(Vue);
 
 /***/ }),
 /* 5 */
-/*!*************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/pages.json ***!
-  \*************************************************/
+/*!*********************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/pages.json ***!
+  \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9097,9 +9016,9 @@ internalMixin(Vue);
 /* 7 */,
 /* 8 */,
 /* 9 */
-/*!*****************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/index.js ***!
-  \*****************************************************/
+/*!*************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/index.js ***!
+  \*************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10381,9 +10300,9 @@ module.exports = index_cjs;
 
 /***/ }),
 /* 11 */
-/*!****************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules sync nonrecursive \.js$ ***!
-  \****************************************************************************/
+/*!************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules sync nonrecursive \.js$ ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10417,9 +10336,9 @@ webpackContext.id = 11;
 
 /***/ }),
 /* 12 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/common.js ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/common.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10521,9 +10440,9 @@ var actions = {};exports.actions = actions;
 
 /***/ }),
 /* 13 */
-/*!*************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/order.js ***!
-  \*************************************************************/
+/*!*********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/order.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10538,9 +10457,9 @@ var actions = {};exports.actions = actions;
 
 /***/ }),
 /* 14 */
-/*!************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/user.js ***!
-  \************************************************************/
+/*!********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/user.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10578,9 +10497,9 @@ var actions = {};exports.actions = actions;
 
 /***/ }),
 /* 15 */
-/*!*************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/video.js ***!
-  \*************************************************************/
+/*!*********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/video.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10597,9 +10516,9 @@ var actions = {};exports.actions = actions;
 
 /***/ }),
 /* 16 */
-/*!************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/store/modules/word.js ***!
-  \************************************************************/
+/*!********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/store/modules/word.js ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10789,9 +10708,9 @@ function normalizeComponent (
 
 /***/ }),
 /* 20 */
-/*!*********************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/index.js ***!
-  \*********************************************************************/
+/*!*****************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/index.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -10878,9 +10797,9 @@ var install = function install(Vue) {
 
 /***/ }),
 /* 21 */
-/*!********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mixin.js ***!
-  \********************************************************************************/
+/*!****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mixin.js ***!
+  \****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11047,9 +10966,9 @@ var install = function install(Vue) {
 
 /***/ }),
 /* 22 */
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mpMixin.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/mpMixin.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11062,9 +10981,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 23 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/index.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/index.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11075,9 +10994,9 @@ _Request.default;exports.default = _default;
 
 /***/ }),
 /* 24 */
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/Request.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/Request.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11283,9 +11202,9 @@ Request = /*#__PURE__*/function () {
 
 /***/ }),
 /* 25 */
-/*!******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/dispatchRequest.js ***!
-  \******************************************************************************************************/
+/*!**************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/dispatchRequest.js ***!
+  \**************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11296,9 +11215,9 @@ function _default(config) {return (0, _index.default)(config);};exports.default 
 
 /***/ }),
 /* 26 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/adapters/index.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/adapters/index.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11404,9 +11323,9 @@ function _default(config) {return new Promise(function (resolve, reject) {
 
 /***/ }),
 /* 27 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/buildURL.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/buildURL.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11483,9 +11402,9 @@ function buildURL(url, params) {
 
 /***/ }),
 /* 28 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11624,9 +11543,9 @@ function isUndefined(val) {
 
 /***/ }),
 /* 29 */
-/*!****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/buildFullPath.js ***!
-  \****************************************************************************************************/
+/*!************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/buildFullPath.js ***!
+  \************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11654,9 +11573,9 @@ function buildFullPath(baseURL, requestedURL) {
 
 /***/ }),
 /* 30 */
-/*!*******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/isAbsoluteURL.js ***!
-  \*******************************************************************************************************/
+/*!***************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/isAbsoluteURL.js ***!
+  \***************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11678,9 +11597,9 @@ function isAbsoluteURL(url) {
 
 /***/ }),
 /* 31 */
-/*!*****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/combineURLs.js ***!
-  \*****************************************************************************************************/
+/*!*************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/helpers/combineURLs.js ***!
+  \*************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11702,9 +11621,9 @@ function combineURLs(baseURL, relativeURL) {
 
 /***/ }),
 /* 32 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/settle.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/settle.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11728,9 +11647,9 @@ function settle(resolve, reject, response) {var
 
 /***/ }),
 /* 33 */
-/*!*********************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/InterceptorManager.js ***!
-  \*********************************************************************************************************/
+/*!*****************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/InterceptorManager.js ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11788,9 +11707,9 @@ InterceptorManager;exports.default = _default;
 
 /***/ }),
 /* 34 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/mergeConfig.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/mergeConfig.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11901,9 +11820,9 @@ function _default(globalsConfig) {var config2 = arguments.length > 1 && argument
 
 /***/ }),
 /* 35 */
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/defaults.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/core/defaults.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11939,9 +11858,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 36 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils/clone.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/luch-request/utils/clone.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -14287,17 +14206,17 @@ module.exports = Array.isArray || function (arr) {
 
 /***/ }),
 /* 41 */
-/*!*******************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/util/route.js ***!
-  \*******************************************************************************/
+/*!***************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/util/route.js ***!
+  \***************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 42));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}function _createClass(Constructor, protoProps, staticProps) {if (protoProps) _defineProperties(Constructor.prototype, protoProps);if (staticProps) _defineProperties(Constructor, staticProps);return Constructor;} /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              * 路由跳转方法，该方法相对于直接使用uni.xxx的好处是使用更加简单快捷
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              * 并且带有路由拦截功能
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              */var
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  * 路由跳转方法，该方法相对于直接使用uni.xxx的好处是使用更加简单快捷
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  * 并且带有路由拦截功能
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  */var
 
 Router = /*#__PURE__*/function () {
   function Router() {_classCallCheck(this, Router);
@@ -15210,9 +15129,9 @@ if (hadRuntime) {
 
 /***/ }),
 /* 45 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/colorGradient.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/colorGradient.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15353,9 +15272,9 @@ function colorToRgba(color, alpha) {
 
 /***/ }),
 /* 46 */
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/test.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/test.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15650,9 +15569,9 @@ function regExp(o) {
 
 /***/ }),
 /* 47 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/debounce.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/debounce.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15689,9 +15608,9 @@ debounce;exports.default = _default;
 
 /***/ }),
 /* 48 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/throttle.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/throttle.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15729,9 +15648,9 @@ throttle;exports.default = _default;
 
 /***/ }),
 /* 49 */
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/index.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/index.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16444,9 +16363,9 @@ function setConfig(_ref3)
 
 /***/ }),
 /* 50 */
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/digit.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/digit.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16619,9 +16538,9 @@ function enableBoundaryChecking() {var flag = arguments.length > 0 && arguments[
 
 /***/ }),
 /* 51 */
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/config.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/config.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16662,9 +16581,9 @@ if (true) {
 
 /***/ }),
 /* 52 */
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16861,9 +16780,9 @@ _upload.default);exports.default = _default;
 
 /***/ }),
 /* 53 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/actionSheet.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/actionSheet.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16894,9 +16813,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 54 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/album.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/album.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16927,9 +16846,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 55 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/alert.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/alert.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16957,9 +16876,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 56 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16993,9 +16912,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 57 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatarGroup.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/avatarGroup.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17024,9 +16943,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 58 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/backtop.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/backtop.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17058,9 +16977,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 59 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/badge.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/badge.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17093,9 +17012,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 60 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/button.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/button.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17143,9 +17062,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 61 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/calendar.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/calendar.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17193,9 +17112,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 62 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/carKeyboard.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/carKeyboard.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17216,9 +17135,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 63 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cell.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cell.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17259,9 +17178,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 64 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cellGroup.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/cellGroup.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17284,9 +17203,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 65 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkbox.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkbox.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17319,9 +17238,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 66 */
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkboxGroup.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/checkboxGroup.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17356,9 +17275,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 67 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/circleProgress.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/circleProgress.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17379,9 +17298,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 68 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/code.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/code.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17408,9 +17327,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 69 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/codeInput.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/codeInput.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17444,9 +17363,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 70 */
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/col.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/col.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17471,9 +17390,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 71 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapse.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapse.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17496,9 +17415,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 72 */
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapseItem.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/collapseItem.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17529,9 +17448,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 73 */
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/columnNotice.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/columnNotice.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17561,9 +17480,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 74 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countDown.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countDown.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17587,9 +17506,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 75 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countTo.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/countTo.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17620,9 +17539,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 76 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/datetimePicker.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/datetimePicker.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17664,9 +17583,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 77 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/divider.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/divider.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17694,9 +17613,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 78 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/empty.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/empty.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17727,9 +17646,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 79 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/form.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/form.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17757,9 +17676,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 80 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/formItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/formItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17787,9 +17706,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 81 */
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gap.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gap.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17814,9 +17733,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 82 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/grid.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/grid.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17839,9 +17758,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 83 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gridItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/gridItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17863,9 +17782,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 84 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/icon.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/icon.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17907,9 +17826,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 
 /***/ }),
 /* 85 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/image.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/image.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17945,9 +17864,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 86 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexAnchor.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexAnchor.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17972,9 +17891,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 87 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexList.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/indexList.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17999,9 +17918,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 88 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/input.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/input.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18055,9 +17974,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 89 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/keyboard.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/keyboard.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18093,9 +18012,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 90 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/line.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/line.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18121,9 +18040,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 91 */
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/lineProgress.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/lineProgress.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18148,9 +18067,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 92 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/link.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/link.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18182,9 +18101,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 
 /***/ }),
 /* 93 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/list.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/list.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18218,9 +18137,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 94 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/listItem.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/listItem.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18241,9 +18160,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 95 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingIcon.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingIcon.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18279,9 +18198,9 @@ var _config = _interopRequireDefault(__webpack_require__(/*! ../config */ 51));f
 
 /***/ }),
 /* 96 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingPage.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadingPage.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18309,9 +18228,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 97 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadmore.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/loadmore.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18346,9 +18265,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 98 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/modal.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/modal.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18384,9 +18303,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 99 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/navbar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/navbar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18423,9 +18342,9 @@ var _color = _interopRequireDefault(__webpack_require__(/*! ../color */ 100));fu
 
 /***/ }),
 /* 100 */
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/color.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/color.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18450,9 +18369,9 @@ color;exports.default = _default;
 
 /***/ }),
 /* 101 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noNetwork.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noNetwork.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18475,9 +18394,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 102 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noticeBar.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/noticeBar.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18510,9 +18429,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 103 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/notify.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/notify.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18540,9 +18459,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 104 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberBox.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberBox.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18583,9 +18502,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 105 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberKeyboard.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/numberKeyboard.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18608,9 +18527,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 106 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/overlay.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/overlay.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18634,9 +18553,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 107 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/parse.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/parse.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18664,9 +18583,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 108 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/picker.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/picker.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18702,9 +18621,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 109 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/popup.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/popup.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18739,9 +18658,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 110 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radio.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radio.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18774,9 +18693,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 111 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radioGroup.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/radioGroup.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18812,9 +18731,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 112 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rate.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rate.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18846,9 +18765,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 113 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/readMore.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/readMore.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18876,9 +18795,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 114 */
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/row.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/row.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18901,9 +18820,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 115 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rowNotice.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/rowNotice.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18930,9 +18849,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 116 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/scrollList.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/scrollList.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18958,9 +18877,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 117 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/search.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/search.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19003,9 +18922,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 118 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/section.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/section.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19035,9 +18954,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 119 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/skeleton.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/skeleton.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19068,9 +18987,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 120 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/slider.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/slider.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19101,9 +19020,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 121 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/statusBar.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/statusBar.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19124,9 +19043,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 122 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/steps.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/steps.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19153,9 +19072,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 123 */
-/*!*******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/stepsItem.js ***!
-  \*******************************************************************************************/
+/*!***************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/stepsItem.js ***!
+  \***************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19179,9 +19098,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 124 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/sticky.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/sticky.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19207,9 +19126,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 125 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/subsection.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/subsection.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19238,9 +19157,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 126 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeAction.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeAction.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19261,9 +19180,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 127 */
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeActionItem.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipeActionItem.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19290,9 +19209,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 128 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swiper.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swiper.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19336,9 +19255,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 129 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipterIndicator.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/swipterIndicator.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19363,9 +19282,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 130 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/switch.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/switch.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19395,9 +19314,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 131 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbar.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbar.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19425,9 +19344,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 132 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbarItem.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabbarItem.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19453,9 +19372,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 133 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabs.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tabs.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19493,9 +19412,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 134 */
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tag.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tag.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19530,9 +19449,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 135 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/text.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/text.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19575,9 +19494,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 136 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/textarea.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/textarea.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19619,9 +19538,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 137 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toast.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toast.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19656,9 +19575,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 138 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toolbar.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/toolbar.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19684,9 +19603,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 139 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tooltip.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/tooltip.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19717,9 +19636,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 140 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/transition.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/transition.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19743,9 +19662,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 141 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/props/upload.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/props/upload.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19787,9 +19706,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 142 */
-/*!**********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/config/zIndex.js ***!
-  \**********************************************************************************/
+/*!******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/config/zIndex.js ***!
+  \******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19816,9 +19735,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 143 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/function/platform.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/function/platform.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19901,9 +19820,9 @@ platform;exports.default = _default;
 
 /***/ }),
 /* 144 */
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/style/main.scss ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/style/main.scss ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19913,9 +19832,9 @@ platform;exports.default = _default;
 
 /***/ }),
 /* 145 */
-/*!*******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/plugins/utils.js ***!
-  \*******************************************************/
+/*!***************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/plugins/utils.js ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20539,9 +20458,9 @@ _vue.default.filter('timeFormat', function (val) {var fmt = arguments.length > 1
 
 /***/ }),
 /* 146 */
-/*!********************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/baseUrl.js ***!
-  \********************************************************/
+/*!****************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/baseUrl.js ***!
+  \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20594,9 +20513,9 @@ courtConfig);exports.default = _default;
 
 /***/ }),
 /* 147 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/requestConfig.js ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/requestConfig.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20809,9 +20728,9 @@ $http;exports.default = _default;
 
 /***/ }),
 /* 148 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/index.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/index.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20827,9 +20746,9 @@ var _upload = _interopRequireDefault(__webpack_require__(/*! ./upload/upload.js 
 
 /***/ }),
 /* 149 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/upload.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/upload.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21121,9 +21040,9 @@ fileUpload = /*#__PURE__*/function (_request) {_inherits(fileUpload, _request);v
 
 /***/ }),
 /* 150 */
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/request.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/request.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21260,9 +21179,9 @@ request = /*#__PURE__*/function () {
 
 /***/ }),
 /* 151 */
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/utils.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/core/utils.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21372,9 +21291,9 @@ exports.dispatchRequest = dispatchRequest;var jsonpRequest = function jsonpReque
 
 /***/ }),
 /* 152 */
-/*!*************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/utils.js ***!
-  \*************************************************************************************************/
+/*!*********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/utils.js ***!
+  \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21767,9 +21686,9 @@ exports.aliUpload = aliUpload;var urlUpload = function urlUpload(requestInfo, da
 
 /***/ }),
 /* 153 */
-/*!*********************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/qiniuUploader.js ***!
-  \*********************************************************************************************************/
+/*!*****************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/qiniuUploader.js ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -21945,9 +21864,9 @@ exports.aliUpload = aliUpload;var urlUpload = function urlUpload(requestInfo, da
 
 /***/ }),
 /* 154 */
-/*!*******************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/aliUploader.js ***!
-  \*******************************************************************************************************/
+/*!***************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/aliUploader.js ***!
+  \***************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21994,9 +21913,9 @@ module.exports = getAliyunOssKey;
 
 /***/ }),
 /* 155 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/Base64.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/Base64.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22135,9 +22054,9 @@ module.exports = Base64;
 
 /***/ }),
 /* 156 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/hmac.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/hmac.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22185,9 +22104,9 @@ module.exports = Crypto;
 
 /***/ }),
 /* 157 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/crypto.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/crypto.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22379,9 +22298,9 @@ module.exports = Crypto;
 
 /***/ }),
 /* 158 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/sha1.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/uni_modules/zhouWei-request/js_sdk/request/upload/sha1.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22474,9 +22393,9 @@ module.exports = Crypto;
 
 /***/ }),
 /* 159 */
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/login.js ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/login.js ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22614,9 +22533,9 @@ function judgeLogin(callback) {var type = arguments.length > 1 && arguments[1] !
 
 /***/ }),
 /* 160 */
-/*!******************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/utils.js ***!
-  \******************************************************/
+/*!**************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/utils.js ***!
+  \**************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22860,9 +22779,9 @@ exports.setPayAssign = setPayAssign;var getLatLon = function getLatLon(tip) {
 /* 179 */,
 /* 180 */,
 /* 181 */
-/*!***************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image sync ^\.\/image.*\.png$ ***!
-  \***************************************************************************/
+/*!***********************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image sync ^\.\/image.*\.png$ ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -22900,9 +22819,9 @@ webpackContext.id = 181;
 
 /***/ }),
 /* 182 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image0.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image0.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22910,9 +22829,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 183 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image1.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image1.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22920,9 +22839,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 184 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image2.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image2.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22930,9 +22849,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 185 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image3.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image3.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22940,9 +22859,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 186 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image4.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image4.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22950,9 +22869,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 187 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image5.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image5.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22960,9 +22879,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 188 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image6.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image6.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22970,9 +22889,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 189 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image7.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image7.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -22980,9 +22899,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 
 /***/ }),
 /* 190 */
-/*!**************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/static/image/image8.png ***!
-  \**************************************************************/
+/*!**********************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/static/image/image8.png ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -23071,9 +22990,9 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4
 /* 270 */,
 /* 271 */,
 /* 272 */
-/*!******************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/mescroll-uni/mescroll-uni.js ***!
-  \******************************************************************************/
+/*!**************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/mescroll-uni/mescroll-uni.js ***!
+  \**************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -23947,9 +23866,9 @@ MeScroll.prototype.setBounce = function (isBounce) {
 
 /***/ }),
 /* 273 */
-/*!*************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/mescroll-uni/mescroll-uni-option.js ***!
-  \*************************************************************************************/
+/*!*********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/mescroll-uni/mescroll-uni-option.js ***!
+  \*********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24003,9 +23922,9 @@ GlobalOption;exports.default = _default;
 /* 284 */,
 /* 285 */,
 /* 286 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-input/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-input/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24200,9 +24119,9 @@ GlobalOption;exports.default = _default;
 /* 292 */,
 /* 293 */,
 /* 294 */
-/*!************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-line-progress/props.js ***!
-  \************************************************************************************************/
+/*!********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-line-progress/props.js ***!
+  \********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24264,9 +24183,9 @@ GlobalOption;exports.default = _default;
 /* 321 */,
 /* 322 */,
 /* 323 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-text/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-text/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24387,9 +24306,9 @@ GlobalOption;exports.default = _default;
 /* 327 */,
 /* 328 */,
 /* 329 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-popup/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-popup/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24481,9 +24400,9 @@ GlobalOption;exports.default = _default;
 /* 335 */,
 /* 336 */,
 /* 337 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-tag/props.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-tag/props.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24585,9 +24504,9 @@ GlobalOption;exports.default = _default;
 /* 348 */,
 /* 349 */,
 /* 350 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-image/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-image/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24682,9 +24601,9 @@ GlobalOption;exports.default = _default;
 /* 354 */,
 /* 355 */,
 /* 356 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-list/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-list/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24774,9 +24693,9 @@ GlobalOption;exports.default = _default;
 /* 362 */,
 /* 363 */,
 /* 364 */
-/*!********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-list-item/props.js ***!
-  \********************************************************************************************/
+/*!****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-list-item/props.js ***!
+  \****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24798,9 +24717,9 @@ GlobalOption;exports.default = _default;
 /* 370 */,
 /* 371 */,
 /* 372 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-cell/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-cell/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -24923,9 +24842,9 @@ GlobalOption;exports.default = _default;
 /* 378 */,
 /* 379 */,
 /* 380 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-navbar/props.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-navbar/props.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25022,9 +24941,9 @@ GlobalOption;exports.default = _default;
 /* 386 */,
 /* 387 */,
 /* 388 */
-/*!****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-parse/props.js ***!
-  \****************************************************************************************/
+/*!************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-parse/props.js ***!
+  \************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25076,9 +24995,9 @@ GlobalOption;exports.default = _default;
 
 /***/ }),
 /* 389 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-parse/parser.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-parse/parser.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26169,9 +26088,9 @@ module.exports = parser;
 /* 395 */,
 /* 396 */,
 /* 397 */
-/*!*******************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/components/cu-editor/util.js ***!
-  \*******************************************************************/
+/*!***************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/components/cu-editor/util.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26207,9 +26126,9 @@ var handleHtmlImage = function handleHtmlImage() {var html = arguments.length > 
 /* 410 */,
 /* 411 */,
 /* 412 */
-/*!****************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/config/componentConfig.js ***!
-  \****************************************************************/
+/*!************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/config/componentConfig.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26305,9 +26224,9 @@ var platform = uni.getSystemInfoSync().platform;var _default =
 /* 423 */,
 /* 424 */,
 /* 425 */
-/*!******************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-overlay/props.js ***!
-  \******************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-overlay/props.js ***!
+  \**************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26344,9 +26263,9 @@ var platform = uni.getSystemInfoSync().platform;var _default =
 /* 431 */,
 /* 432 */,
 /* 433 */
-/*!*****************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-search/props.js ***!
-  \*****************************************************************************************/
+/*!*************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-search/props.js ***!
+  \*************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26512,9 +26431,9 @@ var platform = uni.getSystemInfoSync().platform;var _default =
 /* 474 */,
 /* 475 */,
 /* 476 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-icon/icons.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-icon/icons.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26735,9 +26654,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 477 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-icon/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-icon/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26839,9 +26758,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 483 */,
 /* 484 */,
 /* 485 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-text/value.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-text/value.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26933,9 +26852,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 486 */
-/*!*********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/button.js ***!
-  \*********************************************************************************/
+/*!*****************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/button.js ***!
+  \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26954,9 +26873,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 487 */
-/*!***********************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/libs/mixin/openType.js ***!
-  \***********************************************************************************/
+/*!*******************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/libs/mixin/openType.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26994,9 +26913,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 493 */,
 /* 494 */,
 /* 495 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/props.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/props.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27026,9 +26945,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 /* 496 */
-/*!**************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/transition.js ***!
-  \**************************************************************************************************/
+/*!**********************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/transition.js ***!
+  \**********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27191,9 +27110,9 @@ var getClassNames = function getClassNames(name) {return {
 
 /***/ }),
 /* 497 */
-/*!****************************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-transition/nvue.ani-map.js ***!
-  \****************************************************************************************************/
+/*!************************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-transition/nvue.ani-map.js ***!
+  \************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27274,9 +27193,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 503 */,
 /* 504 */,
 /* 505 */
-/*!*********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-status-bar/props.js ***!
-  \*********************************************************************************************/
+/*!*****************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-status-bar/props.js ***!
+  \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27297,9 +27216,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 511 */,
 /* 512 */,
 /* 513 */
-/*!**********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-safe-bottom/props.js ***!
-  \**********************************************************************************************/
+/*!******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-safe-bottom/props.js ***!
+  \******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27323,9 +27242,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 526 */,
 /* 527 */,
 /* 528 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-line/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-line/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27394,9 +27313,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 557 */,
 /* 558 */,
 /* 559 */
-/*!***********************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-loading-icon/props.js ***!
-  \***********************************************************************************************/
+/*!*******************************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-loading-icon/props.js ***!
+  \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27468,9 +27387,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 565 */,
 /* 566 */,
 /* 567 */
-/*!**************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-gap/props.js ***!
-  \**************************************************************************************/
+/*!**********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-gap/props.js ***!
+  \**********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -27507,9 +27426,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /* 573 */,
 /* 574 */,
 /* 575 */
-/*!***************************************************************************************!*\
-  !*** E:/uniwords/memorizingwords_wx/node_modules/uview-ui/components/u-link/props.js ***!
-  \***************************************************************************************/
+/*!***********************************************************************************!*\
+  !*** D:/练习项目/memorizingwords_wx/node_modules/uview-ui/components/u-link/props.js ***!
+  \***********************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
