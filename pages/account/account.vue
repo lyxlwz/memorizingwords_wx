@@ -16,8 +16,6 @@
         Account
       </view>
       <view class="flex_x_center padding-top-sm">
-        <!-- <image src="static/word/img.png" >
-			</image> -->
         <image
           src="../../static/word/img.png"
           style="height: 200rpx;width: 200rpx;"
@@ -46,7 +44,6 @@ import { mapState } from 'vuex';
 export default {
   data() {
     return {
-      day: "2020-6-3",
       item: [
         {
           name: "已背单词数量",
