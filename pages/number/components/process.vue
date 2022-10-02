@@ -95,7 +95,7 @@ export default {
 .number-train {
   background: #3d5cff;
   height: 90vh;
-  padding: 60rpx 32rpx;
+  padding: 100rpx 32rpx;
   .num-btn {
     padding-top: 600rpx;
     .btn {
