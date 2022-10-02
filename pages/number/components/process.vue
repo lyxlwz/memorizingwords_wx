@@ -7,7 +7,6 @@
     <view
       v-else
       class="flex_bet text-white"
-	  
     >
       <span>请记住以下数字</span>
       <span class="flex">
@@ -30,7 +29,7 @@
       <view
         v-if="remember"
         class="btn"
-        style="padding: 20rpx 200rpx; border-radius: 50upx;"
+        style="padding: 20rpx 200rpx; border-radius: 50rpx;"
         @click="submit"
       >
         提交答案
@@ -39,7 +38,7 @@
       <view
         v-else
         class="btn"
-        style="padding: 20rpx 200rpx; border-radius: 50upx;"
+        style="padding: 20rpx 200rpx; border-radius: 50rpx;"
         @click="remember = true"
       >我记住了</view>
     </div>

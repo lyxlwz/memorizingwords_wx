@@ -10,8 +10,8 @@
       style="height: 180rpx;background: #3d5cff;"
     >
       <view
-        class="text"
-        style="color: white;font-weight: 200%;padding-top: 120rpx;font-size: 36rpx;"
+        class="text test-w-b text-white"
+        style="padding-top: 120rpx;font-size: 36rpx;"
       >
         单词管理
       </view>
@@ -38,7 +38,7 @@
               iconStyle="font-size: 50rpx;color: #d7d7d7"
               :text="`${searchCondition}:`"
               slot="prefix"
-              margin="0 3px 0 0"
+              margin="0 6rpx 0 0"
               bold
               size="32rpx"
               color="#3753E5"
@@ -171,7 +171,6 @@
 
               </view>
             </u-popup>
-            <!-- <image @click="show = true" url></image> -->
             <u--image
               :src="src"
               width="40rpx"
@@ -510,7 +509,7 @@ export default {
   width: 90%;
   height: 100rpx;
   .inp {
-    border-radius: 20upx;
+    border-radius: 20rpx;
     padding: 20rpx;
     background: #ede9fd;
 

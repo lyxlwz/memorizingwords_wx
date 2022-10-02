@@ -36,7 +36,6 @@
           class=" flex_x_center"
           style="padding-top: 80rpx  ;"
         >
-          <!--iconColor="#627bff" <button type="primary" iconColor="#3d5cff"  style="width: 55%;" @click="yes"  shape="circle">开始筛查</button> -->
           <view
             class="word-text-border but"
             style="font-size: 30rpx; padding: 20rpx 40rpx; border-radius: 50upx;"

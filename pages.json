@@ -27,9 +27,8 @@
     {
       "path": "pages/manage/manage",
       "style": {
-        "navigationBarTitleText": "单词管理",
-        "enablePullDownRefresh": false,
-        "navigationBarBackgroundColor": "#3d5cff"
+        "navigationBarTitleText": "",
+        "enablePullDownRefresh": false
       }
     },
     {

@@ -39,7 +39,7 @@
           v-else
           class="input_item"
           v-model="wordObj.word"
-          style="height:80px !important;border:1px solid #fff;border-radius:20rpx;"
+          style="height:160rpx !important;border:2rpx solid #fff;border-radius:20rpx;"
           placeholder="请输入单词"
         />
       </view>
@@ -142,7 +142,7 @@
           >
             <view
               class="tab-t word-text-border "
-              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50rpx;"
               @click="lastWord"
             >
               {{firstLoad ? '不记得' : '上一词'}}
@@ -150,7 +150,7 @@
 
             <view
               class="tab-b word-text-border "
-              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50upx;"
+              style="font-size: 32rpx; padding: 24rpx 52rpx; border-radius: 50rpx;"
               @click="nextWord"
             >
               {{lastLoad ? '开始筛查' :'下一词'}}
@@ -165,7 +165,7 @@
           <view class="flex_xy_center">
             <view
               class="look word-text-border flex_xy_center"
-              style="font-size: 40rpx; width: 250rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
+              style="font-size: 40rpx; width: 250rpx; padding: 20rpx 42rpx; border-radius: 50rpx; background: #627bff;"
               @click="look"
             >
               查看释义
@@ -178,7 +178,7 @@
           >
             <view
               class="top word-text-border "
-              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx; background: #627bff;"
+              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50rpx; background: #627bff;"
               @click="lastWord"
             >
               {{firstLoad ? '不记得' : '上一词'}}
@@ -186,7 +186,7 @@
 
             <view
               class="down word-text-border "
-              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50upx;background: #627bff;"
+              style="font-size: 40rpx; padding: 20rpx 42rpx; border-radius: 50rpx;background: #627bff;"
               @click="nextWord"
             >
               {{lastLoad ? '开始筛查' :'下一词'}}
@@ -382,7 +382,7 @@ export default {
     // padding-top: 150rpx;
     color: white;
     font-size: 100rpx;
-    font-weight: 200%;
+    font-weight: bold;
     .custom-style {
       margin: auto;
 

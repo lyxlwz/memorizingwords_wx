@@ -18,7 +18,7 @@
             v-else
             class="input_item"
             v-model="wordObj.word"
-            style="height:80px !important;border:1px solid #fff;border-radius:20rpx;"
+            style="height:160rpx !important;border:2rpx solid #fff;border-radius:20rpx;"
             placeholder="请输入单词"
           />
         </view>
@@ -151,7 +151,7 @@ export default {
     this.firstLoad = true
     this.resapi(options.id)
   },
-  components: { playWords },
+  components: { playWords, cuEditor },
   methods: {
     resapi(word_id) {
       this.$http.get('/WordSystem/wordData',
@@ -189,7 +189,7 @@ export default {
       padding-top: 150rpx;
       color: white;
       font-size: 100rpx;
-      font-weight: 200%;
+      font-weight: bold;
       .custom-style {
         // margin: 0 200rpx;
         width: 50rpx;

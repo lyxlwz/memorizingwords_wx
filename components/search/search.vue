@@ -7,7 +7,7 @@
       class="search"
       style="padding-top: 170rpx;margin: 0 5%;"
     >
-      <view style="background: white;border-radius: 20upx;padding: 20rpx;">
+      <view style="background: white;border-radius: 20rpx;padding: 20rpx;">
         <u-input
           shape="square"
           placeholder="请输入要查询的单词"
@@ -136,10 +136,10 @@ export default {
 
 <style>
 ::v-deep .u-search__content {
-  border-radius: 10px !important;
+  border-radius: 20rpx !important;
 }
 
 ::v-deep .u-cell__body {
-  padding: 10px 0 !important;
+  padding: 20rpx 0 !important;
 }
 </style>

@@ -24,7 +24,7 @@
           >
             <view
               class="answer-box word-info-bgcolor margin-right-xs"
-              :style="{'border':`1px solid${rule.color}`}"
+              :style="{'border':`2rpx solid${rule.color}`}"
             ></view>
             <span>{{ rule.title }}</span>
           </view>
@@ -53,7 +53,7 @@
     <view class="flex-row margin-top-xl">
       <view
         class="btn"
-        style="padding: 20rpx 100rpx; border-radius: 50upx;"
+        style="padding: 20rpx 100rpx; border-radius: 50rpx;"
         @click="finishTrain"
       >
         结束训练
@@ -61,7 +61,7 @@
 
       <view
         class="btn"
-        style="padding: 20rpx 100rpx; border-radius: 50upx;"
+        style="padding: 20rpx 100rpx; border-radius: 50rpx;"
         @click="practiceAgain"
       >
         再次练习
@@ -141,12 +141,12 @@ export default {
   }
 
   .checkAnswers {
-    padding-top: 50px;
+    padding-top: 100rpx;
 
     .answer-box {
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;
+      width: 40rpx;
+      height: 40rpx;
+      border-radius: 12rpx;
     }
   }
 
