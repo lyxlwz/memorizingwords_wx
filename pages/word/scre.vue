@@ -1,7 +1,7 @@
 <template>
   <view class="screen">
     <u-navbar
-      :leftText="`${wordIndex}/${wordList.length}`"
+      :leftText="wordRatio"
       bgColor="#3d5cff"
       color="#cbcdce"
       leftIconColor="#cbcdce"
@@ -247,7 +247,10 @@ export default {
   },
   components: { playWords, cuEditor },
   computed: {
-    ...mapState(['wordList', 'wordId'])
+    ...mapState(['wordList', 'wordId']),
+    wordRatio() {
+      return `${this.wordIndex}/${this.wordList.length}`
+    },
   },
   methods: {
     ...mapMutations(['setWordId', 'emptyWordList', 'emptyWorId']),
@@ -407,7 +410,7 @@ export default {
   .all {
     margin: auto;
     width: 90%;
-    height: calc(90vh - 300rpx);
+    height: calc(80vh - 300rpx);
     overflow: scroll;
     // padding-left: 20rpx;
     .exp {

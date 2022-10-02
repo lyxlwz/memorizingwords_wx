@@ -106,16 +106,12 @@ export default {
           }
         }).then(res => {
           this.setUserInfo({ token: res });
-          uni.showToast({
-            title: '登录成功',
-            duration: 2000,
-            success: () => {
-              uni.switchTab({
-                url: '/pages/index/index'
-              });
-            }
+          uni.switchTab({
+            url: '/pages/index/index'
           });
-          this.getUserInfo()
+          setTimeout(() => {
+            this.getUserInfo()
+          }, 1000)
         })
     },
     getUserInfo() {

@@ -105,7 +105,7 @@
             :src="imgUrl"
             alt=""
             mode="widthFix"
-            style="border-radius:50%; height: 300rpx; width: 200rpx;"
+            style="border-radius:50%; height: 50%; width: 50%;"
           >
         </view>
 

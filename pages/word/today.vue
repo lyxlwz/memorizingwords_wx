@@ -1,7 +1,7 @@
 <template>
   <view class="today wordPageSty">
     <u-navbar
-      :leftText="`${wordIndex}/${wordList.length}`"
+      :leftText="wordRatio"
       bgColor="#3d5cff"
       color="#cbcdce"
       leftIconColor="#cbcdce"
@@ -15,8 +15,6 @@
           style="font-size: 30rpx;"
         >
           学习日期：{{wordObj.study_date}}
-
-          444{{wordList.length}}888
         </view>
         <view
           class="word-text-light-1 flex_x_right padding-top-sm"
@@ -215,7 +213,10 @@ export default {
   },
   components: { playWords, cuEditor },
   computed: {
-    ...mapState(['wordList', 'wordId'])
+    ...mapState(['wordList', 'wordId']),
+    wordRatio() {
+      return `${this.wordIndex}/${this.wordList.length}`
+    },
   },
   methods: {
     ...mapMutations(['setWordList', 'setWordId', 'emptyWordList', 'emptyWorId']),
@@ -228,7 +229,6 @@ export default {
           date: this.day,
         }).then(res => {
           this.setWordList(res.temp_word_list)
-          console.log(this.wordList.length, 666666666);
           this.setWordId(res.temp_word_list[0])
           this.todayWord(this.wordId)
           this.firstLoad = true
@@ -353,7 +353,7 @@ export default {
   .all {
     margin: auto;
     width: 90%;
-    height: calc(90vh - 300rpx);
+    height: calc(80vh - 300rpx);
     overflow: scroll;
     // padding-left: 20rpx;
     .title {

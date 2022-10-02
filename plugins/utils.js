@@ -944,6 +944,6 @@ Vue.prototype.$infoMsg = function (message = '') {
 Vue.prototype.$errorMsg = function (message = '') {
   getApp().globalData.toast.show({
     message,
-    type: 'error'
+    type: 'error',
   })
 }
