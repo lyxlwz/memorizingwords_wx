@@ -2,7 +2,7 @@
   "name": "memorizingwords_wx",
   "appid": "__UNI__6768C31",
   "description": "memorizingwords_wx",
-  "transformPx": true,
+  "transformPx": false,
   "icons": [
     {
       "sizes": "分辨率，192x192",

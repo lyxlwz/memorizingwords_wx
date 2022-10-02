@@ -88,20 +88,20 @@ export default {
 .Fallible {
   background: #3d5cff;
   height: 100vh;
- 
+
   .text {
     font-size: 40rpx;
     font-weight: 1000;
   }
-  
+
   .but {
     background: #627bff;
     width: 200rpx;
     // height: 20%;
   }
 }
- ::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
-  	  height: 50rpx;
-  }
+::v-deep .u-input__content__field-wrapper__field {
+  height: 50rpx;
+}
 </style>
 

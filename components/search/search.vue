@@ -16,7 +16,7 @@
           clearable
           height="90rpx"
           border="none"
-		  fontSize="50rpx"
+          fontSize="50rpx"
           :focus="boo"
           confirmType="search"
           v-model="keyword"
@@ -135,7 +135,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 ::v-deep .u-search__content {
   border-radius: 20rpx !important;
 }
@@ -143,7 +143,7 @@ export default {
 ::v-deep .u-cell__body {
   padding: 20rpx 0 !important;
 }
-::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
-	height: 50rpx;
-}
+/* ::v-deep .u-input__content__field-wrapper__field {
+  height: 50rpx;
+} */
 </style>

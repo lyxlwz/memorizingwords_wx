@@ -60,7 +60,7 @@
               >
                 <view class="title flex">
                   <circle-progress
-                    v-if="!pop && !popupShow"
+                    v-if="!popupShow"
                     :canvasId="`canvas${index}`"
                     active-color="#009DFF"
                     :total="plan.planTotalNum"
@@ -221,9 +221,10 @@ export default {
     getData() { },
     tosearch() {
       this.pop = true;
-    },
-    onRaised() {
       this.popupShow = true
+    },
+    onRaised(val) {
+      this.popupShow = val
     },
   }
 }
@@ -303,7 +304,7 @@ export default {
 ::v-deep .u-input--square[data-v-fdbb9fe6] {
   background-color: #fff !important;
 }
-::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
-	height: 50rpx;
+::v-deep .u-input__content__field-wrapper__field {
+  height: 50rpx;
 }
 </style>
