@@ -236,6 +236,14 @@ export default {
       this.lastLoad = this.wordId == this.wordList[this.wordList.length - 1]
       this.$http.get('/WordSystem/wordData',
         { word_id }).then(res => {
+          if (res != null) {
+            for (let key in res) {
+              if (res[key] === null) {
+                res[key] = ''
+              }
+            }
+            this.wordObj = { ...res };
+          }
           this.wordObj = res
           this.wordObj.word_voice = `${base.wordVoiceUrl}${res.word_voice}`
           this.$nextTick(() => {
