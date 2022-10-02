@@ -12,7 +12,7 @@
           shape="square"
           placeholder="请输入要查询的单词"
           placeholderStyle="font-size: 30rpx;"
-		  @clear = "clearall"
+          @clear="clearall"
           clearable
           height="90rpx"
           border="none"
@@ -121,10 +121,10 @@ export default {
       this.queryData.page = this.queryData.page + 1
       this.confirmInput()
     },
-	clearall(){
-		this.keyword = '',
-		this.confirmInput()
-	},
+    clearall() {
+      this.keyword = '',
+        this.indexList = []
+    },
     word(word) {
       uni.navigateTo({
         url: `/pages/word/results?id=${word.id}`

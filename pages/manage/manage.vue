@@ -29,6 +29,7 @@
           border="none"
           confirmType="search"
           v-model="searchVal"
+          @clear="clearSearchVal"
           @confirm="confirmInput"
         >
           <template slot="prefix">
@@ -186,6 +187,7 @@
     <!-- 列表-->
     <view class="u-page margin-top-lg">
       <u-list
+        v-if="indexList.length > 0"
         @scrolltolower="scrolltolower"
         height="calc(80vh - 180rpx)"
         pagingEnabled
@@ -224,6 +226,14 @@
           </u-cell>
         </u-list-item>
       </u-list>
+      <view
+        v-else
+        class="flex-center"
+        style="height:calc(80vh - 180rpx)"
+      >
+        <u-empty>
+        </u-empty>
+      </view>
     </view>
     <z-navigation></z-navigation>
   </view>
@@ -305,7 +315,7 @@ export default {
       firstLoad: true,
       selConditions: {
         name: '今日学习单词',
-        val: 'word'
+        val: 'study_date'
       },
       modVal: '',
       modConditions: {
@@ -327,6 +337,24 @@ export default {
     // 隐藏原生的tabbar
     uni.hideTabBar();
   },
+  watch: {
+    searchVal(val) {
+      if (val) {
+        this.queryData = {
+          count: 20,
+          page: 1,
+        }
+      }
+    },
+    modVal(val) {
+      if (val) {
+        this.queryData = {
+          count: 20,
+          page: 1,
+        }
+      }
+    },
+  },
   methods: {
     manageapi() {
       this.$http.get('/WordSystem/wordData',
@@ -347,6 +375,7 @@ export default {
         this.searchCondition = this.selConditions.name
         this.close()
       } else {
+        this.indexList = []
         this.updateWord()
       }
     },
@@ -427,7 +456,11 @@ export default {
     close() {
       this.show = false
     },
+    clearSearchVal() {
+      this.manageapi()
+    },
     confirmInput() {
+      this.serachList = []
       this.$http.post('/WordSystem/wordData',
         { [this.selConditions.val]: this.searchVal, ...this.queryData }).then(res => {
           this.isSerach = true
