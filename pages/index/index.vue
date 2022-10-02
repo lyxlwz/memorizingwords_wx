@@ -4,7 +4,7 @@
       <view class="search">
         <view
           @click="tosearch"
-          style="background: white;border-radius: 20upx;padding: 20rpx;"
+          style="background: white;border-radius: 20rpx;padding: 20rpx;"
         >
           <u-input
             shape="square"
@@ -49,7 +49,7 @@
         </view>
 
         <view class="plan padding-top-lg">
-          <text style="font-size: 100%;font-weight: 800;">学习计划</text>
+          <text style="font-size: 40rpx;font-weight: 800;">学习计划</text>
           <view class="aplan margin-top-sm">
             <view class="train">
               <view
@@ -90,13 +90,13 @@
           <view>
             <view
               class="big "
-              style="font-weight: 800;font-size: 130%;color: #4d5156; padding-bottom: 10px;"
+              style="font-weight: 800;font-size: 50rpx;color: #4d5156; padding-bottom: 20rpx;"
             >
               箴言
             </view>
             <view
               class="Small test-w-b word-text-middle"
-              style="font-size: 80%;"
+              style="font-size: 30rpx;"
             >
               {{text}}
             </view>
@@ -105,7 +105,7 @@
             :src="imgUrl"
             alt=""
             mode="widthFix"
-            style="border-radius:50%; height: 50%; width: 50%;"
+            style="border-radius:50%; height: 300rpx; width: 200rpx;"
           >
         </view>
 
@@ -241,21 +241,21 @@ export default {
       // padding-top:30px;
       padding: 20rpx;
       background: #ffff;
-      border-radius: 20upx;
+      border-radius: 20rpx;
       box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 
       .title {
         color: #afafaf;
         font-weight: 900;
         // margin-left: 5px;
-        font-size: 80%;
+        font-size: 20rpx;
       }
 
       .number {
         padding: 2rpx 0;
         // font-weight: 900;
         font-weight: bold;
-        font-size: 110%;
+        font-size: 60rpx;
       }
     }
 
@@ -263,13 +263,13 @@ export default {
       .aplan {
         padding: 40rpx;
         background: #ffff;
-        border-radius: 20upx;
+        border-radius: 20rpx;
         box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 
         .format {
           display: flex;
           justify-content: space-between;
-          font-size: 90%;
+          font-size: 35rpx;
 
           .percentage {
             display: flex;
@@ -285,7 +285,7 @@ export default {
 
     .Proverbs {
       box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
-      border-radius: 20upx;
+      border-radius: 20rpx;
       padding: 40rpx 40rpx;
       height: 300rpx;
     }
@@ -293,7 +293,7 @@ export default {
 }
 
 ::v-deep .u-search__content {
-  border-radius: 10px !important;
+  border-radius: 20rpx !important;
 }
 
 ::v-deep .u-input--radius,

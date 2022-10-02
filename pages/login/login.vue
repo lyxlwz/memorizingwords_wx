@@ -152,7 +152,7 @@ export default {
 
   .input_item {
     font-size: 28rpx;
-    border: 0px;
+    border: 0rpx;
     flex: 1;
     height: 88rpx;
     width: 100%;

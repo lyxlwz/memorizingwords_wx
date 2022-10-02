@@ -124,7 +124,7 @@ export default {
   .text {
     color: white;
     font-weight: 900;
-    font-size: 130%;
+    font-size: 50rpx;
     padding-top: 100rpx;
     padding-left: 40rpx;
   }
@@ -136,13 +136,13 @@ export default {
       margin: 35rpx;
       width: 90%;
       background: #ffff;
-      border-radius: 20upx;
+      border-radius: 20rpx;
       box-shadow: 20rpx 20rpx 20rpx 0 rgba(0, 0, 0, 0.1);
 
       .title {
         padding-top: 30rpx;
         font-weight: 550;
-        font-size: 90%;
+        font-size: 35rpx;
       }
 
       .english {
@@ -150,7 +150,7 @@ export default {
         color: #afafaf;
         // padding: 1rpx 0;
         font-weight: 600;
-        font-size: 80%;
+        font-size: 30rpx;
       }
     }
   }
