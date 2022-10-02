@@ -164,50 +164,63 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _vuex = __webpack_require__(/*! vuex */ 10);function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var _default =
 {
   data: function data() {
     return {
@@ -215,33 +228,22 @@ var _default =
       idlist: [] };
 
   },
-  methods: {
-    yes: function yes() {
+  computed: _objectSpread({},
+  (0, _vuex.mapState)(['wordList', 'wordId'])),
 
+  methods: _objectSpread(_objectSpread({},
+  (0, _vuex.mapMutations)(['setWordList', 'setWordId', 'emptyWordList', 'emptyWorId'])), {}, {
+    yes: function yes() {var _this = this;
       this.$http.get('/WordLearn/errorProneWordScreening',
-      { count: this.keyword },
-      {
-        header: {//默认 无 说明：请求头
-          // 'Content-Type': 'multipart/form-data; charset=UTF-8'
-        } }).
-      then(function (data) {
-        // uni.navigateTo({
-        // 	url: `/pages/word/scre?word_id=${data[0]}&type=3`
+      { count: this.keyword }).then(function (res) {
+        _this.setWordList(res.temp_word_list);
+        _this.setWordId(res.temp_word_list[0]);
+        uni.navigateTo({
+          url: "/pages/word/scre?word_id=".concat(res.temp_word_list[0], "&type=3") });
 
-        // });
-        // this.$router.push({
-        //  path:'/pages/word/scre',
-        //  query:{
-        //   idlist: data.temp_word_list,
-        //   type:3
-        //  }
-        // })
       });
-
-      // uni.navigateTo({
-      // 	url: '/pages/word/scre'
-      // });
-    } } };exports.default = _default;
+    } }) };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 

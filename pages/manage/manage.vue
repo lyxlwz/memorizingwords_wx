@@ -153,10 +153,11 @@
                   style="display: flex;padding: 2rpx 50rpx;margin: auto;justify-content: space-between;"
                 >
                   <button
-                    type="primary"
+                    type="info"
                     plain=true
                     iconColor="#3d5cff"
-                    style="width: 40%;"
+					color="#3d5cff"
+                    style="width: 40%;border-color:#3d5cff;color: #3d5cff;"
                     @click="no"
                   >取消</button>
                   <button

@@ -10634,7 +10634,7 @@ var mutations = {
     }
   },
   // 清空单词list
-  emptyWordList: function emptyWordList(state) {
+  emptyWordList: function emptyWordList() {
     state.wordList = [];
 
 
@@ -10644,7 +10644,7 @@ var mutations = {
 
   },
   // 清空单词id
-  emptyWorId: function emptyWorId(state) {
+  emptyWorId: function emptyWorId() {
     state.wordId = '';
 
 
