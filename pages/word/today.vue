@@ -15,6 +15,8 @@
           style="font-size: 30rpx;"
         >
           学习日期：{{wordObj.study_date}}
+
+          444{{wordList.length}}888
         </view>
         <view
           class="word-text-light-1 flex_x_right padding-top-sm"
@@ -226,6 +228,7 @@ export default {
           date: this.day,
         }).then(res => {
           this.setWordList(res.temp_word_list)
+          console.log(this.wordList.length, 666666666);
           this.setWordId(res.temp_word_list[0])
           this.todayWord(this.wordId)
           this.firstLoad = true

@@ -126,6 +126,7 @@ export default {
     },
     onRaised() {
       this.popupShow = true;
+      this.$emit('onRaised', true)
     }
   }
 };

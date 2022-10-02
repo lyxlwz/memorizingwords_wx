@@ -54,17 +54,14 @@
               :closeOnClickOverlay="false"
               @close="close"
             >
-              <view
-                class="sys"
-                style="height: 1000rpx;width: 100%;"
-              >
+              <view class="sys">
                 <view
                   class="test-w-b"
                   style="padding: 40rpx 300rpx;"
                 >设置</view>
                 <view
                   class="lg "
-                  style=" height: calc(800rpx - 50rpx);overflow: scroll;"
+                  style=" height: calc(600rpx - 50rpx);overflow: scroll;"
                 >
                   <view v-if="firstLoad">
                     <view
@@ -150,7 +147,7 @@
                 </view>
                 <view
                   class="butt"
-                  style="display: flex;padding: 2rpx 50rpx;margin: auto;justify-content: space-between;"
+                  style="display: flex;padding: 20rpx 50rpx;margin: auto;justify-content: space-between;"
                 >
                   <button
                     type="info"
@@ -513,8 +510,9 @@ export default {
     padding: 20rpx;
     background: #ede9fd;
 
-    ::v-deep .uni-input-input {
+    ::v-deep .u-input__content__field-wrapper__field {
       font-weight: bolder;
+      height: 50rpx;
     }
   }
   // .u-page__tag-item {

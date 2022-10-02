@@ -60,7 +60,7 @@
               >
                 <view class="title flex">
                   <circle-progress
-                    v-if="!pop"
+                    v-if="!pop && !popupShow"
                     :canvasId="`canvas${index}`"
                     active-color="#009DFF"
                     :total="plan.planTotalNum"
@@ -115,7 +115,7 @@
     <search :show.sync="pop"></search>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
-    <z-navigation></z-navigation>
+    <z-navigation @onRaised="onRaised"></z-navigation>
   </view>
 </template>
 
@@ -154,6 +154,7 @@ export default {
         planTotalNum: 0,
       },
       ],
+      popupShow: false
     };
   },
   computed: {
@@ -220,6 +221,9 @@ export default {
     getData() { },
     tosearch() {
       this.pop = true;
+    },
+    onRaised() {
+      this.popupShow = true
     },
   }
 }
