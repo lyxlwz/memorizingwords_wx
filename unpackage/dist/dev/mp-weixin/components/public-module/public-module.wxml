@@ -1,1 +1,0 @@
-<view class="data-v-503f4466"><z-loading vue-id="90ac6d40-1" class="data-v-503f4466" bind:__l="__l"></z-loading><applets-bind-user-info vue-id="90ac6d40-2" class="data-v-503f4466" bind:__l="__l"></applets-bind-user-info><u-toast vue-id="90ac6d40-3" type="error" data-ref="uToast" class="data-v-503f4466 vue-ref" bind:__l="__l"></u-toast></view>

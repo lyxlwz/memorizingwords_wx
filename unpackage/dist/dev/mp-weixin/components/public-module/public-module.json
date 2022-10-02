@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "z-loading": "/uni_modules/z-loading/components/z-loading/z-loading",
-    "applets-bind-user-info": "/components/applets-bind-userInfo/applets-bind-userInfo",
-    "u-toast": "/node-modules/uview-ui/components/u-toast/u-toast"
-  },
-  "component": true
-}
