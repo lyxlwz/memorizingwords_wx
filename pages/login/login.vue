@@ -1,7 +1,7 @@
 <template>
   <view class="login">
     <!-- 公共组件-每个页面必须引入 -->
-    <public-module></public-module>
+    <public-module ref="publicModule"></public-module>
     <view
       class="text"
       style="padding-top: 130rpx; padding-left: 50rpx;"
@@ -106,18 +106,16 @@ export default {
           }
         }).then(res => {
           this.setUserInfo({ token: res });
-          this.getUserInfo()
-          console.log(55555555555);
           uni.showToast({
             title: '登录成功',
             duration: 2000,
             success: () => {
-              console.log(55555555555);
               uni.switchTab({
                 url: '/pages/index/index'
               });
             }
           });
+          this.getUserInfo()
         })
     },
     getUserInfo() {

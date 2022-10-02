@@ -1,6 +1,7 @@
 import request from "@/uni_modules/zhouWei-request/js_sdk/request";
 import store from '@/store';
 import base from '@/config/baseUrl';
+import Vue from 'vue';
 // #ifdef H5
 import {
   h5Login
@@ -151,20 +152,14 @@ $http.dataFactory = async function (res) {
     if (httpData.success || httpData.code == 200) {
       // 返回正确的结果(then接受数据)
       return Promise.resolve(httpData.data);
-    } else if (httpData.code == "1000" || httpData.code == "1001" || httpData.code == 1100 || httpData.code == 402) {
-      uni.showToast({
-        title: httpData.info || httpData.msg,
-        icon: 'none'
-      });
+    } else if (httpData.code == 401 || httpData.code == 402) {
+      Vue.prototype.$errorMsg(httpData.info || httpData.msg)
       return Promise.reject({
         statusCode: 0,
         errMsg: httpData.info || httpData.msg
       });
     } else if (httpData.code == "0") {
-      uni.showToast({
-        title: httpData.info || httpData.msg,
-        icon: 'none'
-      });
+      Vue.prototype.$errorMsg(httpData.info || httpData.msg)
       setTimeout(() => {
         uni.reLaunch({
           url: '/pages/login/login'
@@ -176,10 +171,7 @@ $http.dataFactory = async function (res) {
       });
     }
   } else {
-    uni.showToast({
-      title: httpData.info || httpData.msg,
-      icon: 'none'
-    });
+    Vue.prototype.$errorMsg(httpData.info || httpData.msg)
     // 返回错误的结果(catch接受数据)
     return Promise.reject({
       statusCode: res.response.statusCode,
@@ -194,11 +186,10 @@ $http.requestError = function (e) {
   if (e.statusCode === 0) {
     throw e;
   } else {
-    console.log(e);
-    uni.showToast({
-      title: "网络错误，请检查一下网络",
-      icon: "none"
-    });
+    getApp().globalData.toast.show({
+      message: "网络错误，请检查一下网络",
+      type: 'error',
+    })
   }
 }
 export default $http;

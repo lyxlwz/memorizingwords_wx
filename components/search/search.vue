@@ -106,12 +106,12 @@ export default {
         {
           word: this.keyword,
           ...this.queryData
-        },
-        {
-          header: { //默认 无 说明：请求头
-            // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-          }
         }).then(data => {
+          if (data.data.length == 0 && data.current_page === 1) {
+            this.indexList = []
+            this.$errorMsg('暂无该单词，请重新输入')
+            return
+          }
           this.indexList.push(...data.data)
         });
 

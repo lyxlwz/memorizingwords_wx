@@ -926,3 +926,24 @@ uni.showModal = function (options) {
   options.complete && options.complete();
 };
 // #endif
+
+
+// 通知窗口
+Vue.prototype.$successMsg = function (message = '') {
+  getApp().globalData.toast.show({
+    message,
+    type: 'success',
+  })
+}
+Vue.prototype.$infoMsg = function (message = '') {
+  getApp().globalData.toast.show({
+    message,
+    type: 'default',
+  })
+}
+Vue.prototype.$errorMsg = function (message = '') {
+  getApp().globalData.toast.show({
+    message,
+    type: 'error'
+  })
+}

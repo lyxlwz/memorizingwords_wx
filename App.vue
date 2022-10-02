@@ -77,7 +77,10 @@ export default {
     }
     // #endif
   },
-  onHide: function () { }
+  onHide: function () { },
+  globalData: {
+    toast: Object,//全局提示，必须在页面初始化
+  },
 };
 </script>
 

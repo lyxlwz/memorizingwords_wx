@@ -18,19 +18,12 @@
 
 <script>
 export default {
-  watch: {
-    flushInfoMsg(nval) {
-      this.$refs.uToast.show({
-        message: this.infoMsg,
-        type: 'success',
-      });
-    },
-    flushErrorMsg(nval) {
-      this.$refs.uToast.show({
-        message: this.errorMsg,
-        type: 'error',
-      });
-    }
+  mounted() {
+    //初始化赋值，如果使用的页面未初始化会报错，就算已经其他页面已经初始化过了也会看不到，所以建议用全局导航栏u-navbar
+    getApp().globalData.toast = this.$refs.uToast
+  },
+  methods: {
+
   }
 };
 </script>

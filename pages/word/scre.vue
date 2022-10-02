@@ -234,7 +234,6 @@ export default {
     }
   },
   onLoad(options) {
-    console.log(options, 55555555555);
     this.todayWord(options.word_id)
   },
   onShow() {
@@ -330,15 +329,13 @@ export default {
     },
     getScreenWords(data) {
       this.$http.get('/WordLearn/wordScreening', { ...data }).then((res) => {
-        console.log(res, 55555555);
         let successMsg = '单词不记得，临时表及筛查表更新成功'
         if (data.error_count === 1) {
           successMsg = '单词不记得，临时表及筛查表更新成功'
         } else if (data.error_count === 0) {
           successMsg = '单词记得，临时表及筛查表更新成功'
         }
-        console.log(successMsg, 55555);
-        // this.$successMsg(successMsg)
+        this.$successMsg(successMsg)
       })
     },
     toNewWord(wordId) {
@@ -349,8 +346,6 @@ export default {
             word: this.wordObj.word,
             connect_in_the_mind: this.wordObj.connect_in_the_mind
           }).then(res => {
-            // todo
-            console.log(res, 55555555);
             this.isEditorMind = false
             this.isEditorWord = false
             this.wordObj = res[0]
@@ -359,6 +354,7 @@ export default {
             this.$nextTick(() => {
               this.$refs.playWords.creatAudio()
             })
+            this.$successMsg('单词更新成功!')
           })
       } else {
         this.setWordId(wordId)

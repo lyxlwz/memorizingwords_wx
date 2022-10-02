@@ -78,9 +78,9 @@
                         :text="item.name"
                         size="large"
                         :name="index"
-                        :bgColor="item.bgColor"
-                        :borderColor="item.borderColor"
-                        :color="item.color"
+                        :bgColor="item.checked ? '#3d5cff': '#d7d7d7'"
+                        :borderColor="item.checked ? '#3d5cff' : '#d7d7d7'"
+                        :color="item.checked ? '#FFFF':'#a6a6a6'"
                         @click="radioClick"
                       >
                       </u-tag>
@@ -88,26 +88,26 @@
                   </view>
                   <view v-else>
                     <!-- <view class="padding-top-lg">
-                    <view
-                      class="test-w-b"
-                      style="font-size: 100%;padding-left: 20rpx;"
-                    >选择</view>
-                  </view>
-                  <view class="u-page__tag-item-i flex text-center">
-                    <u-tag
-                      v-for="(aitem, index) in aradios"
-                      class="atag-item "
-                      :key="index"
-                      :text="aitem.aname"
-                      size="large"
-                      :name="index"
-                      :bgColor="aitem.bgColor"
-                      :borderColor="aitem.borderColor"
-                      :color="aitem.color"
-                      @click="aradioClick"
-                    >
-                    </u-tag>
-                  </view> -->
+                      <view
+                        class="test-w-b"
+                        style="font-size: 100%;padding-left: 20rpx;"
+                      >选择</view>
+                    </view>
+                    <view class="u-page__tag-item-i flex text-center">
+                      <u-tag
+                        v-for="(aitem, index) in aradios"
+                        class="atag-item "
+                        :key="index"
+                        :text="aitem.aname"
+                        size="large"
+                        :name="index"
+                        :bgColor="aitem.checked ? '#3d5cff': '#d7d7d7'"
+                        :borderColor="aitem.checked ? '#3d5cff' : '#d7d7d7'"
+                        :color="aitem.checked ? '#FFFF':'#a6a6a6'"
+                        @click="aradioClick"
+                      >
+                      </u-tag>
+                    </view> -->
                     <view class="padding-top-lg">
                       <view
                         class="test-w-b"
@@ -122,9 +122,9 @@
                         :text="aitem.aname"
                         size="large"
                         :name="index"
-                        :bgColor="aitem.bgColor"
-                        :borderColor="aitem.borderColor"
-                        :color="aitem.color"
+                        :bgColor="aitem.checked ? '#3d5cff': '#d7d7d7'"
+                        :borderColor="aitem.checked ? '#3d5cff' : '#d7d7d7'"
+                        :color="aitem.checked ? '#FFFF':'#a6a6a6'"
                         @click="yaradioClick"
                       >
                       </u-tag>
@@ -237,97 +237,65 @@ export default {
       all: '',
       src: '/static/word/sear.png',
       indexList: [],
-      searchCondition: '单词',
+      searchCondition: '今日学习单词',
       searchVal: 'Product Design',
       urls: [],
       show: false,
       yaradios: [{
         checked: false,
         aname: "首次学习日期",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
         val: 'first_study_date'
       },
       {
         checked: false,
         aname: "单词",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
         val: 'word'
       },
       {
         checked: false,
         aname: "释义",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
         val: 'paraphrase'
       }],
       aradios: [{
         checked: false,
         aname: "全选",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
       },
       {
         checked: false,
         aname: "已选单词",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
 
       }],
-      radios: [{
-        checked: false,
-        name: "单词",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'word',
-      },
-      {
-        checked: false,
-        name: "释义",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'paraphrase',
-      },
-      {
-        checked: false,
-        name: "首次学习日期",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'first_study_date',
-      },
-      {
-        checked: false,
-        name: "学习日期",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'word',
-      },
-      {
-        checked: false,
-        name: "分组序号",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'group_id',
-      },
-      {
-        checked: false,
-        name: "今日学习单词",
-        bgColor: "#d7d7d7",
-        borderColor: "#d7d7d7",
-        color: "#a6a6a6",
-        val: 'study_date',
-      }
+      radios: [
+        {
+          checked: true,
+          name: "今日学习单词",
+          val: 'study_date',
+        },
+        {
+          checked: false,
+          name: "单词",
+          val: 'word',
+        },
+        {
+          checked: false,
+          name: "释义",
+          val: 'paraphrase',
+        },
+        {
+          checked: false,
+          name: "首次学习日期",
+          val: 'first_study_date',
+        },
+        {
+          checked: false,
+          name: "学习日期",
+          val: 'word',
+        },
+        {
+          checked: false,
+          name: "分组序号",
+          val: 'group_id',
+        },
       ],
       queryData: {
         count: 20,//单页数据条数
@@ -336,7 +304,7 @@ export default {
       selDataIds: [],
       firstLoad: true,
       selConditions: {
-        name: '单词',
+        name: '今日学习单词',
         val: 'word'
       },
       modVal: '',
@@ -384,7 +352,7 @@ export default {
     },
     updateWord() {
       if (this.selDataIds.length == 0) {
-        console.log('请选择单词');
+        this.$errorMsg('请选择单词!')
         return
       }
       this.$http.get('/WordSystem/wordUpdate',
@@ -395,7 +363,7 @@ export default {
             this.manageapi()
           }
           this.close()
-          // this.$successMsg('更新成功！')
+          this.$successMsg('单词更新成功!')
         });
     },
     no() {
@@ -415,13 +383,6 @@ export default {
             name: item.name,
             val: item.val
           }
-          item.bgColor = "#3d5cff"
-          item.borderColor = "#3d5cff"
-          item.color = "#FFFF"
-        } else {
-          item.bgColor = "#d7d7d7"
-          item.borderColor = "#d7d7d7"
-          item.color = "#a6a6a6"
         }
       })
 
@@ -433,16 +394,6 @@ export default {
           aitem.checked = !aitem.checked
         } else {
           aitem.checked = false
-        }
-
-        if (aitem.checked) {
-          aitem.bgColor = "#3d5cff"
-          aitem.borderColor = "#3d5cff"
-          aitem.color = "#FFFF"
-        } else {
-          aitem.bgColor = "#d7d7d7"
-          aitem.borderColor = "#d7d7d7"
-          aitem.color = "#a6a6a6"
         }
       })
 
@@ -461,13 +412,6 @@ export default {
             name: aitem.name,
             val: aitem.val
           }
-          aitem.bgColor = "#3d5cff"
-          aitem.borderColor = "#3d5cff"
-          aitem.color = "#FFFF"
-        } else {
-          aitem.bgColor = "#d7d7d7"
-          aitem.borderColor = "#d7d7d7"
-          aitem.color = "#a6a6a6"
         }
       })
 
