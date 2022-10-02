@@ -95,4 +95,7 @@ export default {
     // height: 20%;
   }
 }
+::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
+  	  height: 50rpx;
+  }
 </style>

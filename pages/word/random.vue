@@ -24,13 +24,13 @@
           class=" word-Border-radius"
           style="width: 60%;height: 100rpx; background: #516dff; padding-top:20rpx"
         >
-          <u--input
+          <u-input
             border="none"
-            fontSize="40rpx"
+            fontSize="50rpx"
             inputAlign="center"
             color="#CBCDCE"
             v-model="keyword"
-          ></u--input>
+          ></u-input>
         </view>
       </view>
       <view
@@ -88,15 +88,20 @@ export default {
 .Fallible {
   background: #3d5cff;
   height: 100vh;
+ 
   .text {
     font-size: 40rpx;
     font-weight: 1000;
   }
+  
   .but {
     background: #627bff;
     width: 200rpx;
     // height: 20%;
   }
 }
+ ::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
+  	  height: 50rpx;
+  }
 </style>
 

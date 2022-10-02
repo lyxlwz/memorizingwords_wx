@@ -9,7 +9,7 @@
           <u-input
             shape="square"
             placeholder="请输入要查询的单词"
-            placeholderStyle="font-size: 30rpx;"
+            placeholderStyle="font-size: 20rpx;"
             clearable
             height="90rpx"
             disabledColor="white"
@@ -248,7 +248,7 @@ export default {
         color: #afafaf;
         font-weight: 900;
         // margin-left: 5px;
-        font-size: 20rpx;
+        font-size: 25rpx;
       }
 
       .number {

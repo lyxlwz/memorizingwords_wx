@@ -11,7 +11,7 @@
         <u-input
           shape="square"
           placeholder="请输入要查询的单词"
-          placeholderStyle="font-size: 30rpx;"
+          placeholderStyle="font-size: 20rpx;"
           @clear="clearall"
           clearable
           height="90rpx"
