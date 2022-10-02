@@ -11,11 +11,12 @@
         <u-input
           shape="square"
           placeholder="请输入要查询的单词"
-          placeholderStyle="font-size: 20rpx;"
+          placeholderStyle="font-size: 40rpx;"
           @clear="clearall"
           clearable
           height="90rpx"
           border="none"
+		  fontSize="50rpx"
           :focus="boo"
           confirmType="search"
           v-model="keyword"
@@ -141,5 +142,8 @@ export default {
 
 ::v-deep .u-cell__body {
   padding: 20rpx 0 !important;
+}
+::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
+	height: 50rpx;
 }
 </style>

@@ -9,7 +9,7 @@
           <u-input
             shape="square"
             placeholder="请输入要查询的单词"
-            placeholderStyle="font-size: 20rpx;"
+            placeholderStyle="font-size: 40rpx;"
             clearable
             height="90rpx"
             disabledColor="white"
@@ -247,7 +247,7 @@ export default {
         color: #afafaf;
         font-weight: 900;
         // margin-left: 5px;
-        font-size: 25rpx;
+        font-size: 35rpx;
       }
 
       .number {
@@ -298,5 +298,8 @@ export default {
 ::v-deep .u-input--radius,
 ::v-deep .u-input--square[data-v-fdbb9fe6] {
   background-color: #fff !important;
+}
+::v-deep .u-input__content__field-wrapper__field.data-v-fdbb9fe6{
+	height: 50rpx;
 }
 </style>

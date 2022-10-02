@@ -173,5 +173,7 @@ export default {
 .btn {
   background: #3d5cff;
   border-radius: 20rpx;
+  height: 90rpx;
+  font-size: 35rpx;
 }
 </style>
