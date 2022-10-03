@@ -50,7 +50,10 @@
       v-if="bg"
       class="footer_station"
     ></view>
-    <search :show.sync="popupShow"></search>
+    <search
+      :show.sync="popupShow"
+      @close="close"
+    ></search>
     <!-- <z-popup
       v-model="popupShow"
       type="center"
@@ -67,6 +70,10 @@ export default {
     bg: {
       type: Boolean,
       default: true
+    },
+    closeEverything: {
+      type: Boolean,
+      default: true,
     }
   },
 
@@ -127,7 +134,10 @@ export default {
     onRaised() {
       this.popupShow = true;
       this.$emit('onRaised', true)
-    }
+    },
+    close() {
+      this.$emit('close', false)
+    },
   }
 };
 </script>

@@ -112,10 +112,16 @@
       </view>
 
     </view>
-    <search :show.sync="pop"></search>
+    <search
+      :show.sync="pop"
+      @close="popupShow = false"
+    ></search>
     <!-- 公共组件-每个页面必须引入 -->
     <public-module></public-module>
-    <z-navigation @onRaised="onRaised"></z-navigation>
+    <z-navigation
+      @onRaised="onRaised"
+      @close="popupShow = false"
+    ></z-navigation>
   </view>
 </template>
 
@@ -132,6 +138,7 @@ export default {
       imgUrl: '',
       //  per:'',
       pop: false,
+      popupShow: false,
       toword: '',
       planList: [{
         planName: '记忆训练',
@@ -154,7 +161,6 @@ export default {
         planTotalNum: 0,
       },
       ],
-      popupShow: false
     };
   },
   computed: {

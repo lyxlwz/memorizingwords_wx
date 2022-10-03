@@ -101,6 +101,7 @@ export default {
   methods: {
     close() {
       this.$emit('update:show', false)
+      this.$emit('close', false)
     },
 
     confirmInput() {
